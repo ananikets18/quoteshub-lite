@@ -23,7 +23,6 @@ class UserSeeder extends Seeder
             'password' => Hash::make('Admin123!'),
             'role' => 'admin',
             'is_active' => true,
-            'is_verified' => true,
             'email_verified_at' => now(),
             'bio' => 'System Administrator',
         ]);
@@ -36,7 +35,6 @@ class UserSeeder extends Seeder
             'password' => Hash::make('Moderator123!'),
             'role' => 'moderator',
             'is_active' => true,
-            'is_verified' => true,
             'email_verified_at' => now(),
             'bio' => 'Content Moderator',
         ]);
@@ -49,7 +47,6 @@ class UserSeeder extends Seeder
             'password' => Hash::make('User123!'),
             'role' => 'user',
             'is_active' => true,
-            'is_verified' => true,
             'email_verified_at' => now(),
             'bio' => 'Regular user account',
         ]);
@@ -62,7 +59,6 @@ class UserSeeder extends Seeder
             'password' => Hash::make('Banned123!'),
             'role' => 'user',
             'is_active' => false, // Banned
-            'is_verified' => true,
             'email_verified_at' => now(),
             'bio' => 'This account has been suspended',
         ]);
@@ -75,8 +71,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('Unverified123!'),
             'role' => 'user',
             'is_active' => true,
-            'is_verified' => false, // Not verified
-            'email_verified_at' => null,
+            'email_verified_at' => null, // Not verified
             'bio' => 'Email not verified yet',
         ]);
 
@@ -85,6 +80,6 @@ class UserSeeder extends Seeder
         $this->command->info('   Moderator: moderator@quoteshub.com / Moderator123!');
         $this->command->info('   User: user@quoteshub.com / User123!');
         $this->command->info('   Banned: banned@quoteshub.com / Banned123! (is_active=false)');
-        $this->command->info('   Unverified: unverified@quoteshub.com / Unverified123! (not verified)');
+        $this->command->info('   Unverified: unverified@quoteshub.com / Unverified123! (email not verified)');
     }
 }

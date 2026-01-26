@@ -30,12 +30,19 @@ class User extends Authenticatable
         'website',
         'location',
         'role',
+        
+        // Cached counter columns - NOT source of truth
+        // These are denormalized for performance
+        // Update via events/observers to keep in sync
         'quotes_count',
         'followers_count',
         'following_count',
-        'daily_streak',
-        'last_active_date',
-        'is_verified',
+        
+        // Activity tracking
+        'daily_streak',      // TODO: Consider moving to user_stats table
+        'last_active_at',    // Changed from last_active_date for precision
+        
+        // Status flags
         'is_active',
     ];
 
@@ -59,9 +66,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'last_active_date' => 'date',
-            'is_verified' => 'boolean',
+            'last_active_at' => 'datetime',  // Changed from date to datetime
             'is_active' => 'boolean',
+            
+            // Cached counters (denormalized)
             'quotes_count' => 'integer',
             'followers_count' => 'integer',
             'following_count' => 'integer',
@@ -153,11 +161,14 @@ class User extends Authenticatable
 
     /**
      * Update daily streak
+     * 
+     * TODO: Consider moving streak logic to a separate service
+     * or computing from activity logs instead of storing in users table
      */
     public function updateDailyStreak(): void
     {
         $today = now()->toDateString();
-        $lastActive = $this->last_active_date?->toDateString();
+        $lastActive = $this->last_active_at?->toDateString();
 
         if ($lastActive === $today) {
             return; // Already active today
@@ -173,7 +184,7 @@ class User extends Authenticatable
             $this->daily_streak = 1;
         }
 
-        $this->last_active_date = now();
+        $this->last_active_at = now();
         $this->save();
     }
 
