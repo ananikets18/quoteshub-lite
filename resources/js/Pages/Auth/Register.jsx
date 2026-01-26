@@ -1,13 +1,9 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
+        username: '',
         email: '',
         password: '',
         password_confirmation: '',
@@ -15,106 +11,113 @@ export default function Register() {
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('register'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
 
     return (
-        <GuestLayout>
+        <>
             <Head title="Register" />
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
+            <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
+                <h1 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>Register</h1>
 
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                    />
+                <form onSubmit={submit}>
+                    {/* Name */}
+                    <div style={{ marginBottom: '15px' }}>
+                        <label htmlFor="name" style={{ display: 'block', marginBottom: '5px' }}>Name</label>
+                        <input
+                            id="name"
+                            type="text"
+                            value={data.name}
+                            onChange={(e) => setData('name', e.target.value)}
+                            required
+                            autoFocus
+                            style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        />
+                        {errors.name && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.name}</div>}
+                    </div>
 
-                    <InputError message={errors.name} className="mt-2" />
-                </div>
+                    {/* Username */}
+                    <div style={{ marginBottom: '15px' }}>
+                        <label htmlFor="username" style={{ display: 'block', marginBottom: '5px' }}>Username</label>
+                        <input
+                            id="username"
+                            type="text"
+                            value={data.username}
+                            onChange={(e) => setData('username', e.target.value)}
+                            required
+                            style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        />
+                        {errors.username && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.username}</div>}
+                    </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
+                    {/* Email */}
+                    <div style={{ marginBottom: '15px' }}>
+                        <label htmlFor="email" style={{ display: 'block', marginBottom: '5px' }}>Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={data.email}
+                            onChange={(e) => setData('email', e.target.value)}
+                            required
+                            style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        />
+                        {errors.email && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.email}</div>}
+                    </div>
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                    />
+                    {/* Password */}
+                    <div style={{ marginBottom: '15px' }}>
+                        <label htmlFor="password" style={{ display: 'block', marginBottom: '5px' }}>Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            value={data.password}
+                            onChange={(e) => setData('password', e.target.value)}
+                            required
+                            style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        />
+                        {errors.password && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.password}</div>}
+                    </div>
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
+                    {/* Confirm Password */}
+                    <div style={{ marginBottom: '15px' }}>
+                        <label htmlFor="password_confirmation" style={{ display: 'block', marginBottom: '5px' }}>Confirm Password</label>
+                        <input
+                            id="password_confirmation"
+                            type="password"
+                            value={data.password_confirmation}
+                            onChange={(e) => setData('password_confirmation', e.target.value)}
+                            required
+                            style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        />
+                        {errors.password_confirmation && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.password_confirmation}</div>}
+                    </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        required
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
+                    {/* Submit Button */}
+                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Link href={route('login')} style={{ color: '#0066cc', textDecoration: 'underline' }}>
+                            Already registered?
+                        </Link>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            style={{
+                                padding: '10px 20px',
+                                backgroundColor: '#0066cc',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: processing ? 'not-allowed' : 'pointer',
+                                opacity: processing ? 0.6 : 1
+                            }}
+                        >
+                            {processing ? 'Registering...' : 'Register'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </>
     );
 }
