@@ -159,7 +159,7 @@ export default function Register() {
                             }}
                         />
                         <div id="password-hint" style={{ fontSize: '12px', color: '#666', marginTop: '3px' }}>
-                            Minimum 8 characters, must include letters and numbers
+                            Min 8 characters, must include uppercase, lowercase, and numbers
                         </div>
                         {errors.password && (
                             <div id="password-error" role="alert" style={{ color: '#dc3545', fontSize: '14px', marginTop: '5px' }}>

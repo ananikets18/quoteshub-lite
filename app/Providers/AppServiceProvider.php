@@ -25,8 +25,9 @@ class AppServiceProvider extends ServiceProvider
         // Set password validation rules
         \Illuminate\Validation\Rules\Password::defaults(function () {
             return \Illuminate\Validation\Rules\Password::min(8)
-                ->letters()
-                ->numbers()
+                ->letters()      // Must contain at least one letter
+                ->numbers()      // Must contain at least one number
+                ->mixedCase()    // Must contain both uppercase and lowercase
                 ->max(255);
         });
     }

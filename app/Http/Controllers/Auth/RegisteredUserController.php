@@ -42,8 +42,8 @@ class RegisteredUserController extends Controller
             'password.min' => 'Password must be at least 8 characters long.',
         ]);
 
-        // Trim email to remove any whitespace
-        $validated['email'] = trim($validated['email']);
+        // Normalize email and username (trim + lowercase email)
+        $validated['email'] = strtolower(trim($validated['email']));
         $validated['username'] = trim($validated['username']);
 
         $user = User::create([

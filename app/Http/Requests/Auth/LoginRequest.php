@@ -50,7 +50,7 @@ class LoginRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'email' => trim($this->email ?? ''),
+            'email' => strtolower(trim($this->email ?? '')),
         ]);
     }
 
