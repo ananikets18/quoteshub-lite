@@ -39,6 +39,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me/saved', [UserController::class, 'savedQuotes']);
     Route::get('/me/collections', [UserController::class, 'collections']);
     Route::post('/me/streak', [UserController::class, 'updateStreak']);
+    
+    // Avatar & Cover Image Upload
+    Route::post('/me/avatar', [App\Http\Controllers\Api\AvatarController::class, 'upload']);
+    Route::delete('/me/avatar', [App\Http\Controllers\Api\AvatarController::class, 'deleteAvatar']);
+    Route::post('/me/cover', [App\Http\Controllers\Api\AvatarController::class, 'uploadCover']);
+    Route::delete('/me/cover', [App\Http\Controllers\Api\AvatarController::class, 'deleteCover']);
 
     // Quote management
     Route::post('/quotes', [QuoteController::class, 'store']);

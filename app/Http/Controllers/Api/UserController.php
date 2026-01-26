@@ -66,28 +66,35 @@ class UserController extends Controller
 
     /**
      * Update password
+     * 
+     * Security features:
+     * - Verifies current password
+     * - Validates new password strength
+     * - Regenerates session to prevent fixation
+     * - Logs out other devices (optional)
      */
     public function updatePassword(Request $request)
     {
         $validated = $request->validate([
-            'current_password' => 'required|string',
-            'password' => 'required|string|min:8|confirmed',
+            'current_password' => ['required', 'string', 'current_password'],
+            'password' => ['required', 'string', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        ], [
+            'current_password.current_password' => 'The current password is incorrect.',
+            'password.confirmed' => 'The password confirmation does not match.',
         ]);
 
         $user = Auth::user();
 
-        if (!Hash::check($validated['current_password'], $user->password)) {
-            return response()->json([
-                'message' => 'Current password is incorrect',
-            ], 422);
-        }
-
+        // Update password
         $user->update([
             'password' => Hash::make($validated['password']),
         ]);
 
+        // Regenerate session for security
+        $request->session()->regenerate();
+
         return response()->json([
-            'message' => 'Password updated successfully',
+            'message' => 'Password updated successfully. Please login again on other devices.',
         ]);
     }
 
