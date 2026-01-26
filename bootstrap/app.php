@@ -16,10 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
             \App\Http\Middleware\PreventBackHistory::class,
+            \App\Http\Middleware\EnsureUserIsActive::class,
         ]);
 
         // Register middleware aliases
         $middleware->alias([
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'moderator' => \App\Http\Middleware\EnsureUserIsModerator::class,
+            'active' => \App\Http\Middleware\EnsureUserIsActive::class,
             'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
     })

@@ -53,8 +53,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Follow system
     Route::post('/users/{username}/follow', [UserController::class, 'follow']);
 
-    // Admin routes
-    Route::prefix('admin')->group(function () {
+    // Admin routes (require admin role)
+    Route::prefix('admin')->middleware('admin')->group(function () {
         Route::get('/quotes/pending', [AdminController::class, 'pendingQuotes']);
         Route::post('/quotes/{id}/approve', [AdminController::class, 'approveQuote']);
         Route::post('/quotes/{id}/reject', [AdminController::class, 'rejectQuote']);
