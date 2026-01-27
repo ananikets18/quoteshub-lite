@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { Heart, Bookmark, Share2, Eye, MoreVertical } from 'lucide-react';
+import { Heart, Bookmark, Share2, Eye, MoreVertical, Edit2, Trash2, Flag } from 'lucide-react';
 import QuoteDetailModal from './QuoteDetailModal';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import ReportModal from './ReportModal';
 
 // Professional color schemes with subtle accents
 const colorSchemes = [
@@ -15,33 +17,63 @@ const colorSchemes = [
     { bg: '#ECFDF5', accent: '#14B8A6', text: '#1F2937', border: '#99F6E4' }, // Teal accent
 ];
 
-export default function QuoteCard({ quote, compact = false }) {
+export default function QuoteCard({ quote, compact = false, auth }) {
     const [isLiked, setIsLiked] = useState(quote.is_liked || false);
     const [isSaved, setIsSaved] = useState(quote.is_saved || false);
     const [likesCount, setLikesCount] = useState(quote.likes_count || 0);
     const [savesCount, setSavesCount] = useState(quote.saves_count || 0);
     const [showModal, setShowModal] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isDeleted, setIsDeleted] = useState(false);
 
-    const handleLike = async (e) => {
+    const isOwner = auth?.user?.id === quote.user_id;
+
+    // Don't render if deleted
+    if (isDeleted) {
+        return null;
+    }
+
+    const handleLike = (e) => {
         e.stopPropagation();
-
-        router.post(`/api/quotes/${quote.id}/like`, {}, {
+        
+        // Optimistic update - instant UI feedback
+        const newIsLiked = !isLiked;
+        setIsLiked(newIsLiked);
+        setLikesCount(newIsLiked ? likesCount + 1 : likesCount - 1);
+        
+        // Background sync with server
+        router.post(`/quotes/${quote.id}/like`, {}, {
+            preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                setIsLiked(!isLiked);
-                setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+            only: [],
+            onError: () => {
+                // Revert on error
+                setIsLiked(!newIsLiked);
+                setLikesCount(newIsLiked ? likesCount : likesCount + 1);
             },
         });
     };
 
-    const handleSave = async (e) => {
+    const handleSave = (e) => {
         e.stopPropagation();
-
-        router.post(`/api/quotes/${quote.id}/save`, {}, {
+        
+        // Optimistic update - instant UI feedback
+        const newIsSaved = !isSaved;
+        setIsSaved(newIsSaved);
+        setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
+        
+        // Background sync with server
+        router.post(`/quotes/${quote.id}/save`, {}, {
+            preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                setIsSaved(!isSaved);
-                setSavesCount(isSaved ? savesCount - 1 : savesCount + 1);
+            only: [],
+            onError: () => {
+                // Revert on error
+                setIsSaved(!newIsSaved);
+                setSavesCount(newIsSaved ? savesCount : savesCount + 1);
             },
         });
     };
@@ -57,8 +89,10 @@ export default function QuoteCard({ quote, compact = false }) {
                     url: window.location.origin + `/quotes/${quote.id}`,
                 });
 
-                router.post(`/api/quotes/${quote.id}/share`, {}, {
+                router.post(`/quotes/${quote.id}/share`, {}, {
                     preserveScroll: true,
+                    preserveState: true,
+                    only: [],
                 });
             } catch (err) {
                 console.log('Share cancelled');
@@ -68,6 +102,42 @@ export default function QuoteCard({ quote, compact = false }) {
 
     const handleCardClick = () => {
         setShowModal(true);
+    };
+
+    const handleEdit = (e) => {
+        e.stopPropagation();
+        router.visit(`/quotes/${quote.id}/edit`);
+    };
+
+    const handleDelete = (e) => {
+        e.stopPropagation();
+        setShowMenu(false);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        setIsDeleting(true);
+        router.delete(`/quotes/${quote.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setIsDeleted(true);
+                setShowDeleteModal(false);
+            },
+            onError: () => {
+                setIsDeleting(false);
+                setShowDeleteModal(false);
+                alert('Failed to delete quote. Please try again.');
+            },
+        });
+    };
+
+    const handleReport = (data) => {
+        router.post(`/quotes/${quote.id}/report`, data, {
+            preserveScroll: true,
+            onSuccess: () => {
+                alert('Report submitted successfully!');
+            },
+        });
     };
 
     const colorScheme = colorSchemes[quote.id % colorSchemes.length];
@@ -109,20 +179,65 @@ export default function QuoteCard({ quote, compact = false }) {
                         </div>
                     </div>
 
-                    <button className="p-2 rounded-full hover:bg-black/5 transition-colors">
-                        <MoreVertical className="w-5 h-5" style={{ color: colorScheme.text }} />
-                    </button>
-                </div>
+                    <div className="relative">
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowMenu(!showMenu);
+                            }}
+                            className="p-2 rounded-full hover:bg-black/5 transition-colors"
+                        >
+                            <MoreVertical className="w-5 h-5" style={{ color: colorScheme.text }} />
+                        </button>
 
-                {/* Quote Text */}
-                <div className={`${compact ? 'mb-3' : 'mb-6'}`}>
-                    <p 
-                        className={`${compact ? 'text-lg' : 'text-2xl'} font-serif leading-relaxed mb-3 font-medium`}
-                        style={{ color: colorScheme.text }}
-                    >
-                        "{quote.content}"
-                    </p>
-                    {quote.author && (
+                            {showMenu && (
+                                <div 
+                                    className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {isOwner ? (
+                                        <>
+                                            <button
+                                                onClick={handleEdit}
+                                                className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                                <span>Edit Quote</span>
+                                            </button>
+                                            <button
+                                                onClick={handleDelete}
+                                                className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                                <span>Delete Quote</span>
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <button
+                                            onClick={() => {
+                                                setShowMenu(false);
+                                                setShowReportModal(true);
+                                            }}
+                                            className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                        >
+                                            <Flag className="w-4 h-4" />
+                                            <span>Report Quote</span>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Quote Text */}
+                    <div className={`${compact ? 'mb-3' : 'mb-6'}`}>
+                        <p 
+                            className={`${compact ? 'text-lg' : 'text-2xl'} font-serif leading-relaxed mb-3 font-medium`}
+                            style={{ color: colorScheme.text }}
+                        >
+                            "{quote.content}"
+                        </p>
+                        {quote.author && (
                         <p 
                             className={`${compact ? 'text-sm' : 'text-base'} font-semibold flex items-center gap-2`}
                             style={{ color: colorScheme.accent }}
@@ -218,6 +333,22 @@ export default function QuoteCard({ quote, compact = false }) {
                 quote={quote}
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
+            />
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmationModal
+                show={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={confirmDelete}
+                processing={isDeleting}
+            />
+
+            {/* Report Modal */}
+            <ReportModal
+                show={showReportModal}
+                onClose={() => setShowReportModal(false)}
+                quoteId={quote.id}
+                onSubmit={handleReport}
             />
         </div>
     );

@@ -5,20 +5,20 @@ import {
     Type,
     Palette,
     Tag,
-    Send,
+    Save,
     ArrowLeft,
     Check
 } from 'lucide-react';
 
-export default function CreateQuote({ categories }) {
-    const { data, setData, post, processing, errors } = useForm({
-        content: '',
-        author: '',
-        source: '',
-        background_color: '#FFFFFF',
-        accent_color: '#8B5CF6',
-        background_gradient: '#FFFFFF,#8B5CF6',
-        category_ids: [],
+export default function EditQuote({ quote, categories }) {
+    const { data, setData, put, processing, errors } = useForm({
+        content: quote.content || '',
+        author: quote.author || '',
+        source: quote.source || '',
+        background_color: quote.background_gradient?.split(',')[0] || '#FFFFFF',
+        accent_color: quote.background_gradient?.split(',')[1] || '#8B5CF6',
+        background_gradient: quote.background_gradient || '#FFFFFF,#8B5CF6',
+        category_ids: quote.categories?.map(c => c.id) || [],
     });
 
     const [activeTab, setActiveTab] = useState('text'); // 'text', 'style', 'tags'
@@ -39,7 +39,7 @@ export default function CreateQuote({ categories }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('quotes.store'));
+        put(route('quotes.update', quote.id));
     };
 
     const toggleCategory = (categoryId) => {
@@ -51,7 +51,7 @@ export default function CreateQuote({ categories }) {
     };
 
     return (
-        <AppLayout title="Create Quote" showHeader={false} showNav={false}>
+        <AppLayout title="Edit Quote" showHeader={false} showNav={false}>
             {/* Custom Full Screen Layout */}
             <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
 
@@ -63,7 +63,7 @@ export default function CreateQuote({ categories }) {
                     >
                         <ArrowLeft className="w-6 h-6" />
                     </button>
-                    <h1 className="font-bold text-lg text-gray-900 dark:text-white">New Quote</h1>
+                    <h1 className="font-bold text-lg text-gray-900 dark:text-white">Edit Quote</h1>
                     <button
                         onClick={handleSubmit}
                         disabled={processing || !data.content}
@@ -72,8 +72,8 @@ export default function CreateQuote({ categories }) {
                                 : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-xl hover:scale-105'
                             }`}
                     >
-                        <span>Post</span>
-                        <Send className="w-4 h-4" />
+                        <span>Update</span>
+                        <Save className="w-4 h-4" />
                     </button>
                 </header>
 
@@ -94,7 +94,7 @@ export default function CreateQuote({ categories }) {
                                     className={`font-serif leading-relaxed break-words whitespace-pre-wrap transition-all duration-300 font-medium ${data.content.length > 200 ? 'text-xl md:text-2xl' : 'text-2xl md:text-4xl'}`}
                                     style={{ color: '#1F2937' }}
                                 >
-                                    {data.content || 'Start typing to create your masterpiece...'}
+                                    {data.content || 'Start typing to edit your quote...'}
                                 </p>
 
                                 {(data.author || data.source) && (

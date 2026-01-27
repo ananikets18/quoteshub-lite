@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import { TrendingUp, Clock, Star, Filter } from 'lucide-react';
 
 export default function Feed({ quotes: initialQuotes, categories }) {
+    const { auth } = usePage().props;
     const [quotes, setQuotes] = useState(initialQuotes.data || []);
     const [loading, setLoading] = useState(false);
     const [activeFilter, setActiveFilter] = useState('latest');
@@ -133,7 +134,7 @@ export default function Feed({ quotes: initialQuotes, categories }) {
                 ) : (
                     <>
                         {quotes.map((quote) => (
-                            <QuoteCard key={quote.id} quote={quote} />
+                            <QuoteCard key={quote.id} quote={quote} auth={auth} />
                         ))}
 
                         {loading && (

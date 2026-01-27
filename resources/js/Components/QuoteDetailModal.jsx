@@ -49,24 +49,44 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
         }
     };
 
-    const handleLike = async (e) => {
+    const handleLike = (e) => {
         e.stopPropagation();
-        router.post(`/api/quotes/${quote.id}/like`, {}, {
+        
+        // Optimistic update - instant UI feedback
+        const newIsLiked = !isLiked;
+        setIsLiked(newIsLiked);
+        setLikesCount(newIsLiked ? likesCount + 1 : likesCount - 1);
+        
+        // Background sync with server
+        router.post(`/quotes/${quote.id}/like`, {}, {
+            preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                setIsLiked(!isLiked);
-                setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+            only: [],
+            onError: () => {
+                // Revert on error
+                setIsLiked(!newIsLiked);
+                setLikesCount(newIsLiked ? likesCount : likesCount + 1);
             },
         });
     };
 
-    const handleSave = async (e) => {
+    const handleSave = (e) => {
         e.stopPropagation();
-        router.post(`/api/quotes/${quote.id}/save`, {}, {
+        
+        // Optimistic update - instant UI feedback
+        const newIsSaved = !isSaved;
+        setIsSaved(newIsSaved);
+        setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
+        
+        // Background sync with server
+        router.post(`/quotes/${quote.id}/save`, {}, {
+            preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                setIsSaved(!isSaved);
-                setSavesCount(isSaved ? savesCount - 1 : savesCount + 1);
+            only: [],
+            onError: () => {
+                // Revert on error
+                setIsSaved(!newIsSaved);
+                setSavesCount(newIsSaved ? savesCount : savesCount + 1);
             },
         });
     };
@@ -80,8 +100,10 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
                     url: window.location.origin + `/quotes/${quote.id}`,
                 });
 
-                router.post(`/api/quotes/${quote.id}/share`, {}, {
+                router.post(`/quotes/${quote.id}/share`, {}, {
+                    preserveState: true,
                     preserveScroll: true,
+                    only: [],
                 });
             } catch (err) {
                 console.log('Share cancelled');
