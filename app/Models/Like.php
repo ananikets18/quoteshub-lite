@@ -31,6 +31,7 @@ class Like extends Model
         return $this->belongsTo(Quote::class);
     }
 
+
     /**
      * Boot the model
      */
@@ -40,6 +41,12 @@ class Like extends Model
 
         static::created(function ($like) {
             $like->quote->increment('likes_count');
+            
+            // Track interaction for recommendations
+            if ($like->user) {
+                $recommendationService = app(\App\Services\RecommendationService::class);
+                $recommendationService->trackInteraction($like->user, $like->quote, 'like');
+            }
         });
 
         static::deleted(function ($like) {
@@ -47,3 +54,4 @@ class Like extends Model
         });
     }
 }
+

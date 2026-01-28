@@ -4,11 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Quote;
 use App\Models\Category;
+use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FeedController extends Controller
 {
+    protected $recommendationService;
+
+    public function __construct(RecommendationService $recommendationService)
+    {
+        $this->recommendationService = $recommendationService;
+    }
+
     public function index(Request $request)
     {
         $query = Quote::with(['user', 'categories', 'tags'])
@@ -25,6 +33,20 @@ class FeedController extends Controller
                 break;
             case 'popular':
                 $query->popular();
+                break;
+            case 'foryou':
+                // Personalized feed handled separately
+                if (auth()->check()) {
+                    $quotes = $this->getForYouFeed($request);
+                    $categories = Category::active()->ordered()->get();
+                    
+                    return Inertia::render('Feed', [
+                        'quotes' => $quotes,
+                        'categories' => $categories,
+                    ]);
+                }
+                // Fall back to latest for guests
+                $query->latest();
                 break;
             default:
                 $query->latest();
@@ -47,5 +69,37 @@ class FeedController extends Controller
             'quotes' => $quotes,
             'categories' => $categories,
         ]);
+    }
+
+    /**
+     * Get personalized "For You" feed
+     */
+    protected function getForYouFeed(Request $request)
+    {
+        $user = auth()->user();
+        $page = $request->get('page', 1);
+        $perPage = 20;
+
+        // Get personalized recommendations
+        $allRecommendations = $this->recommendationService->getPersonalizedFeed($user, $perPage * 3);
+        
+        // Paginate manually
+        $quotes = $allRecommendations->forPage($page, $perPage);
+
+        // Add user interaction flags
+        $quotes->transform(function ($quote) use ($user) {
+            $quote->is_liked = $quote->isLikedBy($user);
+            $quote->is_saved = $quote->isSavedBy($user);
+            return $quote;
+        });
+
+        // Create pagination structure
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $quotes,
+            $allRecommendations->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
     }
 }

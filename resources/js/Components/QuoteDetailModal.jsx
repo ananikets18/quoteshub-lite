@@ -22,18 +22,58 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
     const [savesCount, setSavesCount] = useState(quote?.saves_count || 0);
     const [copied, setCopied] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
+    const [viewStartTime, setViewStartTime] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
+            
+            // Track view start time
+            const startTime = Date.now();
+            setViewStartTime(startTime);
+            
+            // Track view when modal opens
+            if (quote?.id) {
+                fetch(`/api/quotes/${quote.id}/view`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    },
+                    body: JSON.stringify({
+                        source: 'modal',
+                        duration: 0,
+                    }),
+                }).catch(err => console.log('View tracking failed:', err));
+            }
         } else {
             document.body.style.overflow = 'unset';
+            
+            // Track duration when modal closes
+            if (viewStartTime && quote?.id) {
+                const duration = Math.floor((Date.now() - viewStartTime) / 1000);
+                if (duration > 0) {
+                    fetch(`/api/quotes/${quote.id}/view`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        },
+                        body: JSON.stringify({
+                            source: 'modal',
+                            duration: duration,
+                        }),
+                    }).catch(err => console.log('Duration tracking failed:', err));
+                }
+                setViewStartTime(null);
+            }
         }
 
         return () => {
             document.body.style.overflow = 'unset';
         };
-    }, [isOpen]);
+    }, [isOpen, quote?.id]);
+
 
     const handleClose = () => {
         setIsClosing(true);

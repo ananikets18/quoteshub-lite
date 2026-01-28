@@ -128,6 +128,30 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the user's category preferences for recommendations
+     */
+    public function categoryPreferences(): HasMany
+    {
+        return $this->hasMany(\App\Models\UserCategoryPreference::class);
+    }
+
+    /**
+     * Get the user's author preferences for recommendations
+     */
+    public function authorPreferences(): HasMany
+    {
+        return $this->hasMany(\App\Models\UserAuthorPreference::class);
+    }
+
+    /**
+     * Get the user's interaction pattern
+     */
+    public function interactionPattern(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\UserInteractionPattern::class);
+    }
+
+    /**
      * Check if user is following another user
      */
     public function isFollowing(User $user): bool

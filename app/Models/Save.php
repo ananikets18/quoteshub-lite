@@ -41,6 +41,12 @@ class Save extends Model
 
         static::created(function ($save) {
             $save->quote->increment('saves_count');
+            
+            // Track interaction for recommendations
+            if ($save->user) {
+                $recommendationService = app(\App\Services\RecommendationService::class);
+                $recommendationService->trackInteraction($save->user, $save->quote, 'save');
+            }
         });
 
         static::deleted(function ($save) {

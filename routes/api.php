@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\RecommendationController;
+use App\Http\Controllers\Api\UserPreferenceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,6 +24,13 @@ Route::get('/users/{username}', [UserController::class, 'show']);
 Route::get('/users/{username}/quotes', [UserController::class, 'quotes']);
 Route::get('/users/{username}/followers', [UserController::class, 'followers']);
 Route::get('/users/{username}/following', [UserController::class, 'following']);
+Route::get('/users/{username}/similar', [UserController::class, 'similar']);
+Route::get('/users/discover/suggested', [UserController::class, 'suggested']);
+
+// Recommendation routes (public but enhanced with auth)
+Route::get('/quotes/{quote}/similar', [RecommendationController::class, 'similar']);
+Route::get('/categories/{category}/quotes', [RecommendationController::class, 'byCategory']);
+Route::post('/quotes/{quote}/view', [RecommendationController::class, 'trackView']);
 
 // Search routes
 Route::get('/search/quotes', [SearchController::class, 'quotes']);
@@ -45,6 +54,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/me/avatar', [App\Http\Controllers\Api\AvatarController::class, 'deleteAvatar']);
     Route::post('/me/cover', [App\Http\Controllers\Api\AvatarController::class, 'uploadCover']);
     Route::delete('/me/cover', [App\Http\Controllers\Api\AvatarController::class, 'deleteCover']);
+
+    // Personalized recommendations (requires auth)
+    Route::get('/recommendations/for-you', [RecommendationController::class, 'forYou']);
+    Route::get('/recommendations/authors', [RecommendationController::class, 'authors']);
+    Route::get('/recommendations/collaborative', [RecommendationController::class, 'collaborative']);
+
+    // User preferences and "not interested" features
+    Route::post('/preferences/not-interested', [UserPreferenceController::class, 'markNotInterested']);
+    Route::post('/preferences/undo-not-interested', [UserPreferenceController::class, 'undoNotInterested']);
+    Route::get('/preferences', [UserPreferenceController::class, 'getPreferences']);
+    Route::post('/preferences/recalculate', [UserPreferenceController::class, 'recalculatePreferences']);
 
     // Quote management
     Route::post('/quotes', [QuoteController::class, 'store']);

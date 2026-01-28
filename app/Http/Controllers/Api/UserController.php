@@ -245,4 +245,89 @@ class UserController extends Controller
             'daily_streak' => $user->daily_streak,
         ]);
     }
+
+    /**
+     * Get suggested users to follow (similar authors)
+     */
+    public function suggested(Request $request)
+    {
+        if (!Auth::check()) {
+            // For guests, return trending authors
+            $users = User::has('quotes')
+                ->where('is_active', true)
+                ->orderByDesc('quotes_count')
+                ->orderByDesc('followers_count')
+                ->limit(10)
+                ->get();
+
+            return response()->json($users);
+        }
+
+        $user = Auth::user();
+        
+        // Get users the current user is already following
+        $followingIds = $user->following()->pluck('following_id')->toArray();
+        $followingIds[] = $user->id; // Exclude self
+
+        // Find active authors not already followed
+        $suggestedUsers = User::has('quotes')
+            ->where('is_active', true)
+            ->whereNotIn('id', $followingIds)
+            ->withCount(['quotes' => function ($q) {
+                $q->approved();
+            }])
+            ->orderByDesc('quotes_count')
+            ->orderByDesc('followers_count')
+            ->limit($request->get('limit', 10))
+            ->get();
+
+        return response()->json($suggestedUsers);
+    }
+
+    /**
+     * Get similar authors based on a specific user
+     */
+    public function similar($username, Request $request)
+    {
+        $targetUser = User::where('username', $username)
+            ->orWhere('id', $username)
+            ->firstOrFail();
+
+        // Get categories this author writes about
+        $authorCategories = $targetUser->quotes()
+            ->approved()
+            ->with('categories')
+            ->get()
+            ->pluck('categories')
+            ->flatten()
+            ->pluck('id')
+            ->unique()
+            ->toArray();
+
+        if (empty($authorCategories)) {
+            return response()->json([]);
+        }
+
+        // Find other authors who write in similar categories
+        $excludeIds = [$targetUser->id];
+        if (Auth::check()) {
+            $excludeIds[] = Auth::id();
+        }
+
+        $similarAuthors = User::whereHas('quotes', function ($q) use ($authorCategories) {
+                $q->approved()
+                  ->whereHas('categories', function ($catQuery) use ($authorCategories) {
+                      $catQuery->whereIn('categories.id', $authorCategories);
+                  });
+            })
+            ->whereNotIn('id', $excludeIds)
+            ->withCount(['quotes' => function ($q) {
+                $q->approved();
+            }])
+            ->orderByDesc('quotes_count')
+            ->limit($request->get('limit', 10))
+            ->get();
+
+        return response()->json($similarAuthors);
+    }
 }

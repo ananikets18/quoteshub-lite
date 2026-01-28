@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { Heart, Bookmark, Share2, Eye, MoreVertical, Edit2, Trash2, Flag } from 'lucide-react';
+import { Heart, Bookmark, Share2, Eye, MoreVertical, Edit2, Trash2, Flag, EyeOff, CheckCircle } from 'lucide-react';
 import QuoteDetailModal from './QuoteDetailModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import ReportModal from './ReportModal';
+import axios from 'axios';
 
 // Professional color schemes with subtle accents
 const colorSchemes = [
@@ -28,13 +29,23 @@ export default function QuoteCard({ quote, compact = false, auth }) {
     const [showReportModal, setShowReportModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isDeleted, setIsDeleted] = useState(false);
+    const [isHidden, setIsHidden] = useState(false);
+    const [isFadingOut, setIsFadingOut] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
     const isOwner = auth?.user?.id === quote.user_id;
 
-    // Don't render if deleted
-    if (isDeleted) {
+    // Don't render if deleted or hidden (not interested)
+    if (isDeleted || isHidden) {
         return null;
     }
+
+    const showNotification = (message) => {
+        setToastMessage(message);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+    };
 
     const handleLike = (e) => {
         e.stopPropagation();
@@ -140,11 +151,50 @@ export default function QuoteCard({ quote, compact = false, auth }) {
         });
     };
 
+    const handleNotInterested = async (e) => {
+        e.stopPropagation();
+        setShowMenu(false);
+
+        try {
+            // Get CSRF token
+            const csrfToken = document.head.querySelector('meta[name="csrf-token"]')?.content;
+            
+            const response = await axios.post('/api/preferences/not-interested', {
+                item_type: 'quote',
+                item_id: quote.id,
+                reason: 'dont_like',
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                withCredentials: true,
+            });
+
+            if (response.data.success) {
+                // Show success message
+                showNotification('Quote hidden. We\'ll show you less like this.');
+                
+                // Start fade out animation
+                setIsFadingOut(true);
+                
+                // Remove from DOM after animation
+                setTimeout(() => {
+                    setIsHidden(true);
+                }, 500);
+            }
+        } catch (error) {
+            console.error('Failed to mark as not interested:', error);
+            showNotification('Failed to update preference. Please try again.');
+        }
+    };
+
     const colorScheme = colorSchemes[quote.id % colorSchemes.length];
 
     return (
         <div
-            className="quote-card-professional cursor-pointer mb-4"
+            className={`quote-card-professional cursor-pointer mb-4 transition-opacity duration-500 ${
+                isFadingOut ? 'opacity-0 scale-95' : 'opacity-100'
+            }`}
             onClick={handleCardClick}
             style={{
                 backgroundColor: colorScheme.bg,
@@ -213,16 +263,27 @@ export default function QuoteCard({ quote, compact = false, auth }) {
                                             </button>
                                         </>
                                     ) : (
-                                        <button
-                                            onClick={() => {
-                                                setShowMenu(false);
-                                                setShowReportModal(true);
-                                            }}
-                                            className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                                        >
-                                            <Flag className="w-4 h-4" />
-                                            <span>Report Quote</span>
-                                        </button>
+                                        <>
+                                            {auth?.user && (
+                                                <button
+                                                    onClick={handleNotInterested}
+                                                    className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                                >
+                                                    <EyeOff className="w-4 h-4" />
+                                                    <span>Not Interested</span>
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => {
+                                                    setShowMenu(false);
+                                                    setShowReportModal(true);
+                                                }}
+                                                className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                            >
+                                                <Flag className="w-4 h-4" />
+                                                <span>Report Quote</span>
+                                            </button>
+                                        </>
                                     )}
                                 </div>
                             )}
@@ -350,6 +411,16 @@ export default function QuoteCard({ quote, compact = false, auth }) {
                 quoteId={quote.id}
                 onSubmit={handleReport}
             />
+
+            {/* Toast Notification */}
+            {showToast && (
+                <div className="fixed bottom-4 right-4 z-50 animate-slide-up">
+                    <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-4 py-3 rounded-lg shadow-lg flex items-center gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-400 dark:text-green-600" />
+                        <span className="font-medium">{toastMessage}</span>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
