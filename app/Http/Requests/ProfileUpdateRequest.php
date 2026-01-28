@@ -35,6 +35,8 @@ class ProfileUpdateRequest extends FormRequest
             'bio' => ['nullable', 'string', 'max:500'],
             'website' => ['nullable', 'url', 'max:255'],
             'location' => ['nullable', 'string', 'max:100'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'cover_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
         ];
     }
 }

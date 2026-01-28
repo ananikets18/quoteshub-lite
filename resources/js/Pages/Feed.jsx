@@ -4,7 +4,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import { TrendingUp, Clock, Star, Sparkles, Filter } from 'lucide-react';
 
-export default function Feed({ quotes: initialQuotes, categories }) {
+export default function Feed({ quotes: initialQuotes, categories, collections = [] }) {
     const { auth } = usePage().props;
     const [quotes, setQuotes] = useState(initialQuotes.data || []);
     const [loading, setLoading] = useState(false);
@@ -144,7 +144,7 @@ export default function Feed({ quotes: initialQuotes, categories }) {
                 ) : (
                     <>
                         {quotes.map((quote) => (
-                            <QuoteCard key={quote.id} quote={quote} auth={auth} />
+                            <QuoteCard key={quote.id} quote={quote} auth={auth} collections={collections} />
                         ))}
 
                         {loading && (

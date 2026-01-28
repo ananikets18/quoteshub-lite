@@ -59,15 +59,26 @@ class FeedController extends Controller
             $quotes->getCollection()->transform(function ($quote) {
                 $quote->is_liked = $quote->isLikedBy(auth()->user());
                 $quote->is_saved = $quote->isSavedBy(auth()->user());
+                // Add collection IDs this quote is in
+                $quote->collection_ids = $quote->collections()
+                    ->where('user_id', auth()->id())
+                    ->pluck('collections.id')
+                    ->toArray();
                 return $quote;
             });
         }
 
         $categories = Category::active()->ordered()->get();
+        
+        // Get user's collections if authenticated
+        $collections = auth()->check() 
+            ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
+            : [];
 
         return Inertia::render('Feed', [
             'quotes' => $quotes,
             'categories' => $categories,
+            'collections' => $collections,
         ]);
     }
 

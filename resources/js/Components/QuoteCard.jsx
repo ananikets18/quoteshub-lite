@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { Heart, Bookmark, Share2, Eye, MoreVertical, Edit2, Trash2, Flag, EyeOff, CheckCircle } from 'lucide-react';
+import { Heart, Bookmark, Share2, Eye, MoreVertical, Edit2, Trash2, Flag, EyeOff, CheckCircle, Folder } from 'lucide-react';
 import QuoteDetailModal from './QuoteDetailModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import ReportModal from './ReportModal';
+import AddToCollectionModal from './AddToCollectionModal';
 import axios from 'axios';
 
 // Professional color schemes with subtle accents
@@ -18,7 +19,7 @@ const colorSchemes = [
     { bg: '#ECFDF5', accent: '#14B8A6', text: '#1F2937', border: '#99F6E4' }, // Teal accent
 ];
 
-export default function QuoteCard({ quote, compact = false, auth }) {
+export default function QuoteCard({ quote, compact = false, auth, collections = [] }) {
     const [isLiked, setIsLiked] = useState(quote.is_liked || false);
     const [isSaved, setIsSaved] = useState(quote.is_saved || false);
     const [likesCount, setLikesCount] = useState(quote.likes_count || 0);
@@ -27,6 +28,7 @@ export default function QuoteCard({ quote, compact = false, auth }) {
     const [showMenu, setShowMenu] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
+    const [showCollectionModal, setShowCollectionModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isDeleted, setIsDeleted] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
@@ -368,6 +370,40 @@ export default function QuoteCard({ quote, compact = false, auth }) {
                             <span className="text-sm font-medium" style={{ color: colorScheme.text }}>{savesCount}</span>
                         </button>
 
+                        {/* Add to Collection - Instagram/Pinterest style */}
+                        {auth?.user && collections && collections.length > 0 && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowCollectionModal(true);
+                                }}
+                                className="flex items-center gap-2 group relative"
+                                title="Add to Collection"
+                            >
+                                <Folder
+                                    className={`w-5 h-5 transition-all ${
+                                        quote.collection_ids && quote.collection_ids.length > 0
+                                            ? 'fill-current'
+                                            : 'group-hover:scale-110'
+                                    }`}
+                                    style={{ 
+                                        color: quote.collection_ids && quote.collection_ids.length > 0 
+                                            ? colorScheme.accent 
+                                            : colorScheme.text + '99' 
+                                    }}
+                                />
+                                {quote.collection_ids && quote.collection_ids.length > 0 && (
+                                    <span className="text-xs font-bold px-1.5 py-0.5 rounded-full" 
+                                        style={{ 
+                                            backgroundColor: colorScheme.accent + '20',
+                                            color: colorScheme.accent 
+                                        }}>
+                                        {quote.collection_ids.length}
+                                    </span>
+                                )}
+                            </button>
+                        )}
+
                         {/* Share */}
                         <button
                             onClick={handleShare}
@@ -410,6 +446,14 @@ export default function QuoteCard({ quote, compact = false, auth }) {
                 onClose={() => setShowReportModal(false)}
                 quoteId={quote.id}
                 onSubmit={handleReport}
+            />
+
+            {/* Add to Collection Modal */}
+            <AddToCollectionModal
+                show={showCollectionModal}
+                onClose={() => setShowCollectionModal(false)}
+                quote={quote}
+                collections={collections}
             />
 
             {/* Toast Notification */}

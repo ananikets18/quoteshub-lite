@@ -8,7 +8,7 @@ export default function BottomNav() {
         { name: 'Home', href: '/feed', icon: Home },
         { name: 'Search', href: '/search', icon: Search },
         { name: 'Create', href: '/quotes/create', icon: PlusCircle },
-        { name: 'Saved', href: '/saved', icon: Bookmark },
+        { name: 'Saved', href: '/profile/saved', icon: Bookmark },
         { name: 'Profile', href: '/profile', icon: User },
     ];
 

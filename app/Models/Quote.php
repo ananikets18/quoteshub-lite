@@ -78,6 +78,15 @@ class Quote extends Model
     }
 
     /**
+     * Get the collections that contain this quote
+     */
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(Collection::class, 'collection_quote')
+            ->withTimestamps();
+    }
+
+    /**
      * Check if the quote is liked by a user
      */
     public function isLikedBy(?User $user): bool

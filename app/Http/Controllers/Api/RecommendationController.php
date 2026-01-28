@@ -147,7 +147,8 @@ class RecommendationController extends Controller
             // Track interaction for recommendations
             $this->recommendationService->trackInteraction(Auth::user(), $quote, 'view');
         } else {
-            $viewData['session_id'] = $request->session()->getId();
+            // For API routes, generate a session ID from IP and user agent
+            $viewData['session_id'] = md5($request->ip() . $request->userAgent());
         }
 
         QuoteView::create($viewData);
