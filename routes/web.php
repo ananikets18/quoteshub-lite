@@ -24,6 +24,11 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Notifications
+    Route::get('/notifications', function () {
+        return Inertia::render('Notifications');
+    })->name('notifications');
+    
     Route::get('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
     Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store');
     Route::get('/quotes/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');

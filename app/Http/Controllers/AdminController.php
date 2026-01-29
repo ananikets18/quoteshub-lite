@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\Quote;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -77,12 +78,17 @@ class AdminController extends Controller
             'reviewed_at' => now(),
         ]);
 
+        $notificationService = app(NotificationService::class);
+        $quoteOwner = $report->quote->user;
+
         // Take action on the quote if needed
         if ($validated['action'] === 'remove') {
+            $reason = $validated['admin_notes'] ?? 'Violated community guidelines';
+            $notificationService->notifyQuoteRemoved($quoteOwner, $report->quote, $reason, $request->user());
             $report->quote->delete();
         } elseif ($validated['action'] === 'warn') {
-            // Could send a warning notification to the quote owner
-            // For now, just mark as action taken
+            $reason = $validated['admin_notes'] ?? 'Your quote was reported and reviewed';
+            $notificationService->notifyAdminWarning($quoteOwner, $reason, $request->user());
         }
 
         return back()->with('success', 'Report reviewed successfully!');

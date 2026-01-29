@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -72,7 +73,13 @@ class AdminController extends Controller
     public function toggleFeatured($id)
     {
         $quote = Quote::findOrFail($id);
+        $wasFeatured = $quote->is_featured;
         $quote->update(['is_featured' => !$quote->is_featured]);
+
+        // Send notification if quote was just featured
+        if (!$wasFeatured && $quote->is_featured) {
+            app(NotificationService::class)->notifyQuoteFeatured($quote->user, $quote);
+        }
 
         return response()->json([
             'message' => 'Featured status updated',

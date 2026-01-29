@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\RecommendationController;
 use App\Http\Controllers\Api\UserPreferenceController;
+use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -54,6 +55,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/me/avatar', [App\Http\Controllers\Api\AvatarController::class, 'deleteAvatar']);
     Route::post('/me/cover', [App\Http\Controllers\Api\AvatarController::class, 'uploadCover']);
     Route::delete('/me/cover', [App\Http\Controllers\Api\AvatarController::class, 'deleteCover']);
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
+    Route::delete('/notifications/read/all', [NotificationController::class, 'deleteAllRead']);
 
     // Personalized recommendations (requires auth)
     Route::get('/recommendations/for-you', [RecommendationController::class, 'forYou']);

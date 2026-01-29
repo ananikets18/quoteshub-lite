@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -26,6 +27,9 @@ class FollowController extends Controller
             $currentUser->following()->attach($userToFollow->id);
             $currentUser->increment('following_count');
             $userToFollow->increment('followers_count');
+            
+            // Trigger notification
+            app(NotificationService::class)->notifyNewFollower($currentUser, $userToFollow);
         }
 
         return back();

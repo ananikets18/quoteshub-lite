@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Quote;
 use App\Models\Category;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -153,6 +154,9 @@ class QuoteController extends Controller
             $like->delete();
         } else {
             $quote->likes()->create(['user_id' => $user->id]);
+            
+            // Trigger notification
+            app(NotificationService::class)->notifyQuoteLiked($user, $quote);
         }
 
         return back();
@@ -173,6 +177,9 @@ class QuoteController extends Controller
                 'user_id' => $user->id,
                 'collection' => 'default',
             ]);
+            
+            // Trigger notification
+            app(NotificationService::class)->notifyQuoteSaved($user, $quote);
         }
 
         return back();

@@ -136,6 +136,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the user's notifications
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class)->orderByDesc('created_at');
+    }
+
+    /**
      * Get the user's category preferences for recommendations
      */
     public function categoryPreferences(): HasMany
@@ -237,5 +245,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Quote::class, 'saves')
             ->withPivot('collection')
             ->withTimestamps();
+    }
+
+    /**
+     * Get unread notifications count
+     */
+    public function unreadNotificationsCount(): int
+    {
+        return $this->notifications()->whereNull('read_at')->count();
     }
 }
