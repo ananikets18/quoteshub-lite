@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Models\Notification;
 use App\Models\User;
 use App\Models\Quote;
+use App\Models\UserNotificationPreference;
+use App\Events\NotificationSent;
+
 
 class NotificationService
 {
@@ -13,7 +16,7 @@ class NotificationService
      */
     public function notifyNewFollower(User $follower, User $followedUser): void
     {
-        Notification::create([
+        $this->createAndBroadcast([
             'user_id' => $followedUser->id,
             'actor_id' => $follower->id,
             'type' => Notification::TYPE_NEW_FOLLOWER,
@@ -45,7 +48,7 @@ class NotificationService
             return; // Don't create duplicate notification
         }
 
-        Notification::create([
+        $this->createAndBroadcast([
             'user_id' => $quote->user_id,
             'actor_id' => $liker->id,
             'type' => Notification::TYPE_QUOTE_LIKED,
@@ -78,7 +81,7 @@ class NotificationService
             return;
         }
 
-        Notification::create([
+        $this->createAndBroadcast([
             'user_id' => $quote->user_id,
             'actor_id' => $saver->id,
             'type' => Notification::TYPE_QUOTE_SAVED,
@@ -204,4 +207,104 @@ class NotificationService
             ->whereNull('read_at')
             ->count();
     }
+
+    /**
+     * Check if user has enabled this notification type
+     */
+    protected function isNotificationEnabled(User $user, string $notificationType): bool
+    {
+        $preferences = $user->notificationPreferences;
+        
+        if (!$preferences) {
+            return true; // Default to enabled if no preferences set
+        }
+
+        return $preferences->isEnabled($notificationType);
+    }
+
+    /**
+     * Create and broadcast a notification
+     */
+    protected function createAndBroadcast(array $data): ?Notification
+    {
+        $user = User::find($data['user_id']);
+        
+        // Extract notification type from data
+        $typeMap = [
+            Notification::TYPE_NEW_FOLLOWER => 'new_follower',
+            Notification::TYPE_QUOTE_LIKED => 'quote_liked',
+            Notification::TYPE_QUOTE_SAVED => 'quote_saved',
+            Notification::TYPE_COMMENT_ADDED => 'comment_added',
+            Notification::TYPE_ACHIEVEMENT_UNLOCKED => 'achievement_unlocked',
+            Notification::TYPE_ADMIN_WARNING => 'admin_warning',
+            Notification::TYPE_QUOTE_REMOVED => 'quote_removed',
+            Notification::TYPE_QUOTE_FEATURED => 'quote_featured',
+        ];
+
+        $preferenceKey = $typeMap[$data['type']] ?? null;
+
+        // Check if user has this notification type enabled
+        if ($preferenceKey && !$this->isNotificationEnabled($user, $preferenceKey)) {
+            return null; // User has disabled this notification type
+        }
+
+        // Create the notification
+        $notification = Notification::create($data);
+
+        // Load the actor relationship for broadcasting
+        $notification->load('actor');
+
+        // Broadcast the notification in real-time
+        broadcast(new NotificationSent($notification))->toOthers();
+
+        return $notification;
+    }
+
+    /**
+     * Group similar notifications (e.g., "John and 5 others liked your quote")
+     */
+    public function groupSimilarNotifications(User $user): array
+    {
+        $preferences = $user->notificationPreferences;
+        
+        if (!$preferences || !$preferences->group_similar_notifications) {
+            return []; // Grouping disabled
+        }
+
+        // Get recent unread notifications
+        $notifications = Notification::where('user_id', $user->id)
+            ->whereNull('read_at')
+            ->where('created_at', '>=', now()->subHours(24))
+            ->with('actor')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $grouped = [];
+
+        // Group by type and related item (e.g., quote_id)
+        foreach ($notifications as $notification) {
+            $key = $notification->type;
+            
+            // Add quote_id to key if it exists
+            if (isset($notification->data['quote_id'])) {
+                $key .= '_' . $notification->data['quote_id'];
+            }
+
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                    'type' => $notification->type,
+                    'notifications' => [],
+                    'count' => 0,
+                    'latest' => $notification,
+                ];
+            }
+
+            $grouped[$key]['notifications'][] = $notification;
+            $grouped[$key]['count']++;
+        }
+
+        // Filter groups with more than 1 notification
+        return array_filter($grouped, fn($group) => $group['count'] > 1);
+    }
 }
+

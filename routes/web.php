@@ -29,6 +29,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Notifications');
     })->name('notifications');
     
+    // Achievements
+    Route::get('/achievements', [App\Http\Controllers\AchievementController::class, 'index'])->name('achievements');
+
+    
     Route::get('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
     Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store');
     Route::get('/quotes/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
@@ -48,6 +52,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Saved quotes (requires auth)
     Route::get('/profile/saved', [ProfileController::class, 'saved'])->name('profile.saved');
+    
+    // Notification preferences
+    Route::get('/profile/notification-preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'edit'])->name('profile.notification-preferences.edit');
+    Route::post('/profile/notification-preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('profile.notification-preferences.update');
+
     
     // Collections
     Route::get('/collections', [CollectionController::class, 'index'])->name('collections.index');

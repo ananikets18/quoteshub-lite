@@ -168,6 +168,15 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the user's notification preferences
+     */
+    public function notificationPreferences(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserNotificationPreference::class);
+    }
+
+
+    /**
      * Check if user is following another user
      */
     public function isFollowing(User $user): bool
@@ -226,6 +235,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $this->last_active_at = now();
         $this->save();
+
+        // Check streak achievements
+        $achievementService = app(\App\Services\AchievementService::class);
+        $achievementService->checkAchievements($this, 'streak_updated', $this->daily_streak);
     }
 
     /**
