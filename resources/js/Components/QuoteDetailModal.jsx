@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Heart, Bookmark, Share2, Eye, Download, Copy, Check } from 'lucide-react';
 import { router } from '@inertiajs/react';
+import ShareModal from './ShareModal';
 
 // Professional color schemes matching QuoteCard
 const colorSchemes = [
@@ -23,15 +24,16 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
     const [copied, setCopied] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [viewStartTime, setViewStartTime] = useState(null);
+    const [showShareModal, setShowShareModal] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-            
+
             // Track view start time
             const startTime = Date.now();
             setViewStartTime(startTime);
-            
+
             // Track view when modal opens
             if (quote?.id) {
                 fetch(`/api/quotes/${quote.id}/view`, {
@@ -48,7 +50,7 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
             }
         } else {
             document.body.style.overflow = 'unset';
-            
+
             // Track duration when modal closes
             if (viewStartTime && quote?.id) {
                 const duration = Math.floor((Date.now() - viewStartTime) / 1000);
@@ -91,12 +93,12 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
 
     const handleLike = (e) => {
         e.stopPropagation();
-        
+
         // Optimistic update - instant UI feedback
         const newIsLiked = !isLiked;
         setIsLiked(newIsLiked);
         setLikesCount(newIsLiked ? likesCount + 1 : likesCount - 1);
-        
+
         // Background sync with server
         router.post(`/quotes/${quote.id}/like`, {}, {
             preserveState: true,
@@ -112,12 +114,12 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
 
     const handleSave = (e) => {
         e.stopPropagation();
-        
+
         // Optimistic update - instant UI feedback
         const newIsSaved = !isSaved;
         setIsSaved(newIsSaved);
         setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
-        
+
         // Background sync with server
         router.post(`/quotes/${quote.id}/save`, {}, {
             preserveState: true,
@@ -131,24 +133,14 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
         });
     };
 
-    const handleShare = async () => {
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Quote from QuotesHub',
-                    text: `"${quote.content}" - ${quote.author || 'Unknown'}`,
-                    url: window.location.origin + `/quotes/${quote.id}`,
-                });
-
-                router.post(`/quotes/${quote.id}/share`, {}, {
-                    preserveState: true,
-                    preserveScroll: true,
-                    only: [],
-                });
-            } catch (err) {
-                console.log('Share cancelled');
-            }
-        }
+    const handleShare = () => {
+        setShowShareModal(true);
+        // Track share intent
+        router.post(`/quotes/${quote.id}/share`, {}, {
+            preserveState: true,
+            preserveScroll: true,
+            only: [],
+        });
     };
 
     const handleCopy = async () => {
@@ -241,19 +233,19 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
                     {/* Quote Display */}
                     <div
                         className="relative p-12 min-h-[400px] flex flex-col items-center justify-center text-center border-l-4"
-                        style={{ 
+                        style={{
                             backgroundColor: colorScheme.bg,
                             borderLeftColor: colorScheme.accent
                         }}
                     >
-                        <p 
+                        <p
                             className="text-3xl md:text-4xl font-serif leading-relaxed mb-6 font-medium"
                             style={{ color: colorScheme.text }}
                         >
                             "{quote.content}"
                         </p>
                         {quote.author && (
-                            <p 
+                            <p
                                 className="text-xl font-semibold flex items-center justify-center gap-3"
                                 style={{ color: colorScheme.accent }}
                             >
@@ -273,7 +265,7 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
                     <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-400px)]">
                         {/* User Info */}
                         <div className="flex items-center gap-3">
-                            <div 
+                            <div
                                 className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg"
                                 style={{ backgroundColor: colorScheme.accent }}
                             >
@@ -403,19 +395,19 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
                     {/* Quote Display */}
                     <div
                         className="relative p-8 min-h-[300px] flex flex-col items-center justify-center text-center border-l-4"
-                        style={{ 
+                        style={{
                             backgroundColor: colorScheme.bg,
                             borderLeftColor: colorScheme.accent
                         }}
                     >
-                        <p 
+                        <p
                             className="text-2xl font-serif leading-relaxed mb-4 font-medium"
                             style={{ color: colorScheme.text }}
                         >
                             "{quote.content}"
                         </p>
                         {quote.author && (
-                            <p 
+                            <p
                                 className="text-lg font-semibold flex items-center justify-center gap-2"
                                 style={{ color: colorScheme.accent }}
                             >
@@ -435,7 +427,7 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
                     <div className="p-4 space-y-4">
                         {/* User Info */}
                         <div className="flex items-center gap-3">
-                            <div 
+                            <div
                                 className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
                                 style={{ backgroundColor: colorScheme.accent }}
                             >
@@ -549,6 +541,14 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
                     </div>
                 </div>
             </div>
+
+            {/* Share Modal */}
+            <ShareModal
+                show={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                quote={quote}
+                colorScheme={colorScheme}
+            />
         </div>,
         document.body
     );

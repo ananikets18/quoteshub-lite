@@ -7,9 +7,13 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\OgImageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+// Open Graph image generation (public route)
+Route::get('/api/og-image/{quote}', [OgImageController::class, 'generate'])->name('og-image.generate');
 
 Route::get('/', [FeedController::class, 'index'])->name('home');
 Route::get('/feed', [FeedController::class, 'index'])->name('feed');

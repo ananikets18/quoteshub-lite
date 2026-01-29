@@ -4,6 +4,8 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Heart, Bookmark, Share2, Eye, ArrowLeft, Edit2, Trash2, MoreVertical, Flag } from 'lucide-react';
 import DeleteConfirmationModal from '@/Components/DeleteConfirmationModal';
 import ReportModal from '@/Components/ReportModal';
+import ShareModal from '@/Components/ShareModal';
+import QuoteMetaTags from '@/Components/QuoteMetaTags';
 
 // Professional color schemes
 const colorSchemes = [
@@ -26,6 +28,7 @@ export default function ShowQuote({ quote }) {
     const [showMenu, setShowMenu] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
     const isOwner = auth?.user?.id === quote.user_id;
@@ -36,12 +39,12 @@ export default function ShowQuote({ quote }) {
             router.visit('/login');
             return;
         }
-        
+
         // Optimistic update - instant UI feedback
         const newIsLiked = !isLiked;
         setIsLiked(newIsLiked);
         setLikesCount(newIsLiked ? likesCount + 1 : likesCount - 1);
-        
+
         // Background sync with server
         router.post(`/quotes/${quote.id}/like`, {}, {
             preserveState: true,
@@ -60,12 +63,12 @@ export default function ShowQuote({ quote }) {
             router.visit('/login');
             return;
         }
-        
+
         // Optimistic update - instant UI feedback
         const newIsSaved = !isSaved;
         setIsSaved(newIsSaved);
         setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
-        
+
         // Background sync with server
         router.post(`/quotes/${quote.id}/save`, {}, {
             preserveState: true,
@@ -79,28 +82,14 @@ export default function ShowQuote({ quote }) {
         });
     };
 
-    const handleShare = async () => {
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Quote from QuotesHub',
-                    text: `"${quote.content}" - ${quote.author || 'Unknown'}`,
-                    url: window.location.href,
-                });
-
-                router.post(`/quotes/${quote.id}/share`, {}, {
-                    preserveScroll: true,
-                    preserveState: true,
-                    only: [],
-                });
-            } catch (err) {
-                console.log('Share cancelled');
-            }
-        } else {
-            // Fallback: Copy to clipboard
-            navigator.clipboard.writeText(window.location.href);
-            alert('Link copied to clipboard!');
-        }
+    const handleShare = () => {
+        setShowShareModal(true);
+        // Track share intent
+        router.post(`/quotes/${quote.id}/share`, {}, {
+            preserveScroll: true,
+            preserveState: true,
+            only: [],
+        });
     };
 
     const handleEdit = () => {
@@ -138,7 +127,7 @@ export default function ShowQuote({ quote }) {
 
     return (
         <AppLayout title={`Quote by ${quote.author || 'Unknown'}`}>
-            <Head title={`${quote.content.substring(0, 50)}...`} />
+            <QuoteMetaTags quote={quote} />
 
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
                 {/* Header */}
@@ -360,6 +349,14 @@ export default function ShowQuote({ quote }) {
                 onClose={() => setShowReportModal(false)}
                 quoteId={quote.id}
                 onSubmit={handleReport}
+            />
+
+            {/* Share Modal */}
+            <ShareModal
+                show={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                quote={quote}
+                colorScheme={colorScheme}
             />
         </AppLayout>
     );
