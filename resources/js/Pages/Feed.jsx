@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
+import SuggestedUsers from '@/Components/SuggestedUsers';
 import { TrendingUp, Clock, Star, Sparkles, Filter } from 'lucide-react';
 
 export default function Feed({ quotes: initialQuotes, categories, collections = [] }) {
@@ -11,18 +12,18 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
     const [activeFilter, setActiveFilter] = useState(auth.user ? 'foryou' : 'latest');
     const [page, setPage] = useState(1);
 
-    const filters = auth.user 
+    const filters = auth.user
         ? [
             { id: 'foryou', label: 'For You', icon: Sparkles },
             { id: 'latest', label: 'Latest', icon: Clock },
             { id: 'trending', label: 'Trending', icon: TrendingUp },
             { id: 'featured', label: 'Featured', icon: Star },
-          ]
+        ]
         : [
             { id: 'latest', label: 'Latest', icon: Clock },
             { id: 'trending', label: 'Trending', icon: TrendingUp },
             { id: 'featured', label: 'Featured', icon: Star },
-          ];
+        ];
 
     const loadMore = () => {
         if (loading || !initialQuotes.next_page_url) return;
@@ -130,12 +131,12 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                 </div>
             </div>
 
-            {/* Quotes Feed */}
-            <div className="p-4">
+            {/* Main Content - Full Width */}
+            <div className="max-w-3xl mx-auto px-4 py-6">
                 {quotes.length === 0 ? (
-                    <div className="text-center py-12">
+                    <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg">
                         <p className="text-gray-500 dark:text-gray-400 text-lg">
-                            {activeFilter === 'foryou' 
+                            {activeFilter === 'foryou'
                                 ? 'Start liking and saving quotes to get personalized recommendations!'
                                 : 'No quotes yet. Be the first to create one!'
                             }
@@ -143,8 +144,15 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                     </div>
                 ) : (
                     <>
-                        {quotes.map((quote) => (
-                            <QuoteCard key={quote.id} quote={quote} auth={auth} collections={collections} />
+                        {quotes.map((quote, index) => (
+                            <div key={`quote-${quote.id}`}>
+                                <QuoteCard quote={quote} auth={auth} collections={collections} />
+
+                                {/* Insert Suggested Users ONLY ONCE after 5th quote in "For You" feed */}
+                                {activeFilter === 'foryou' && auth.user && index === 4 && (
+                                    <SuggestedUsers auth={auth} inline={true} />
+                                )}
+                            </div>
                         ))}
 
                         {loading && (

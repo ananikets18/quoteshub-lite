@@ -7,18 +7,6 @@ import ReportModal from './ReportModal';
 import AddToCollectionModal from './AddToCollectionModal';
 import axios from 'axios';
 
-// Professional color schemes with subtle accents
-const colorSchemes = [
-    { bg: '#FFFFFF', accent: '#8B5CF6', text: '#1F2937', border: '#E5E7EB' }, // Purple accent
-    { bg: '#FEFCE8', accent: '#EAB308', text: '#1F2937', border: '#FEF08A' }, // Yellow accent
-    { bg: '#F0FDF4', accent: '#10B981', text: '#1F2937', border: '#BBF7D0' }, // Green accent
-    { bg: '#FFF7ED', accent: '#F97316', text: '#1F2937', border: '#FED7AA' }, // Orange accent
-    { bg: '#FDF2F8', accent: '#EC4899', text: '#1F2937', border: '#FBCFE8' }, // Pink accent
-    { bg: '#EFF6FF', accent: '#3B82F6', text: '#1F2937', border: '#DBEAFE' }, // Blue accent
-    { bg: '#F5F3FF', accent: '#A855F7', text: '#1F2937', border: '#E9D5FF' }, // Violet accent
-    { bg: '#ECFDF5', accent: '#14B8A6', text: '#1F2937', border: '#99F6E4' }, // Teal accent
-];
-
 export default function QuoteCard({ quote, compact = false, auth, collections = [] }) {
     const [isLiked, setIsLiked] = useState(quote.is_liked || false);
     const [isSaved, setIsSaved] = useState(quote.is_saved || false);
@@ -51,12 +39,12 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
 
     const handleLike = (e) => {
         e.stopPropagation();
-        
+
         // Optimistic update - instant UI feedback
         const newIsLiked = !isLiked;
         setIsLiked(newIsLiked);
         setLikesCount(newIsLiked ? likesCount + 1 : likesCount - 1);
-        
+
         // Background sync with server
         router.post(`/quotes/${quote.id}/like`, {}, {
             preserveState: true,
@@ -72,12 +60,12 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
 
     const handleSave = (e) => {
         e.stopPropagation();
-        
+
         // Optimistic update - instant UI feedback
         const newIsSaved = !isSaved;
         setIsSaved(newIsSaved);
         setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
-        
+
         // Background sync with server
         router.post(`/quotes/${quote.id}/save`, {}, {
             preserveState: true,
@@ -160,7 +148,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
         try {
             // Get CSRF token
             const csrfToken = document.head.querySelector('meta[name="csrf-token"]')?.content;
-            
+
             const response = await axios.post('/api/preferences/not-interested', {
                 item_type: 'quote',
                 item_id: quote.id,
@@ -175,10 +163,10 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
             if (response.data.success) {
                 // Show success message
                 showNotification('Quote hidden. We\'ll show you less like this.');
-                
+
                 // Start fade out animation
                 setIsFadingOut(true);
-                
+
                 // Remove from DOM after animation
                 setTimeout(() => {
                     setIsHidden(true);
@@ -190,127 +178,107 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
         }
     };
 
-    const colorScheme = colorSchemes[quote.id % colorSchemes.length];
-
     return (
         <div
-            className={`quote-card-professional cursor-pointer mb-4 transition-opacity duration-500 ${
-                isFadingOut ? 'opacity-0 scale-95' : 'opacity-100'
-            }`}
+            className={`quote-card-professional cursor-pointer mb-4 transition-opacity duration-500 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${isFadingOut ? 'opacity-0 scale-95' : 'opacity-100'
+                }`}
             onClick={handleCardClick}
-            style={{
-                backgroundColor: colorScheme.bg,
-                borderColor: colorScheme.border,
-                color: colorScheme.text
-            }}
         >
-            {/* Accent border on left */}
-            <div
-                className="absolute left-0 top-0 bottom-0 w-1"
-                style={{ backgroundColor: colorScheme.accent }}
-            />
+            {/* Purple accent border on left */}
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-600" />
 
             {/* Content */}
             <div className="relative z-10 p-6">
                 {/* User Info */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                        <div 
-                            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                            style={{ backgroundColor: colorScheme.accent }}
-                        >
+                        <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-sm">
                             {quote.user?.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                         <div>
-                            <p className="font-semibold text-sm" style={{ color: colorScheme.text }}>
+                            <p className="font-semibold text-sm text-gray-900 dark:text-white">
                                 {quote.user?.name || 'Anonymous'}
                             </p>
-                            <p className="text-xs opacity-60" style={{ color: colorScheme.text }}>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
                                 @{quote.user?.username || 'user'}
                             </p>
                         </div>
                     </div>
 
                     <div className="relative">
-                        <button 
+                        <button
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setShowMenu(!showMenu);
                             }}
-                            className="p-2 rounded-full hover:bg-black/5 transition-colors"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
-                            <MoreVertical className="w-5 h-5" style={{ color: colorScheme.text }} />
+                            <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>
 
-                            {showMenu && (
-                                <div 
-                                    className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    {isOwner ? (
-                                        <>
+                        {showMenu && (
+                            <div
+                                className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {isOwner ? (
+                                    <>
+                                        <button
+                                            onClick={handleEdit}
+                                            className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                        >
+                                            <Edit2 className="w-4 h-4" />
+                                            <span>Edit Quote</span>
+                                        </button>
+                                        <button
+                                            onClick={handleDelete}
+                                            className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                            <span>Delete Quote</span>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        {auth?.user && (
                                             <button
-                                                onClick={handleEdit}
+                                                onClick={handleNotInterested}
                                                 className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
                                             >
-                                                <Edit2 className="w-4 h-4" />
-                                                <span>Edit Quote</span>
+                                                <EyeOff className="w-4 h-4" />
+                                                <span>Not Interested</span>
                                             </button>
-                                            <button
-                                                onClick={handleDelete}
-                                                className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                                <span>Delete Quote</span>
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            {auth?.user && (
-                                                <button
-                                                    onClick={handleNotInterested}
-                                                    className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
-                                                >
-                                                    <EyeOff className="w-4 h-4" />
-                                                    <span>Not Interested</span>
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => {
-                                                    setShowMenu(false);
-                                                    setShowReportModal(true);
-                                                }}
-                                                className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                                            >
-                                                <Flag className="w-4 h-4" />
-                                                <span>Report Quote</span>
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                                        )}
+                                        <button
+                                            onClick={() => {
+                                                setShowMenu(false);
+                                                setShowReportModal(true);
+                                            }}
+                                            className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                        >
+                                            <Flag className="w-4 h-4" />
+                                            <span>Report Quote</span>
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
+                </div>
 
-                    {/* Quote Text */}
-                    <div className={`${compact ? 'mb-3' : 'mb-6'}`}>
-                        <p 
-                            className={`${compact ? 'text-lg' : 'text-2xl'} font-serif leading-relaxed mb-3 font-medium`}
-                            style={{ color: colorScheme.text }}
-                        >
-                            "{quote.content}"
-                        </p>
-                        {quote.author && (
-                        <p 
-                            className={`${compact ? 'text-sm' : 'text-base'} font-semibold flex items-center gap-2`}
-                            style={{ color: colorScheme.accent }}
-                        >
-                            <span className="w-8 h-0.5" style={{ backgroundColor: colorScheme.accent }}></span>
+                {/* Quote Text */}
+                <div className={`${compact ? 'mb-3' : 'mb-6'}`}>
+                    <p className={`${compact ? 'text-lg' : 'text-2xl'} font-serif leading-relaxed mb-3 font-medium text-gray-900 dark:text-white`}>
+                        "{quote.content}"
+                    </p>
+                    {quote.author && (
+                        <p className={`${compact ? 'text-sm' : 'text-base'} font-semibold flex items-center gap-2 text-purple-600 dark:text-purple-400`}>
+                            <span className="w-8 h-0.5 bg-purple-600 dark:bg-purple-400"></span>
                             {quote.author}
                         </p>
                     )}
                     {quote.source && (
-                        <p className="text-xs mt-1 opacity-60" style={{ color: colorScheme.text }}>
+                        <p className="text-xs mt-1 text-gray-500 dark:text-gray-400">
                             {quote.source}
                         </p>
                     )}
@@ -322,11 +290,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                         {quote.categories.slice(0, 3).map((category) => (
                             <span
                                 key={category.id}
-                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium"
-                                style={{ 
-                                    backgroundColor: `${colorScheme.accent}15`,
-                                    color: colorScheme.accent 
-                                }}
+                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
                             >
                                 <span>{category.icon}</span>
                                 <span>{category.name}</span>
@@ -336,7 +300,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 )}
 
                 {/* Actions */}
-                <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: colorScheme.border }}>
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-6">
                         {/* Like */}
                         <button
@@ -344,14 +308,12 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                             className="flex items-center gap-2 group"
                         >
                             <Heart
-                                className={`w-5 h-5 transition-all ${
-                                    isLiked
-                                        ? 'fill-red-500 text-red-500'
-                                        : 'hover:text-red-500 group-hover:scale-110'
-                                }`}
-                                style={{ color: isLiked ? '#EF4444' : colorScheme.text + '99' }}
+                                className={`w-5 h-5 transition-all ${isLiked
+                                    ? 'fill-red-500 text-red-500'
+                                    : 'text-gray-400 dark:text-gray-500 hover:text-red-500 group-hover:scale-110'
+                                    }`}
                             />
-                            <span className="text-sm font-medium" style={{ color: colorScheme.text }}>{likesCount}</span>
+                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">{likesCount}</span>
                         </button>
 
                         {/* Save */}
@@ -360,14 +322,12 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                             className="flex items-center gap-2 group"
                         >
                             <Bookmark
-                                className={`w-5 h-5 transition-all ${
-                                    isSaved
-                                        ? 'fill-current'
-                                        : 'group-hover:scale-110'
-                                }`}
-                                style={{ color: isSaved ? colorScheme.accent : colorScheme.text + '99' }}
+                                className={`w-5 h-5 transition-all ${isSaved
+                                    ? 'fill-purple-600 text-purple-600'
+                                    : 'text-gray-400 dark:text-gray-500 group-hover:text-purple-600 group-hover:scale-110'
+                                    }`}
                             />
-                            <span className="text-sm font-medium" style={{ color: colorScheme.text }}>{savesCount}</span>
+                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">{savesCount}</span>
                         </button>
 
                         {/* Add to Collection - Instagram/Pinterest style */}
@@ -381,23 +341,13 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                                 title="Add to Collection"
                             >
                                 <Folder
-                                    className={`w-5 h-5 transition-all ${
-                                        quote.collection_ids && quote.collection_ids.length > 0
-                                            ? 'fill-current'
-                                            : 'group-hover:scale-110'
-                                    }`}
-                                    style={{ 
-                                        color: quote.collection_ids && quote.collection_ids.length > 0 
-                                            ? colorScheme.accent 
-                                            : colorScheme.text + '99' 
-                                    }}
+                                    className={`w-5 h-5 transition-all ${quote.collection_ids && quote.collection_ids.length > 0
+                                        ? 'fill-purple-600 text-purple-600'
+                                        : 'text-gray-400 dark:text-gray-500 group-hover:text-purple-600 group-hover:scale-110'
+                                        }`}
                                 />
                                 {quote.collection_ids && quote.collection_ids.length > 0 && (
-                                    <span className="text-xs font-bold px-1.5 py-0.5 rounded-full" 
-                                        style={{ 
-                                            backgroundColor: colorScheme.accent + '20',
-                                            color: colorScheme.accent 
-                                        }}>
+                                    <span className="text-xs font-bold px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
                                         {quote.collection_ids.length}
                                     </span>
                                 )}
@@ -409,18 +359,17 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                             onClick={handleShare}
                             className="flex items-center gap-2 group"
                         >
-                            <Share2 
-                                className="w-5 h-5 group-hover:scale-110 transition-all" 
-                                style={{ color: colorScheme.text + '99' }}
+                            <Share2
+                                className="w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:scale-110 transition-all"
                             />
-                            <span className="text-sm font-medium" style={{ color: colorScheme.text }}>{quote.shares_count || 0}</span>
+                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">{quote.shares_count || 0}</span>
                         </button>
                     </div>
 
                     {/* Views */}
                     <div className="flex items-center gap-2 opacity-60">
-                        <Eye className="w-5 h-5" style={{ color: colorScheme.text }} />
-                        <span className="text-sm font-medium" style={{ color: colorScheme.text }}>{quote.views_count || 0}</span>
+                        <Eye className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{quote.views_count || 0}</span>
                     </div>
                 </div>
             </div>

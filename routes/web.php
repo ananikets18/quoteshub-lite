@@ -8,12 +8,27 @@ use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OgImageController;
+use App\Http\Controllers\ActivityController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 // Open Graph image generation (public route)
 Route::get('/api/og-image/{quote}', [OgImageController::class, 'generate'])->name('og-image.generate');
+
+// Activity feed API routes (public for trending, auth for personalized)
+Route::get('/api/activity/feed', [ActivityController::class, 'feed'])->name('activity.feed');
+Route::get('/api/activity/trending', [ActivityController::class, 'trending'])->name('activity.trending');
+Route::get('/api/activity/suggested-users', [ActivityController::class, 'suggestedUsers'])->name('activity.suggested');
+
+// Notification API routes (session-based auth for Inertia)
+Route::middleware('auth')->group(function () {
+    Route::get('/api/notifications', [App\Http\Controllers\Api\NotificationController::class, 'index'])->name('api.notifications.index');
+    Route::get('/api/notifications/unread-count', [App\Http\Controllers\Api\NotificationController::class, 'unreadCount'])->name('api.notifications.unread-count');
+    Route::post('/api/notifications/mark-all-read', [App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead'])->name('api.notifications.mark-all-read');
+    Route::post('/api/notifications/{notification}/read', [App\Http\Controllers\Api\NotificationController::class, 'markAsRead'])->name('api.notifications.mark-as-read');
+    Route::delete('/api/notifications/{notification}', [App\Http\Controllers\Api\NotificationController::class, 'destroy'])->name('api.notifications.destroy');
+});
 
 Route::get('/', [FeedController::class, 'index'])->name('home');
 Route::get('/feed', [FeedController::class, 'index'])->name('feed');

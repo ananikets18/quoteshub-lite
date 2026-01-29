@@ -13,10 +13,10 @@ export default function Header({ title, showStreak = true, showNotifications = t
     useEffect(() => {
         if (auth?.user && showNotifications) {
             fetchUnreadCount();
-            
+
             // Poll for new notifications every 30 seconds
             const interval = setInterval(fetchUnreadCount, 30000);
-            
+
             return () => clearInterval(interval);
         }
     }, [auth?.user, showNotifications]);
@@ -26,7 +26,10 @@ export default function Header({ title, showStreak = true, showNotifications = t
             const response = await axios.get('/api/notifications/unread-count');
             setUnreadCount(response.data.count);
         } catch (error) {
-            console.error('Failed to fetch unread count:', error);
+            // Silently fail if user is not authenticated (401)
+            if (error.response?.status !== 401) {
+                console.error('Failed to fetch unread count:', error);
+            }
         }
     };
 
@@ -58,7 +61,7 @@ export default function Header({ title, showStreak = true, showNotifications = t
 
                     {showNotifications && auth?.user && (
                         <div className="relative">
-                            <button 
+                            <button
                                 onClick={handleBellClick}
                                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
                             >
@@ -69,8 +72,8 @@ export default function Header({ title, showStreak = true, showNotifications = t
                                     </span>
                                 )}
                             </button>
-                            
-                            <NotificationDropdown 
+
+                            <NotificationDropdown
                                 show={showNotificationDropdown}
                                 onClose={() => {
                                     setShowNotificationDropdown(false);
