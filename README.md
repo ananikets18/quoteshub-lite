@@ -159,28 +159,6 @@ This project follows a structured branching workflow:
 
 4. After review, merge to `dev` → `test` → `main`
 
-## 📚 API Documentation
-
-### Authentication Endpoints
-
-- `POST /api/register` - Register new user
-- `POST /api/login` - Login user
-- `POST /api/logout` - Logout user
-
-### Quote Endpoints
-
-- `GET /api/quotes` - Get all quotes
-- `POST /api/quotes` - Create new quote
-- `GET /api/quotes/{id}` - Get specific quote
-- `PUT /api/quotes/{id}` - Update quote
-- `DELETE /api/quotes/{id}` - Delete quote
-
-### Interaction Endpoints
-
-- `POST /api/quotes/{id}/like` - Like/unlike a quote
-- `POST /api/quotes/{id}/save` - Save/unsave a quote
-- `GET /api/saved-quotes` - Get user's saved quotes
-
 ## 🧪 Testing
 
 Run the test suite:
