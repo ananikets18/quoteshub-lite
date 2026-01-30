@@ -1,4 +1,5 @@
 import { useForm, usePage, Link } from '@inertiajs/react';
+import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
 
 export default function UpdateProfileInformationForm({ mustVerifyEmail, status }) {
     const user = usePage().props.auth.user;
@@ -18,139 +19,180 @@ export default function UpdateProfileInformationForm({ mustVerifyEmail, status }
     };
 
     return (
-        <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px' }}>Profile Information</h2>
-            <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>
-                Update your account's profile information and email address.
-            </p>
-
-            <form onSubmit={submit}>
-                {/* Name */}
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="name" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Name</label>
-                    <input
-                        id="name"
-                        type="text"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-                    />
-                    {errors.name && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.name}</div>}
-                </div>
-
-                {/* Username */}
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="username" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Username</label>
-                    <input
-                        id="username"
-                        type="text"
-                        value={data.username}
-                        onChange={(e) => setData('username', e.target.value)}
-                        style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-                    />
-                    {errors.username && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.username}</div>}
-                </div>
-
-                {/* Email */}
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="email" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                        style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-                    />
-                    {errors.email && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.email}</div>}
-                </div>
-
-                {/* Bio */}
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="bio" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Bio</label>
-                    <textarea
-                        id="bio"
-                        value={data.bio}
-                        onChange={(e) => setData('bio', e.target.value)}
-                        rows="3"
-                        style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontFamily: 'inherit' }}
-                    />
-                    {errors.bio && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.bio}</div>}
-                </div>
-
-                {/* Website */}
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="website" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Website</label>
-                    <input
-                        id="website"
-                        type="url"
-                        value={data.website}
-                        onChange={(e) => setData('website', e.target.value)}
-                        placeholder="https://example.com"
-                        style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-                    />
-                    {errors.website && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.website}</div>}
-                </div>
-
-                {/* Location */}
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="location" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Location</label>
-                    <input
-                        id="location"
-                        type="text"
-                        value={data.location}
-                        onChange={(e) => setData('location', e.target.value)}
-                        placeholder="City, Country"
-                        style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-                    />
-                    {errors.location && <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errors.location}</div>}
-                </div>
-
-                {/* Email Verification Notice */}
-                {mustVerifyEmail && user.email_verified_at === null && (
-                    <div style={{ padding: '10px', backgroundColor: '#fff3cd', border: '1px solid #ffc107', borderRadius: '4px', marginBottom: '15px' }}>
-                        <p style={{ fontSize: '14px', marginBottom: '5px' }}>
-                            Your email address is unverified.
-                        </p>
-                        <Link
-                            href={route('verification.send')}
-                            method="post"
-                            as="button"
-                            style={{ color: '#0066cc', textDecoration: 'underline', fontSize: '14px', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-                        >
-                            Click here to re-send the verification email.
-                        </Link>
-                        {status === 'verification-link-sent' && (
-                            <div style={{ color: '#28a745', fontSize: '14px', marginTop: '5px' }}>
-                                A new verification link has been sent to your email address.
-                            </div>
-                        )}
-                    </div>
+        <form onSubmit={submit} className="space-y-4">
+            {/* Name */}
+            <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Name *
+                </label>
+                <input
+                    id="name"
+                    type="text"
+                    value={data.name}
+                    onChange={(e) => setData('name', e.target.value)}
+                    required
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.name && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.name}
+                    </p>
                 )}
+            </div>
 
-                {/* Submit Button */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        style={{
-                            padding: '10px 20px',
-                            backgroundColor: '#0066cc',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: processing ? 'not-allowed' : 'pointer',
-                            opacity: processing ? 0.6 : 1
-                        }}
-                    >
-                        {processing ? 'Saving...' : 'Save'}
-                    </button>
-                    {recentlySuccessful && (
-                        <span style={{ color: '#28a745', fontSize: '14px' }}>✓ Saved successfully!</span>
-                    )}
+            {/* Username */}
+            <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Username
+                </label>
+                <input
+                    id="username"
+                    type="text"
+                    value={data.username}
+                    onChange={(e) => setData('username', e.target.value)}
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.username && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.username}
+                    </p>
+                )}
+            </div>
+
+            {/* Email */}
+            <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email *
+                </label>
+                <input
+                    id="email"
+                    type="email"
+                    value={data.email}
+                    onChange={(e) => setData('email', e.target.value)}
+                    required
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.email && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.email}
+                    </p>
+                )}
+            </div>
+
+            {/* Email Verification Notice */}
+            {mustVerifyEmail && user.email_verified_at === null && (
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <div className="flex items-start gap-3">
+                        <Mail className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                            <p className="text-sm text-amber-800 dark:text-amber-200 mb-2">
+                                Your email address is unverified.
+                            </p>
+                            <Link
+                                href={route('verification.send')}
+                                method="post"
+                                as="button"
+                                className="text-sm text-amber-700 dark:text-amber-300 underline hover:text-amber-900 dark:hover:text-amber-100 transition-colors"
+                            >
+                                Click here to re-send the verification email.
+                            </Link>
+                            {status === 'verification-link-sent' && (
+                                <p className="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                                    <CheckCircle className="w-4 h-4" />
+                                    A new verification link has been sent!
+                                </p>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            </form>
-        </div>
+            )}
+
+            {/* Bio */}
+            <div>
+                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Bio
+                </label>
+                <textarea
+                    id="bio"
+                    value={data.bio}
+                    onChange={(e) => setData('bio', e.target.value)}
+                    rows="3"
+                    maxLength="160"
+                    placeholder="Tell us about yourself..."
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors resize-none"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-right">
+                    {data.bio.length}/160
+                </p>
+                {errors.bio && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.bio}
+                    </p>
+                )}
+            </div>
+
+            {/* Website */}
+            <div>
+                <label htmlFor="website" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Website
+                </label>
+                <input
+                    id="website"
+                    type="url"
+                    value={data.website}
+                    onChange={(e) => setData('website', e.target.value)}
+                    placeholder="https://example.com"
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.website && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.website}
+                    </p>
+                )}
+            </div>
+
+            {/* Location */}
+            <div>
+                <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Location
+                </label>
+                <input
+                    id="location"
+                    type="text"
+                    value={data.location}
+                    onChange={(e) => setData('location', e.target.value)}
+                    placeholder="City, Country"
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.location && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.location}
+                    </p>
+                )}
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex items-center gap-4 pt-4">
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                    {processing ? 'Saving...' : 'Save Changes'}
+                </button>
+                {recentlySuccessful && (
+                    <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1 animate-in fade-in duration-200">
+                        <CheckCircle className="w-4 h-4" />
+                        Saved successfully!
+                    </span>
+                )}
+            </div>
+        </form>
     );
 }

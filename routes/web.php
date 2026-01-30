@@ -39,7 +39,33 @@ Route::get('/category/{slug}', [SearchController::class, 'category'])->name('cat
 Route::get('/tag/{name}', [SearchController::class, 'tag'])->name('tag.show');
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $user = auth()->user();
+    
+    // Get user stats
+    $stats = [
+        'quotes_count' => $user->quotes_count ?? 0,
+        'followers_count' => $user->followers_count ?? 0,
+        'following_count' => $user->following_count ?? 0,
+        'daily_streak' => $user->daily_streak ?? 0,
+        'total_likes' => $user->quotes()->withCount('likes')->get()->sum('likes_count'),
+        'recent_quotes' => $user->quotes()
+            ->latest()
+            ->take(3)
+            ->withCount('likes')
+            ->get()
+            ->map(function ($quote) {
+                return [
+                    'id' => $quote->id,
+                    'content' => $quote->content,
+                    'likes_count' => $quote->likes_count ?? 0,
+                    'time_ago' => $quote->created_at->diffForHumans(),
+                ];
+            }),
+    ];
+    
+    return Inertia::render('Dashboard', [
+        'stats' => $stats,
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {

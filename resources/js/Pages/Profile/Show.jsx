@@ -34,7 +34,7 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
         : null;
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppLayout title={`${profileUser.name}'s Profile`} showNav={true}>
             <Head title={`${profile.name} (@${profile.username})`} />
 
             <div className="max-w-5xl mx-auto">
@@ -221,6 +221,6 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                     <Pagination links={quotes.links} />
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }
