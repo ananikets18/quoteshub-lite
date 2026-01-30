@@ -6,6 +6,7 @@ import DeleteConfirmationModal from '@/Components/DeleteConfirmationModal';
 import ReportModal from '@/Components/ReportModal';
 import ShareModal from '@/Components/ShareModal';
 import QuoteMetaTags from '@/Components/QuoteMetaTags';
+import Toast from '@/Components/Toast';
 
 // Professional color schemes
 const colorSchemes = [
@@ -28,6 +29,9 @@ export default function ShowQuote({ quote }) {
     const [showMenu, setShowMenu] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('info');
     const [showShareModal, setShowShareModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -111,7 +115,9 @@ export default function ShowQuote({ quote }) {
             onError: () => {
                 setIsDeleting(false);
                 setShowDeleteModal(false);
-                alert('Failed to delete quote. Please try again.');
+                setToastMessage('Failed to delete quote. Please try again.');
+                setToastType('error');
+                setShowToast(true);
             },
         });
     };
@@ -120,7 +126,9 @@ export default function ShowQuote({ quote }) {
         router.post(`/quotes/${quote.id}/report`, data, {
             preserveScroll: true,
             onSuccess: () => {
-                alert('Report submitted successfully!');
+                setToastMessage('Report submitted successfully. We\'ll review it soon.');
+                setToastType('success');
+                setShowToast(true);
             },
         });
     };
@@ -358,6 +366,15 @@ export default function ShowQuote({ quote }) {
                 quote={quote}
                 colorScheme={colorScheme}
             />
+
+            {/* Toast Notifications */}
+            {showToast && (
+                <Toast
+                    message={toastMessage}
+                    type={toastType}
+                    onClose={() => setShowToast(false)}
+                />
+            )}
         </AppLayout>
     );
 }

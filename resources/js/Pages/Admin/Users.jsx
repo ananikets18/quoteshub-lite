@@ -2,11 +2,16 @@ import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Pagination from '@/Components/Pagination';
-import { Users, Search, Shield, User, Ban, Check, X } from 'lucide-react';
+import { Users, Search, Shield, User, Ban, Check, X, AlertTriangle, Trash2 } from 'lucide-react';
 
 export default function UsersManagement({ auth, users, filters }) {
     const [search, setSearch] = useState(filters.search || '');
     const [role, setRole] = useState(filters.role || '');
+    const [showModal, setShowModal] = useState(false);
+    const [modalAction, setModalAction] = useState(null); // 'toggle', 'role', 'delete'
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [newRole, setNewRole] = useState('');
+    const [processing, setProcessing] = useState(false);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -16,30 +21,89 @@ export default function UsersManagement({ auth, users, filters }) {
     };
 
     const toggleUserStatus = (user) => {
-        if (confirm(`Are you sure you want to ${user.is_active ? 'deactivate' : 'activate'} ${user.name}?`)) {
-            router.patch(`/admin/users/${user.id}`, {
-                is_active: !user.is_active,
+        setSelectedUser(user);
+        setModalAction('toggle');
+        setShowModal(true);
+    };
+
+    const changeUserRole = (user, roleValue) => {
+        setSelectedUser(user);
+        setNewRole(roleValue);
+        setModalAction('role');
+        setShowModal(true);
+    };
+
+    const deleteUser = (user) => {
+        setSelectedUser(user);
+        setModalAction('delete');
+        setShowModal(true);
+    };
+
+    const confirmAction = () => {
+        setProcessing(true);
+        
+        if (modalAction === 'toggle') {
+            router.patch(`/admin/users/${selectedUser.id}`, {
+                is_active: !selectedUser.is_active,
             }, {
                 preserveState: true,
                 preserveScroll: true,
+                onFinish: () => {
+                    setProcessing(false);
+                    setShowModal(false);
+                },
             });
-        }
-    };
-
-    const changeUserRole = (user, newRole) => {
-        if (confirm(`Change ${user.name}'s role to ${newRole}?`)) {
-            router.patch(`/admin/users/${user.id}`, {
+        } else if (modalAction === 'role') {
+            router.patch(`/admin/users/${selectedUser.id}`, {
                 role: newRole,
             }, {
                 preserveState: true,
                 preserveScroll: true,
+                onFinish: () => {
+                    setProcessing(false);
+                    setShowModal(false);
+                },
+            });
+        } else if (modalAction === 'delete') {
+            router.delete(`/admin/users/${selectedUser.id}`, {
+                onFinish: () => {
+                    setProcessing(false);
+                    setShowModal(false);
+                },
             });
         }
     };
 
-    const deleteUser = (user) => {
-        if (confirm(`Are you sure you want to delete ${user.name}? This action cannot be undone.`)) {
-            router.delete(`/admin/users/${user.id}`);
+    const getModalContent = () => {
+        if (!selectedUser) return null;
+
+        switch (modalAction) {
+            case 'toggle':
+                return {
+                    title: selectedUser.is_active ? 'Deactivate User' : 'Activate User',
+                    message: `Are you sure you want to ${selectedUser.is_active ? 'deactivate' : 'activate'} ${selectedUser.name}?`,
+                    icon: selectedUser.is_active ? Ban : Check,
+                    color: selectedUser.is_active ? 'red' : 'green',
+                    confirmText: selectedUser.is_active ? 'Deactivate' : 'Activate',
+                };
+            case 'role':
+                return {
+                    title: 'Change User Role',
+                    message: `Change ${selectedUser.name}'s role to ${newRole}?`,
+                    icon: Shield,
+                    color: 'blue',
+                    confirmText: 'Change Role',
+                };
+            case 'delete':
+                return {
+                    title: 'Delete User',
+                    message: `Are you sure you want to delete ${selectedUser.name}? This action cannot be undone.`,
+                    icon: Trash2,
+                    color: 'red',
+                    confirmText: 'Delete User',
+                };
+            default:
+                return null;
         }
     };
 
@@ -208,19 +272,98 @@ export default function UsersManagement({ auth, users, filters }) {
                             </table>
                         </div>
 
-                        {/* Pagination */}
-                        {users.links.length > 3 && (
-                            <Pagination links={users.links} />
-                        )}
-                    </>
-                ) : (
-                    <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                        <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No users found</h3>
-                        <p className="text-gray-600">Try adjusting your search or filters.</p>
+                    {/* Pagination */}
+                    {users.links.length > 3 && (
+                        <Pagination links={users.links} />
+                    )}
+                </>
+            ) : (
+                <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                    <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No users found</h3>
+                    <p className="text-gray-600">Try adjusting your search or filters.</p>
+                </div>
+            )}
+
+            {/* Confirmation Modal */}
+            {showModal && selectedUser && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+                        {(() => {
+                            const content = getModalContent();
+                            const Icon = content.icon;
+                            const colorClasses = {
+                                red: 'bg-red-100 text-red-600',
+                                green: 'bg-green-100 text-green-600',
+                                blue: 'bg-blue-100 text-blue-600',
+                            };
+
+                            return (
+                                <>
+                                    {/* Header */}
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-12 h-12 rounded-full ${colorClasses[content.color]} dark:${colorClasses[content.color]} flex items-center justify-center`}>
+                                                <Icon className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                                    {content.title}
+                                                </h3>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowModal(false)}
+                                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                            disabled={processing}
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    </div>
+
+                                    {/* Content */}
+                                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                                        {content.message}
+                                    </p>
+
+                                    {/* Actions */}
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => setShowModal(false)}
+                                            disabled={processing}
+                                            className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={confirmAction}
+                                            disabled={processing}
+                                            className={`flex-1 px-4 py-2.5 ${
+                                                content.color === 'red' ? 'bg-red-600 hover:bg-red-700' :
+                                                content.color === 'green' ? 'bg-green-600 hover:bg-green-700' :
+                                                'bg-blue-600 hover:bg-blue-700'
+                                            } text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+                                        >
+                                            {processing ? (
+                                                <>
+                                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                    Processing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Icon className="w-4 h-4" />
+                                                    {content.confirmText}
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </>
+                            );
+                        })()}
                     </div>
-                )}
-            </div>
-        </AuthenticatedLayout>
-    );
+                </div>
+            )}
+        </div>
+    </AuthenticatedLayout>
+);
 }

@@ -164,11 +164,12 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
             onSuccess: () => {
                 setIsDeleted(true);
                 setShowDeleteModal(false);
+                showNotification('Quote deleted successfully', 'success');
             },
             onError: () => {
                 setIsDeleting(false);
                 setShowDeleteModal(false);
-                alert('Failed to delete quote. Please try again.');
+                showNotification('Failed to delete quote. Please try again.', 'error');
             },
         });
     };

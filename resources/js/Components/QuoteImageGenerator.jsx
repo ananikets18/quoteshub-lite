@@ -77,7 +77,10 @@ export default function QuoteImageGenerator({ quote, colorScheme }) {
             link.click();
         } catch (error) {
             console.error('Error generating image:', error);
-            alert('Failed to generate image. Please try again.');
+            // Show error message in UI instead of alert
+            if (onError) {
+                onError('Failed to generate image. Please try again.');
+            }
         } finally {
             setIsGenerating(false);
         }

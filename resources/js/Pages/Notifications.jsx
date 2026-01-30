@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Bell, Check, Trash2, Heart, Bookmark, UserPlus, Trophy, AlertTriangle, XCircle, Star, MessageCircle, CheckCheck } from 'lucide-react';
+import { Bell, Check, Trash2, Heart, Bookmark, UserPlus, Trophy, AlertTriangle, XCircle, Star, MessageCircle, CheckCheck, X } from 'lucide-react';
 import axios from 'axios';
 
 export default function Notifications() {
@@ -11,6 +11,8 @@ export default function Notifications() {
     const [filter, setFilter] = useState('all'); // all, unread
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         loadNotifications();
@@ -64,13 +66,17 @@ export default function Notifications() {
     };
 
     const deleteAllRead = async () => {
-        if (!confirm('Delete all read notifications?')) return;
+        if (deleting) return;
         
         try {
+            setDeleting(true);
             await axios.delete('/api/notifications/read/all');
             setNotifications(notifications.filter(n => !n.is_read));
+            setShowDeleteModal(false);
         } catch (error) {
             console.error('Failed to delete read notifications:', error);
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -166,7 +172,7 @@ export default function Notifications() {
                             )}
                             {notifications.some(n => n.is_read) && (
                                 <button
-                                    onClick={deleteAllRead}
+                                    onClick={() => setShowDeleteModal(true)}
                                     className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                                 >
                                     <Trash2 className="w-4 h-4" />
@@ -176,6 +182,66 @@ export default function Notifications() {
                         </div>
                     </div>
                 </div>
+
+                {/* Delete Confirmation Modal */}
+                {showDeleteModal && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+                            {/* Header */}
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                                        <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                            Clear Read Notifications?
+                                        </h3>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            {/* Content */}
+                            <p className="text-gray-600 dark:text-gray-400 mb-6">
+                                This will permanently delete all read notifications. This action cannot be undone.
+                            </p>
+
+                            {/* Actions */}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    disabled={deleting}
+                                    className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={deleteAllRead}
+                                    disabled={deleting}
+                                    className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {deleting ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            Deleting...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Trash2 className="w-4 h-4" />
+                                            Delete All
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Notifications List */}
                 {loading ? (

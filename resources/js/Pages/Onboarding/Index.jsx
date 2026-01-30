@@ -10,6 +10,7 @@ export default function Onboarding({ user, currentStep: initialStep }) {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState('info');
+    const [showSkipModal, setShowSkipModal] = useState(false);
 
     const steps = [
         { id: 'welcome', title: 'Welcome', icon: Sparkles },
@@ -91,9 +92,11 @@ export default function Onboarding({ user, currentStep: initialStep }) {
     };
 
     const handleSkip = () => {
-        if (confirm('Are you sure you want to skip onboarding? You can always customize your profile later.')) {
-            router.post('/onboarding/skip');
-        }
+        setShowSkipModal(true);
+    };
+
+    const confirmSkip = () => {
+        router.post('/onboarding/skip');
     };
 
     return (
@@ -166,6 +169,51 @@ export default function Onboarding({ user, currentStep: initialStep }) {
                     </div>
                 </div>
             </div>
+
+            {/* Skip Confirmation Modal */}
+            {showSkipModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                                    <Sparkles className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                        Skip Onboarding?
+                                    </h3>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowSkipModal(false)}
+                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            Are you sure you want to skip the setup? You can always customize your profile and preferences later from your settings.
+                        </p>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowSkipModal(false)}
+                                className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg transition-colors"
+                            >
+                                Continue Setup
+                            </button>
+                            <button
+                                onClick={confirmSkip}
+                                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:shadow-lg transition-all"
+                            >
+                                Skip for Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Toast
                 show={showToast}
@@ -248,7 +296,13 @@ function InterestsStep({ onNext, loading }) {
 
     const handleNext = () => {
         if (selectedCategories.length === 0) {
-            alert('Please select at least one interest');
+            // Show inline error instead of alert
+            const errorEl = document.getElementById('category-error');
+            if (errorEl) {
+                errorEl.classList.remove('hidden');
+                errorEl.classList.add('animate-shake');
+                setTimeout(() => errorEl.classList.remove('animate-shake'), 500);
+            }
             return;
         }
         onNext({ categories: selectedCategories });
@@ -263,6 +317,13 @@ function InterestsStep({ onNext, loading }) {
                 <p className="text-gray-600 dark:text-gray-400">
                     Select topics you'd like to see in your feed
                 </p>
+                
+                {/* Error Message */}
+                <div id="category-error" className="hidden mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+                        Please select at least one interest to continue
+                    </p>
+                </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
