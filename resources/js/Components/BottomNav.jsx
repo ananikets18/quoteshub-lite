@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Home, Search, PlusCircle, Bookmark, User } from 'lucide-react';
 
-export default function BottomNav() {
+export default function BottomNav({ isVisible = true }) {
     const { url } = usePage();
 
     const navItems = [
@@ -20,7 +20,8 @@ export default function BottomNav() {
     };
 
     return (
-        <nav className="bottom-nav safe-area-bottom">
+        <nav className={`bottom-nav safe-area-bottom transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'
+            }`}>
             <div className="flex items-center justify-around max-w-lg mx-auto">
                 {navItems.map((item) => {
                     const Icon = item.icon;

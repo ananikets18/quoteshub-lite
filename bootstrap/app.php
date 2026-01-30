@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
             \App\Http\Middleware\PreventBackHistory::class,
             \App\Http\Middleware\EnsureUserIsActive::class,
+            \App\Http\Middleware\EnsureOnboardingCompleted::class,
         ]);
 
         // Register middleware aliases
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'moderator' => \App\Http\Middleware\EnsureUserIsModerator::class,
             'active' => \App\Http\Middleware\EnsureUserIsActive::class,
             'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
+            'onboarding' => \App\Http\Middleware\EnsureOnboardingCompleted::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

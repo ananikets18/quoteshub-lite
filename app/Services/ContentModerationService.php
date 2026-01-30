@@ -129,10 +129,19 @@ class ContentModerationService
      */
     public function containsProfanity(string $content): bool
     {
-        $content = strtolower($content);
+        // Normalize to catch leetspeak and evasions
+        $normalized = $this->normalizeText($content);
         
         foreach ($this->profanityList as $word) {
-            // Use word boundaries to avoid false positives
+            // Check in normalized text (catches f4ck, f*ck, etc.)
+            if (str_contains($normalized, $word)) {
+                return true;
+            }
+        }
+        
+        // Also check original content with word boundaries for standard cases
+        $content = strtolower($content);
+        foreach ($this->profanityList as $word) {
             if (preg_match('/\b' . preg_quote($word, '/') . '\b/i', $content)) {
                 return true;
             }
@@ -146,16 +155,19 @@ class ContentModerationService
      */
     public function getProfanityWords(string $content): array
     {
-        $content = strtolower($content);
         $found = [];
+        $normalized = $this->normalizeText($content);
+        $content = strtolower($content);
         
         foreach ($this->profanityList as $word) {
-            if (preg_match('/\b' . preg_quote($word, '/') . '\b/i', $content)) {
+            // Check both normalized and original
+            if (str_contains($normalized, $word) || 
+                preg_match('/\b' . preg_quote($word, '/') . '\b/i', $content)) {
                 $found[] = $word;
             }
         }
         
-        return $found;
+        return array_unique($found);
     }
 
     /**
@@ -183,12 +195,15 @@ class ContentModerationService
      */
     public function isSpam(string $content): bool
     {
-        $content = strtolower($content);
+        $contentLower = strtolower($content);
         $spamScore = 0;
 
-        // Check for spam keywords
+        // Check for spam keywords (use normalized for better detection)
+        $normalized = $this->normalizeText($content);
         foreach ($this->spamKeywords as $keyword) {
-            if (stripos($content, $keyword) !== false) {
+            $normalizedKeyword = $this->normalizeText($keyword);
+            // Check both original and normalized
+            if (str_contains($contentLower, $keyword) || str_contains($normalized, $normalizedKeyword)) {
                 $spamScore += 2;
             }
         }

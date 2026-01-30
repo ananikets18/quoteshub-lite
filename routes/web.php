@@ -114,4 +114,12 @@ Route::get('/collections/{slug}', [CollectionController::class, 'show'])->name('
 // Wildcard routes must come AFTER specific routes
 Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
 
+// Onboarding routes (authenticated users only)
+Route::middleware(['auth'])->prefix('onboarding')->group(function () {
+    Route::get('/', [App\Http\Controllers\OnboardingController::class, 'show'])->name('onboarding.show');
+    Route::post('/step', [App\Http\Controllers\OnboardingController::class, 'updateStep'])->name('onboarding.step');
+    Route::post('/complete', [App\Http\Controllers\OnboardingController::class, 'complete'])->name('onboarding.complete');
+    Route::post('/skip', [App\Http\Controllers\OnboardingController::class, 'skip'])->name('onboarding.skip');
+});
+
 require __DIR__.'/auth.php';

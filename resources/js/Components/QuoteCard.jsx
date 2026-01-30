@@ -5,6 +5,8 @@ import QuoteDetailModal from './QuoteDetailModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import ReportModal from './ReportModal';
 import AddToCollectionModal from './AddToCollectionModal';
+import Toast from './Toast';
+import AuthPromptModal from './AuthPromptModal';
 import axios from 'axios';
 
 export default function QuoteCard({ quote, compact = false, auth, collections = [] }) {
@@ -21,8 +23,15 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
     const [isDeleted, setIsDeleted] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
     const [isFadingOut, setIsFadingOut] = useState(false);
+
+    // Toast notifications
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('info');
+
+    // Auth prompt modal
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [authAction, setAuthAction] = useState('like');
 
     const isOwner = auth?.user?.id === quote.user_id;
 
@@ -31,14 +40,21 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
         return null;
     }
 
-    const showNotification = (message) => {
+    const showNotification = (message, type = 'info') => {
         setToastMessage(message);
+        setToastType(type);
         setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
     };
 
     const handleLike = (e) => {
         e.stopPropagation();
+
+        // Check authentication
+        if (!auth?.user) {
+            setAuthAction('like');
+            setShowAuthModal(true);
+            return;
+        }
 
         // Optimistic update - instant UI feedback
         const newIsLiked = !isLiked;
@@ -54,12 +70,20 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 // Revert on error
                 setIsLiked(!newIsLiked);
                 setLikesCount(newIsLiked ? likesCount : likesCount + 1);
+                showNotification('Failed to update like. Please try again.', 'error');
             },
         });
     };
 
     const handleSave = (e) => {
         e.stopPropagation();
+
+        // Check authentication
+        if (!auth?.user) {
+            setAuthAction('save');
+            setShowAuthModal(true);
+            return;
+        }
 
         // Optimistic update - instant UI feedback
         const newIsSaved = !isSaved;
@@ -75,12 +99,20 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 // Revert on error
                 setIsSaved(!newIsSaved);
                 setSavesCount(newIsSaved ? savesCount : savesCount + 1);
+                showNotification('Failed to save quote. Please try again.', 'error');
             },
         });
     };
 
     const handleShare = async (e) => {
         e.stopPropagation();
+
+        // Check authentication
+        if (!auth?.user) {
+            setAuthAction('share');
+            setShowAuthModal(true);
+            return;
+        }
 
         if (navigator.share) {
             try {
@@ -95,13 +127,22 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                     preserveState: true,
                     only: [],
                 });
+                showNotification('Quote shared successfully!', 'success');
             } catch (err) {
-                console.log('Share cancelled');
+                if (err.name !== 'AbortError') {
+                    showNotification('Failed to share quote.', 'error');
+                }
             }
+        } else {
+            showNotification('Sharing is not supported on this device.', 'warning');
         }
     };
 
     const handleCardClick = () => {
+        // Don't open quote detail if any other modal is open
+        if (showMenu || showDeleteModal || showReportModal || showCollectionModal || showAuthModal) {
+            return;
+        }
         setShowModal(true);
     };
 
@@ -136,7 +177,11 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
         router.post(`/quotes/${quote.id}/report`, data, {
             preserveScroll: true,
             onSuccess: () => {
-                alert('Report submitted successfully!');
+                showNotification('Report submitted successfully. We\'ll review it soon.', 'success');
+                setShowReportModal(false);
+            },
+            onError: () => {
+                showNotification('Failed to submit report. Please try again.', 'error');
             },
         });
     };
@@ -162,7 +207,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
 
             if (response.data.success) {
                 // Show success message
-                showNotification('Quote hidden. We\'ll show you less like this.');
+                showNotification('Quote hidden. We\'ll show you less like this.', 'success');
 
                 // Start fade out animation
                 setIsFadingOut(true);
@@ -174,68 +219,71 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
             }
         } catch (error) {
             console.error('Failed to mark as not interested:', error);
-            showNotification('Failed to update preference. Please try again.');
+            showNotification('Failed to update preference. Please try again.', 'error');
         }
     };
 
     return (
         <div
-            className={`quote-card-professional cursor-pointer mb-4 transition-opacity duration-500 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${isFadingOut ? 'opacity-0 scale-95' : 'opacity-100'
+            className={`cursor-pointer transition-all duration-300 ${isFadingOut ? 'opacity-0 scale-95' : 'opacity-100'
                 }`}
             onClick={handleCardClick}
         >
-            {/* Purple accent border on left */}
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-600" />
+            {/* Clean Card Container - Instagram/Twitter Style */}
+            <div className="bg-white p-3.5 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700/50">
 
-            {/* Content */}
-            <div className="relative z-10 p-6">
-                {/* User Info */}
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                {/* Header: User Info */}
+                <div className="flex items-center justify-between px-3 sm:px-4 pt-2 sm:pt-3 pb-1.5 sm:pb-2">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        {/* Avatar */}
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-sm">
                             {quote.user?.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
-                        <div>
-                            <p className="font-semibold text-sm text-gray-900 dark:text-white">
+
+                        {/* User Details */}
+                        <div className="flex flex-col">
+                            <span className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight">
                                 {quote.user?.name || 'Anonymous'}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            </span>
+                            <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
                                 @{quote.user?.username || 'user'}
-                            </p>
+                            </span>
                         </div>
                     </div>
 
+                    {/* Menu Button */}
                     <div className="relative">
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setShowMenu(!showMenu);
                             }}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            className="p-1 sm:p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
                         >
-                            <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                            <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" />
                         </button>
 
+                        {/* Dropdown Menu */}
                         {showMenu && (
                             <div
-                                className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
+                                className="absolute right-0 top-full mt-1 w-44 sm:w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 overflow-hidden"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 {isOwner ? (
                                     <>
                                         <button
                                             onClick={handleEdit}
-                                            className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                            className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-200 transition-colors"
                                         >
-                                            <Edit2 className="w-4 h-4" />
-                                            <span>Edit Quote</span>
+                                            <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            <span className="text-xs sm:text-sm font-medium">Edit</span>
                                         </button>
                                         <button
                                             onClick={handleDelete}
-                                            className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                            className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left flex items-center gap-2 sm:gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
                                         >
-                                            <Trash2 className="w-4 h-4" />
-                                            <span>Delete Quote</span>
+                                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            <span className="text-xs sm:text-sm font-medium">Delete</span>
                                         </button>
                                     </>
                                 ) : (
@@ -243,10 +291,10 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                                         {auth?.user && (
                                             <button
                                                 onClick={handleNotInterested}
-                                                className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                                className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-200 transition-colors"
                                             >
-                                                <EyeOff className="w-4 h-4" />
-                                                <span>Not Interested</span>
+                                                <EyeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                                <span className="text-xs sm:text-sm font-medium">Not Interested</span>
                                             </button>
                                         )}
                                         <button
@@ -254,10 +302,10 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                                                 setShowMenu(false);
                                                 setShowReportModal(true);
                                             }}
-                                            className="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                            className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left flex items-center gap-2 sm:gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
                                         >
-                                            <Flag className="w-4 h-4" />
-                                            <span>Report Quote</span>
+                                            <Flag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            <span className="text-xs sm:text-sm font-medium">Report</span>
                                         </button>
                                     </>
                                 )}
@@ -266,122 +314,143 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                     </div>
                 </div>
 
-                {/* Quote Text */}
-                <div className={`${compact ? 'mb-3' : 'mb-6'}`}>
-                    <p className={`${compact ? 'text-lg' : 'text-2xl'} font-serif leading-relaxed mb-3 font-medium text-gray-900 dark:text-white`}>
+                {/* Quote Content */}
+                <div className="px-3 sm:px-4 py-2 sm:py-3">
+                    {/* Quote Text - Primary Focus */}
+                    <p className="text-[15px] sm:text-base md:text-lg leading-relaxed text-gray-900 dark:text-white mb-2 sm:mb-3 font-medium">
                         "{quote.content}"
                     </p>
-                    {quote.author && (
-                        <p className={`${compact ? 'text-sm' : 'text-base'} font-semibold flex items-center gap-2 text-purple-600 dark:text-purple-400`}>
-                            <span className="w-8 h-0.5 bg-purple-600 dark:bg-purple-400"></span>
-                            {quote.author}
-                        </p>
+
+                    {/* Author & Source - Secondary Info */}
+                    {(quote.author || quote.source) && (
+                        <div className="mt-2 sm:mt-2.5 space-y-0.5">
+                            {quote.author && (
+                                <p className="text-xs sm:text-sm font-semibold text-purple-600 dark:text-purple-400">
+                                    — {quote.author}
+                                </p>
+                            )}
+                            {quote.source && (
+                                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                                    {quote.source}
+                                </p>
+                            )}
+                        </div>
                     )}
-                    {quote.source && (
-                        <p className="text-xs mt-1 text-gray-500 dark:text-gray-400">
-                            {quote.source}
-                        </p>
+
+                    {/* Categories - Minimal Pills */}
+                    {quote.categories && quote.categories.length > 0 && (
+                        <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-2 sm:mt-3">
+                            {quote.categories.slice(0, 3).map((category) => (
+                                <span
+                                    key={category.id}
+                                    className="inline-flex items-center gap-0.5 sm:gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300"
+                                >
+                                    <span className="text-[9px] sm:text-[10px]">{category.icon}</span>
+                                    <span>{category.name}</span>
+                                </span>
+                            ))}
+                        </div>
                     )}
                 </div>
 
-                {/* Categories */}
-                {quote.categories && quote.categories.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        {quote.categories.slice(0, 3).map((category) => (
-                            <span
-                                key={category.id}
-                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
-                            >
-                                <span>{category.icon}</span>
-                                <span>{category.name}</span>
-                            </span>
-                        ))}
-                    </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-6">
+                {/* Actions Bar - Instagram Style */}
+                <div className="px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between">
+                    {/* Left Actions */}
+                    <div className="flex items-center gap-3 sm:gap-4">
                         {/* Like */}
                         <button
                             onClick={handleLike}
-                            className="flex items-center gap-2 group"
+                            className="flex items-center gap-1 sm:gap-1.5 group -ml-1"
                         >
-                            <Heart
-                                className={`w-5 h-5 transition-all ${isLiked
-                                    ? 'fill-red-500 text-red-500'
-                                    : 'text-gray-400 dark:text-gray-500 hover:text-red-500 group-hover:scale-110'
-                                    }`}
-                            />
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">{likesCount}</span>
+                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-red-50 dark:group-hover:bg-red-900/20 transition-colors">
+                                <Heart
+                                    className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all ${isLiked
+                                        ? 'fill-red-500 text-red-500 scale-105'
+                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500'
+                                        }`}
+                                />
+                            </div>
+                            {likesCount > 0 && (
+                                <span className={`text-xs sm:text-sm font-medium ${isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>
+                                    {likesCount}
+                                </span>
+                            )}
                         </button>
 
-                        {/* Save */}
+                        {/* Save/Bookmark */}
                         <button
                             onClick={handleSave}
-                            className="flex items-center gap-2 group"
+                            className="flex items-center gap-1 sm:gap-1.5 group"
                         >
-                            <Bookmark
-                                className={`w-5 h-5 transition-all ${isSaved
-                                    ? 'fill-purple-600 text-purple-600'
-                                    : 'text-gray-400 dark:text-gray-500 group-hover:text-purple-600 group-hover:scale-110'
-                                    }`}
-                            />
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">{savesCount}</span>
+                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors">
+                                <Bookmark
+                                    className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all ${isSaved
+                                        ? 'fill-purple-600 text-purple-600 scale-105'
+                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-purple-600'
+                                        }`}
+                                />
+                            </div>
+                            {savesCount > 0 && (
+                                <span className={`text-xs sm:text-sm font-medium ${isSaved ? 'text-purple-600' : 'text-gray-600 dark:text-gray-400'}`}>
+                                    {savesCount}
+                                </span>
+                            )}
                         </button>
 
-                        {/* Add to Collection - Instagram/Pinterest style */}
+                        {/* Share */}
+                        <button
+                            onClick={handleShare}
+                            className="flex items-center gap-1 sm:gap-1.5 group"
+                        >
+                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50 transition-colors">
+                                <Share2 className="w-5 h-5 sm:w-[22px] sm:h-[22px] text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors" />
+                            </div>
+                            {quote.shares_count > 0 && (
+                                <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
+                                    {quote.shares_count}
+                                </span>
+                            )}
+                        </button>
+
+                        {/* Collection (if available) */}
                         {auth?.user && collections && collections.length > 0 && (
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setShowCollectionModal(true);
                                 }}
-                                className="flex items-center gap-2 group relative"
+                                className="flex items-center gap-1 sm:gap-1.5 group"
                                 title="Add to Collection"
                             >
-                                <Folder
-                                    className={`w-5 h-5 transition-all ${quote.collection_ids && quote.collection_ids.length > 0
-                                        ? 'fill-purple-600 text-purple-600'
-                                        : 'text-gray-400 dark:text-gray-500 group-hover:text-purple-600 group-hover:scale-110'
-                                        }`}
-                                />
-                                {quote.collection_ids && quote.collection_ids.length > 0 && (
-                                    <span className="text-xs font-bold px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
-                                        {quote.collection_ids.length}
-                                    </span>
-                                )}
+                                <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors">
+                                    <Folder
+                                        className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all ${quote.collection_ids && quote.collection_ids.length > 0
+                                            ? 'fill-purple-600 text-purple-600'
+                                            : 'text-gray-600 dark:text-gray-400 group-hover:text-purple-600'
+                                            }`}
+                                    />
+                                </div>
                             </button>
                         )}
-
-                        {/* Share */}
-                        <button
-                            onClick={handleShare}
-                            className="flex items-center gap-2 group"
-                        >
-                            <Share2
-                                className="w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300 group-hover:scale-110 transition-all"
-                            />
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300">{quote.shares_count || 0}</span>
-                        </button>
                     </div>
 
-                    {/* Views */}
-                    <div className="flex items-center gap-2 opacity-60">
-                        <Eye className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{quote.views_count || 0}</span>
-                    </div>
+                    {/* Right: Views */}
+                    {quote.views_count > 0 && (
+                        <div className="flex items-center gap-1 sm:gap-1.5 text-gray-500 dark:text-gray-400">
+                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span className="text-[10px] sm:text-xs font-medium">{quote.views_count}</span>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Quote Detail Modal */}
+            {/* Modals */}
             <QuoteDetailModal
                 quote={quote}
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
             />
 
-            {/* Delete Confirmation Modal */}
             <DeleteConfirmationModal
                 show={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
@@ -389,7 +458,6 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 processing={isDeleting}
             />
 
-            {/* Report Modal */}
             <ReportModal
                 show={showReportModal}
                 onClose={() => setShowReportModal(false)}
@@ -397,7 +465,6 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 onSubmit={handleReport}
             />
 
-            {/* Add to Collection Modal */}
             <AddToCollectionModal
                 show={showCollectionModal}
                 onClose={() => setShowCollectionModal(false)}
@@ -406,14 +473,19 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
             />
 
             {/* Toast Notification */}
-            {showToast && (
-                <div className="fixed bottom-4 right-4 z-50 animate-slide-up">
-                    <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-4 py-3 rounded-lg shadow-lg flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-400 dark:text-green-600" />
-                        <span className="font-medium">{toastMessage}</span>
-                    </div>
-                </div>
-            )}
+            <Toast
+                show={showToast}
+                onClose={() => setShowToast(false)}
+                message={toastMessage}
+                type={toastType}
+            />
+
+            {/* Auth Prompt Modal */}
+            <AuthPromptModal
+                show={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                action={authAction}
+            />
         </div>
     );
 }

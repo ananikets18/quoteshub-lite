@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import { useFormShortcuts } from '@/Hooks/useKeyboardShortcuts';
 import {
-    Type,
     Type,
     Tag,
     Send,
@@ -22,9 +22,16 @@ export default function CreateQuote({ categories }) {
     const [activeTab, setActiveTab] = useState('text'); // 'text', 'tags'
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
+        if (!data.content || processing) return;
         post(route('quotes.store'));
     };
+
+    // Keyboard shortcut: Ctrl/Cmd + Enter to submit
+    useFormShortcuts({
+        onSubmit: handleSubmit,
+        canSubmit: !!data.content && !processing,
+    });
 
     const toggleCategory = (categoryId) => {
         if (data.category_ids.includes(categoryId)) {
@@ -55,6 +62,7 @@ export default function CreateQuote({ categories }) {
                             ? 'bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-600 cursor-not-allowed'
                             : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-xl hover:scale-105'
                             }`}
+                        title="Post quote (Ctrl+Enter)"
                     >
                         <span>Post</span>
                         <Send className="w-4 h-4" />

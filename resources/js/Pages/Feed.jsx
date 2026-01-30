@@ -3,6 +3,7 @@ import { router, usePage } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import SuggestedUsers from '@/Components/SuggestedUsers';
+import useScrollDirection from '@/Hooks/useScrollDirection';
 import { TrendingUp, Clock, Star, Sparkles, Filter } from 'lucide-react';
 
 export default function Feed({ quotes: initialQuotes, categories, collections = [] }) {
@@ -11,6 +12,9 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
     const [loading, setLoading] = useState(false);
     const [activeFilter, setActiveFilter] = useState(auth.user ? 'foryou' : 'latest');
     const [page, setPage] = useState(1);
+
+    // Scroll direction for dynamic header/nav
+    const { scrollDirection, scrollY } = useScrollDirection();
 
     const filters = auth.user
         ? [
@@ -80,10 +84,14 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loading, page]);
 
+    // Determine if header should be visible
+    const isHeaderVisible = scrollDirection === 'up' || scrollY < 50;
+
     return (
         <AppLayout title="QuotesHub">
-            {/* Sticky Header Section */}
-            <div className="sticky top-[60px] z-30 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
+            {/* Sticky Header Section - Hides on scroll down */}
+            <div className={`sticky top-[60px] z-30 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+                }`}>
 
                 {/* Categories Horizontal Scroll */}
                 <div className="bg-white dark:bg-gray-900 px-4 py-3">
@@ -131,10 +139,10 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                 </div>
             </div>
 
-            {/* Main Content - Full Width */}
-            <div className="max-w-3xl mx-auto px-4 py-6">
+            {/* Main Content - Edge to Edge */}
+            <div className="max-w-3xl mx-auto">
                 {quotes.length === 0 ? (
-                    <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg">
+                    <div className="text-center py-12 mx-4 bg-white dark:bg-gray-800 rounded-lg">
                         <p className="text-gray-500 dark:text-gray-400 text-lg">
                             {activeFilter === 'foryou'
                                 ? 'Start liking and saving quotes to get personalized recommendations!'

@@ -4,7 +4,7 @@ import { Flame, Bell, Settings } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 import axios from 'axios';
 
-export default function Header({ title, showStreak = true, showNotifications = true }) {
+export default function Header({ title, showStreak = true, showNotifications = true, isVisible = true }) {
     const { auth } = usePage().props;
     const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -41,7 +41,8 @@ export default function Header({ title, showStreak = true, showNotifications = t
     };
 
     return (
-        <header className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top">
+        <header className={`sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
+            }`}>
             <div className="flex items-center justify-between px-4 py-3 max-w-lg mx-auto">
                 {/* Left: Title or Logo */}
                 <div>

@@ -31,6 +31,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'location',
         'role',
         
+        // Onboarding
+        'onboarding_completed',
+        'onboarding_steps',
+        'onboarding_completed_at',
+        
         // Cached counter columns - NOT source of truth
         // These are denormalized for performance
         // Update via events/observers to keep in sync
@@ -68,6 +73,11 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'last_active_at' => 'datetime',  // Changed from date to datetime
             'is_active' => 'boolean',
+            
+            // Onboarding
+            'onboarding_completed' => 'boolean',
+            'onboarding_steps' => 'array',
+            'onboarding_completed_at' => 'datetime',
             
             // Cached counters (denormalized)
             'quotes_count' => 'integer',
