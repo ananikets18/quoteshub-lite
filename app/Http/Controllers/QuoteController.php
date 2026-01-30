@@ -5,20 +5,32 @@ namespace App\Http\Controllers;
 use App\Models\Quote;
 use App\Models\Category;
 use App\Services\NotificationService;
+use App\Services\ContentModerationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class QuoteController extends Controller
 {
+    protected $moderationService;
+
+    public function __construct(ContentModerationService $moderationService)
+    {
+        $this->moderationService = $moderationService;
+    }
+
     /**
      * Show the form for creating a new quote.
      */
     public function create()
     {
         $categories = Category::active()->ordered()->get();
+        
+        // Get user's rate limit info
+        $rateLimitInfo = $this->moderationService->getRemainingQuotes(auth()->user());
 
         return Inertia::render('CreateQuote', [
             'categories' => $categories,
+            'rateLimitInfo' => $rateLimitInfo,
         ]);
     }
 
@@ -27,6 +39,16 @@ class QuoteController extends Controller
      */
     public function store(Request $request)
     {
+        $user = auth()->user();
+
+        // Check rate limiting
+        if ($this->moderationService->isRateLimited($user)) {
+            $rateLimitInfo = $this->moderationService->getRemainingQuotes($user);
+            return back()->withErrors([
+                'content' => "You've reached your quote limit. Please wait before posting more. (Limit: {$rateLimitInfo['limit']} quotes per hour)"
+            ])->withInput();
+        }
+
         $validated = $request->validate([
             'content' => 'required|string|min:10|max:500',
             'author' => 'required|string|max:100',
@@ -36,13 +58,39 @@ class QuoteController extends Controller
             'category_ids.*' => 'exists:categories,id',
         ]);
 
+        // Content moderation checks
+        $moderationResult = $this->moderationService->validateContent(
+            $validated['content'] . ' ' . $validated['author'] . ' ' . ($validated['source'] ?? ''),
+            $user
+        );
+
+        // Block content with profanity
+        if (in_array('profanity', $moderationResult['flags'])) {
+            return back()->withErrors([
+                'content' => 'Your quote contains inappropriate language. Please revise and try again.'
+            ])->withInput();
+        }
+
+        // Block obvious spam
+        if (in_array('spam', $moderationResult['flags'])) {
+            return back()->withErrors([
+                'content' => 'Your quote appears to be spam. Please ensure you\'re posting genuine quotes.'
+            ])->withInput();
+        }
+
+        // Warn about URLs but allow (for now)
+        $warnings = [];
+        if (in_array('contains_url', $moderationResult['flags'])) {
+            $warnings[] = 'Note: Your quote contains URLs. It may be reviewed by moderators.';
+        }
+
         $quote = Quote::create([
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'content' => $validated['content'],
             'author' => $validated['author'],
             'source' => $validated['source'] ?? null,
             'background_gradient' => $validated['background_gradient'],
-            'status' => 'approved', // Auto-approve for now, can add moderation later
+            'status' => 'approved', // MVP: Auto-approve all quotes. Moderation via report system.
             'is_featured' => false,
         ]);
 
@@ -51,7 +99,12 @@ class QuoteController extends Controller
             $quote->categories()->attach($validated['category_ids']);
         }
 
-        return redirect()->route('home')->with('success', 'Quote created successfully!');
+        $successMessage = 'Quote created successfully!';
+        if (!empty($warnings)) {
+            $successMessage .= ' ' . implode(' ', $warnings);
+        }
+
+        return redirect()->route('home')->with('success', $successMessage);
     }
 
     /**
@@ -110,6 +163,32 @@ class QuoteController extends Controller
             'category_ids.*' => 'exists:categories,id',
         ]);
 
+        // Content moderation checks (prevent editing to add spam/profanity)
+        $moderationResult = $this->moderationService->validateContent(
+            $validated['content'] . ' ' . $validated['author'] . ' ' . ($validated['source'] ?? ''),
+            auth()->user()
+        );
+
+        // Block content with profanity
+        if (in_array('profanity', $moderationResult['flags'])) {
+            return back()->withErrors([
+                'content' => 'Your quote contains inappropriate language. Please revise and try again.'
+            ])->withInput();
+        }
+
+        // Block obvious spam
+        if (in_array('spam', $moderationResult['flags'])) {
+            return back()->withErrors([
+                'content' => 'Your quote appears to be spam. Please ensure you\'re posting genuine quotes.'
+            ])->withInput();
+        }
+
+        // Warn about URLs but allow (for now)
+        $warnings = [];
+        if (in_array('contains_url', $moderationResult['flags'])) {
+            $warnings[] = 'Note: Your quote contains URLs. It may be reviewed by moderators.';
+        }
+
         $quote->update([
             'content' => $validated['content'],
             'author' => $validated['author'],
@@ -124,7 +203,12 @@ class QuoteController extends Controller
             $quote->categories()->detach();
         }
 
-        return redirect()->route('quotes.show', $quote)->with('success', 'Quote updated successfully!');
+        $successMessage = 'Quote updated successfully!';
+        if (!empty($warnings)) {
+            $successMessage .= ' ' . implode(' ', $warnings);
+        }
+
+        return redirect()->route('quotes.show', $quote)->with('success', $successMessage);
     }
 
     /**
@@ -205,9 +289,27 @@ class QuoteController extends Controller
             'description' => 'nullable|string|max:500',
         ]);
 
-        // Here you would typically save to a reports table
-        // For now, we'll just return success
-        // You can create a Report model and migration later
+        // Prevent duplicate reports from same user for same quote
+        $existingReport = \App\Models\Report::where('user_id', auth()->id())
+            ->where('quote_id', $quote->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingReport) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have already reported this quote. We are reviewing it.',
+            ], 422);
+        }
+
+        // Save the report to database
+        \App\Models\Report::create([
+            'user_id' => auth()->id(),
+            'quote_id' => $quote->id,
+            'reason' => $validated['reason'],
+            'details' => $validated['description'] ?? null,
+            'status' => 'pending',
+        ]);
 
         return response()->json([
             'success' => true,

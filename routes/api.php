@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\RecommendationController;
 use App\Http\Controllers\Api\UserPreferenceController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ModerationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -74,6 +75,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/preferences/undo-not-interested', [UserPreferenceController::class, 'undoNotInterested']);
     Route::get('/preferences', [UserPreferenceController::class, 'getPreferences']);
     Route::post('/preferences/recalculate', [UserPreferenceController::class, 'recalculatePreferences']);
+
+    // Moderation and trust score
+    Route::get('/moderation/info', [ModerationController::class, 'getUserModerationInfo']);
+    Route::post('/moderation/validate', [ModerationController::class, 'validateContent']);
 
     // Quote management
     Route::post('/quotes', [QuoteController::class, 'store']);
