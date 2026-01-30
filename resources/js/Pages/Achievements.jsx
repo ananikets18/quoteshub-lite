@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Trophy, Lock, Star, TrendingUp, Users, BookMarked, Flame, Award } from 'lucide-react';
 
 export default function Achievements({ auth, achievements, progress, totalPoints }) {
@@ -38,26 +38,26 @@ export default function Achievements({ auth, achievements, progress, totalPoints
     const completionPercentage = Math.round((unlockedCount / totalCount) * 100);
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppLayout user={auth.user} showNav={true}>
             <Head title="Achievements" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div className="px-4 py-6 pb-20">
+                <div className="max-w-7xl mx-auto">
                     {/* Header Stats */}
-                    <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg p-8 mb-8 text-white">
-                        <div className="flex items-center justify-between">
+                    <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-lg p-6 mb-6 text-white">
+                        <div className="flex items-center justify-between flex-wrap gap-4">
                             <div>
-                                <h1 className="text-3xl font-bold flex items-center gap-3">
-                                    <Trophy className="w-10 h-10" />
+                                <h1 className="text-2xl font-bold flex items-center gap-2">
+                                    <Trophy className="w-7 h-7" />
                                     Achievements
                                 </h1>
-                                <p className="mt-2 text-purple-100">
+                                <p className="mt-1 text-purple-100 text-sm">
                                     Track your progress and unlock rewards
                                 </p>
                             </div>
                             <div className="text-right">
-                                <div className="text-5xl font-bold">{totalPoints}</div>
-                                <div className="text-purple-100">Total Points</div>
+                                <div className="text-4xl font-bold">{totalPoints}</div>
+                                <div className="text-purple-100 text-sm">Total Points</div>
                             </div>
                         </div>
 
@@ -84,8 +84,8 @@ export default function Achievements({ auth, achievements, progress, totalPoints
                         const categoryUnlocked = categoryAchievements.filter(a => a.unlocked).length;
 
                         return (
-                            <div key={categoryKey} className="mb-8">
-                                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+                            <div key={categoryKey} className="mb-6">
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                                     <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
                                         <div className="flex items-center justify-between">
                                             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -98,8 +98,8 @@ export default function Achievements({ auth, achievements, progress, totalPoints
                                         </div>
                                     </div>
 
-                                    <div className="p-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className="p-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                             {categoryAchievements.map((achievement) => (
                                                 <div
                                                     key={achievement.type}
@@ -157,7 +157,7 @@ export default function Achievements({ auth, achievements, progress, totalPoints
 
                     {/* Recent Achievements */}
                     {achievements.length > 0 && (
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                                 <Star className="w-6 h-6 text-yellow-500" />
                                 Recent Achievements
@@ -192,6 +192,6 @@ export default function Achievements({ auth, achievements, progress, totalPoints
                     )}
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

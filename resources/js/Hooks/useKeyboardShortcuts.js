@@ -84,7 +84,7 @@ export function useGlobalShortcuts({
                         e.preventDefault();
                         const username = document.querySelector('[data-user-username]')?.dataset.userUsername;
                         if (username) {
-                            router.visit(`/u/${username}`);
+                            router.visit(`/${username}`);
                         }
                     }
                     break;

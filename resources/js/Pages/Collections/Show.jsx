@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import Pagination from '@/Components/Pagination';
 import Modal from '@/Components/Modal';
@@ -43,10 +43,10 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppLayout user={auth.user} showNav={true}>
             <Head title={collection.name} />
 
-            <div className="max-w-5xl mx-auto">
+            <div className="px-4 py-6 pb-20">
                 {/* Back Link */}
                 <Link
                     href="/collections"
@@ -114,7 +114,7 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                 {/* Quotes Grid */}
                 {quotes.data.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
                             {quotes.data.map((quote) => (
                                 <div key={quote.id} className="relative">
                                     <QuoteCard 
@@ -141,10 +141,10 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                         )}
                     </>
                 ) : (
-                    <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                        <Folder className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Collection is empty</h3>
-                        <p className="text-gray-600 mb-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+                        <Folder className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Collection is empty</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
                             {isOwner 
                                 ? "Start adding quotes to this collection from your saved quotes!"
                                 : "This collection doesn't have any quotes yet."
@@ -152,8 +152,8 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                         </p>
                         {isOwner && (
                             <Link
-                                href={route('profile.saved')}
-                                className="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition"
+                                href={route('saved')}
+                                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:shadow-lg transition-all"
                             >
                                 View Saved Quotes
                             </Link>
@@ -227,6 +227,6 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                     </div>
                 </div>
             </Modal>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

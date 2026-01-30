@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { FolderPlus, Folder, Lock, Globe, Trash2, Edit, ChevronRight, AlertTriangle } from 'lucide-react';
 import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -78,10 +78,10 @@ export default function Index({ auth, collections }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppLayout user={auth.user} showNav={true}>
             <Head title="My Collections" />
 
-            <div className="max-w-5xl mx-auto">
+            <div className="px-4 py-6 pb-20">
                 {/* Header */}
                 <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <div className="flex justify-between items-center">
@@ -106,23 +106,23 @@ export default function Index({ auth, collections }) {
 
                 {/* Collections Grid */}
                 {collections.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {collections.map((collection) => (
                             <div
                                 key={collection.id}
-                                className="bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 group"
+                                className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all p-6 group"
                             >
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-start space-x-3">
-                                        <Folder className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
+                                        <Folder className="w-6 h-6 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-1" />
                                         <div className="flex-1 min-w-0">
                                             <Link
                                                 href={`/collections/${collection.slug}`}
-                                                className="text-lg font-semibold text-gray-900 hover:text-purple-600 block truncate"
+                                                className="text-lg font-semibold text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 block truncate transition-colors"
                                             >
                                                 {collection.name}
                                             </Link>
-                                            <p className="text-sm text-gray-600 mt-1">
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                                 {collection.quotes_count} quote{collection.quotes_count !== 1 ? 's' : ''}
                                             </p>
                                         </div>
@@ -130,13 +130,13 @@ export default function Index({ auth, collections }) {
                                     <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition">
                                         <button
                                             onClick={() => openEditModal(collection)}
-                                            className="text-gray-400 hover:text-gray-600"
+                                            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                                         >
                                             <Edit className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={() => openDeleteModal(collection)}
-                                            className="text-gray-400 hover:text-red-600"
+                                            className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-500"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
@@ -144,13 +144,13 @@ export default function Index({ auth, collections }) {
                                 </div>
 
                                 {collection.description && (
-                                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
                                         {collection.description}
                                     </p>
                                 )}
 
                                 <div className="flex justify-between items-center">
-                                    <span className="inline-flex items-center text-xs text-gray-500">
+                                    <span className="inline-flex items-center text-xs text-gray-500 dark:text-gray-400">
                                         {collection.is_public ? (
                                             <>
                                                 <Globe className="w-3 h-3 mr-1" />
@@ -165,7 +165,7 @@ export default function Index({ auth, collections }) {
                                     </span>
                                     <Link
                                         href={`/collections/${collection.slug}`}
-                                        className="text-purple-600 hover:text-purple-700 text-sm font-medium inline-flex items-center"
+                                        className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium inline-flex items-center transition-colors"
                                     >
                                         View
                                         <ChevronRight className="w-4 h-4 ml-1" />
@@ -175,15 +175,15 @@ export default function Index({ auth, collections }) {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                        <Folder className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No collections yet</h3>
-                        <p className="text-gray-600 mb-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+                        <Folder className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No collections yet</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
                             Create your first collection to organize your saved quotes
                         </p>
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            className="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition"
+                            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:shadow-lg transition-all"
                         >
                             <FolderPlus className="w-5 h-5 mr-2" />
                             Create Collection
@@ -335,6 +335,6 @@ export default function Index({ auth, collections }) {
                     </div>
                 </div>
             </Modal>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

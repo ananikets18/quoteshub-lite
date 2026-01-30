@@ -48,19 +48,84 @@ Route::get('/dashboard', function () {
         'following_count' => $user->following_count ?? 0,
         'daily_streak' => $user->daily_streak ?? 0,
         'total_likes' => $user->quotes()->withCount('likes')->get()->sum('likes_count'),
+        'total_saves' => $user->quotes()->withCount('saves')->get()->sum('saves_count'),
+        'total_views' => $user->quotes()->sum('views_count'),
+        
+        // Recent activity
         'recent_quotes' => $user->quotes()
             ->latest()
             ->take(3)
-            ->withCount('likes')
+            ->withCount(['likes', 'saves'])
             ->get()
             ->map(function ($quote) {
                 return [
                     'id' => $quote->id,
                     'content' => $quote->content,
                     'likes_count' => $quote->likes_count ?? 0,
+                    'saves_count' => $quote->saves_count ?? 0,
+                    'views_count' => $quote->views_count ?? 0,
                     'time_ago' => $quote->created_at->diffForHumans(),
                 ];
             }),
+        
+        // Top performing quote
+        'top_quote' => $user->quotes()
+            ->withCount(['likes', 'saves'])
+            ->orderByDesc('likes_count')
+            ->first()
+            ?->only(['id', 'content', 'likes_count', 'saves_count']),
+        
+        // Collections
+        'collections_count' => $user->collections()->count(),
+        'public_collections' => $user->collections()
+            ->where('is_public', true)
+            ->withCount('quotes')
+            ->latest()
+            ->take(3)
+            ->get()
+            ->map(function ($collection) {
+                return [
+                    'id' => $collection->id,
+                    'name' => $collection->name,
+                    'description' => $collection->description,
+                    'quotes_count' => $collection->quotes_count ?? 0,
+                ];
+            }),
+        
+        // Recent activity from following
+        'following_activity' => $user->following()
+            ->with(['quotes' => function ($query) {
+                $query->latest()->take(1)->withCount('likes');
+            }])
+            ->take(5)
+            ->get()
+            ->filter(fn($followed) => $followed->quotes->isNotEmpty())
+            ->map(function ($followed) {
+                $quote = $followed->quotes->first();
+                return [
+                    'user' => [
+                        'id' => $followed->id,
+                        'name' => $followed->name,
+                        'username' => $followed->username,
+                        'avatar' => $followed->avatar,
+                    ],
+                    'quote' => [
+                        'id' => $quote->id,
+                        'content' => $quote->content,
+                        'likes_count' => $quote->likes_count ?? 0,
+                        'time_ago' => $quote->created_at->diffForHumans(),
+                    ],
+                ];
+            })->values(),
+        
+        // This week stats (compare to last week)
+        'this_week' => [
+            'quotes' => $user->quotes()->where('created_at', '>=', now()->startOfWeek())->count(),
+            'likes' => $user->quotes()
+                ->whereHas('likes', fn($q) => $q->where('created_at', '>=', now()->startOfWeek()))
+                ->count(),
+            'followers' => $user->followers()->wherePivot('created_at', '>=', now()->startOfWeek())->count(),
+        ],
     ];
     
     return Inertia::render('Dashboard', [
@@ -85,29 +150,58 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/quotes/{quote}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
     
     // Quote interactions (web routes instead of API)
-    Route::post('/quotes/{quote}/like', [QuoteController::class, 'like'])->name('quotes.like');
-    Route::post('/quotes/{quote}/save', [QuoteController::class, 'save'])->name('quotes.save');
-    Route::post('/quotes/{quote}/share', [QuoteController::class, 'share'])->name('quotes.share');
-    Route::post('/quotes/{quote}/report', [QuoteController::class, 'report'])->name('quotes.report');
+    Route::post('/quotes/{quote}/like', [QuoteController::class, 'like'])->name('quotes.like')->middleware('throttle:60,1');
+    Route::post('/quotes/{quote}/save', [QuoteController::class, 'save'])->name('quotes.save')->middleware('throttle:30,1');
+    Route::post('/quotes/{quote}/share', [QuoteController::class, 'share'])->name('quotes.share')->middleware('throttle:20,1');
+    Route::post('/quotes/{quote}/report', [QuoteController::class, 'report'])->name('quotes.report')->middleware('throttle:5,1');
     
     // Profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update')->middleware('throttle:10,1');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy')->middleware('throttle:3,1');
     
-    // Saved quotes (requires auth)
-    Route::get('/profile/saved', [ProfileController::class, 'saved'])->name('profile.saved');
+    // Settings
+    Route::get('/settings', function () {
+        $user = auth()->user();
+        
+        // Get or create preferences
+        $preferences = $user->notificationPreferences()->firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'new_follower' => true,
+                'quote_liked' => true,
+                'quote_saved' => true,
+                'comment_added' => true,
+                'achievement_unlocked' => true,
+                'admin_warning' => true,
+                'quote_removed' => true,
+                'quote_featured' => true,
+                'in_app_notifications' => true,
+                'email_notifications' => false,
+                'push_notifications' => false,
+                'notification_sounds' => true,
+                'group_similar_notifications' => true,
+            ]
+        );
+        
+        return Inertia::render('Settings', [
+            'preferences' => $preferences,
+        ]);
+    })->name('settings');
+    
+    // Saved quotes (private - requires auth)
+    Route::get('/saved', [ProfileController::class, 'saved'])->name('saved');
     
     // Notification preferences
     Route::get('/profile/notification-preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'edit'])->name('profile.notification-preferences.edit');
-    Route::post('/profile/notification-preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('profile.notification-preferences.update');
+    Route::post('/profile/notification-preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('profile.notification-preferences.update')->middleware('throttle:10,1');
 
     
-    // Collections
+    // Collections (private to user)
     Route::get('/collections', [CollectionController::class, 'index'])->name('collections.index');
-    Route::post('/collections', [CollectionController::class, 'store'])->name('collections.store');
-    Route::patch('/collections/{slug}', [CollectionController::class, 'update'])->name('collections.update');
-    Route::delete('/collections/{slug}', [CollectionController::class, 'destroy'])->name('collections.destroy');
+    Route::post('/collections', [CollectionController::class, 'store'])->name('collections.store')->middleware('throttle:20,1');
+    Route::patch('/collections/{slug}', [CollectionController::class, 'update'])->name('collections.update')->middleware('throttle:20,1');
+    Route::delete('/collections/{slug}', [CollectionController::class, 'destroy'])->name('collections.destroy')->middleware('throttle:10,1');
     Route::post('/collections/{slug}/quotes/{quote}', [CollectionController::class, 'addQuote'])->name('collections.addQuote');
     Route::delete('/collections/{slug}/quotes/{quote}', [CollectionController::class, 'removeQuote'])->name('collections.removeQuote');
     Route::post('/quotes/{quote}/move', [CollectionController::class, 'moveQuote'])->name('collections.moveQuote');
@@ -128,12 +222,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-// Public profile routes
-Route::get('/u/{username}', [ProfileController::class, 'show'])->name('profile.show');
-Route::get('/u/{username}/liked', [ProfileController::class, 'liked'])->name('profile.liked');
-Route::get('/u/{username}/followers', [FollowController::class, 'followers'])->name('profile.followers');
-Route::get('/u/{username}/following', [FollowController::class, 'following'])->name('profile.following');
-
 // Public collection route
 Route::get('/collections/{slug}', [CollectionController::class, 'show'])->name('collections.show');
 
@@ -149,3 +237,9 @@ Route::middleware(['auth'])->prefix('onboarding')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Public profile routes - MUST BE LAST (wildcard catches everything)
+Route::get('/{username}/followers', [FollowController::class, 'followers'])->name('profile.followers');
+Route::get('/{username}/following', [FollowController::class, 'following'])->name('profile.following');
+Route::get('/{username}/liked', [ProfileController::class, 'liked'])->name('profile.liked');
+Route::get('/{username}', [ProfileController::class, 'show'])->name('profile.show');

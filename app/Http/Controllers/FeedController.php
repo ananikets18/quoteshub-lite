@@ -52,7 +52,7 @@ class FeedController extends Controller
                 $query->latest();
         }
 
-        $quotes = $query->paginate(20);
+        $quotes = $query->paginate(15);
 
         // Add user interaction flags if authenticated
         if (auth()->check()) {
@@ -89,7 +89,7 @@ class FeedController extends Controller
     {
         $user = auth()->user();
         $page = $request->get('page', 1);
-        $perPage = 20;
+        $perPage = 15;
 
         // Get personalized recommendations
         $allRecommendations = $this->recommendationService->getPersonalizedFeed($user, $perPage * 3);

@@ -114,15 +114,23 @@ class ProfileController extends Controller
     /**
      * Get user's saved quotes.
      */
+    /**
+     * Display the user's saved quotes (private to the user).
+     */
     public function saved(Request $request): Response
     {
+        // Ensure user is authenticated
+        if (!$request->user()) {
+            abort(403, 'Unauthorized access to saved quotes.');
+        }
+
         $user = $request->user();
         
         $quotes = $user->savedQuotes()
             ->with(['user', 'categories', 'tags'])
             ->withCount(['likes', 'saves'])
             ->latest('saves.created_at')
-            ->paginate(12);
+            ->paginate(15);
         
         // Add user interaction flags and collection info
         $quotes->getCollection()->transform(function ($quote) use ($user) {

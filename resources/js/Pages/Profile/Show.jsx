@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import Pagination from '@/Components/Pagination';
 import { User, MapPin, Link as LinkIcon, Calendar, Heart, Bookmark, Users, FileText, UserPlus, UserCheck, Edit } from 'lucide-react';
@@ -34,7 +34,7 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
         : null;
 
     return (
-        <AppLayout title={`${profileUser.name}'s Profile`} showNav={true}>
+        <AppLayout title={`${profile.name}'s Profile`} showNav={true}>
             <Head title={`${profile.name} (@${profile.username})`} />
 
             <div className="max-w-5xl mx-auto">
@@ -141,11 +141,11 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                             <span className="font-bold text-gray-900">{stats.likes_received}</span>
                             <span className="text-gray-600 ml-1">Likes Received</span>
                         </div>
-                        <Link href={`/u/${profile.username}/followers`} className="hover:underline">
+                        <Link href={`/${profile.username}/followers`} className="hover:underline">
                             <span className="font-bold text-gray-900">{followersCount}</span>
                             <span className="text-gray-600 ml-1">Followers</span>
                         </Link>
-                        <Link href={`/u/${profile.username}/following`} className="hover:underline">
+                        <Link href={`/${profile.username}/following`} className="hover:underline">
                             <span className="font-bold text-gray-900">{stats.following_count}</span>
                             <span className="text-gray-600 ml-1">Following</span>
                         </Link>
@@ -155,7 +155,7 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                     <div className="mt-6 border-t border-gray-200">
                         <div className="flex space-x-8">
                             <Link
-                                href={`/u/${profile.username}`}
+                                href={`/${profile.username}`}
                                 className={`py-4 border-b-2 transition ${
                                     activeTab === 'quotes'
                                         ? 'border-purple-600 text-purple-600'
@@ -166,7 +166,7 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                                 Quotes
                             </Link>
                             <Link
-                                href={`/u/${profile.username}/liked`}
+                                href={`/${profile.username}/liked`}
                                 className={`py-4 border-b-2 transition ${
                                     activeTab === 'liked'
                                         ? 'border-purple-600 text-purple-600'
@@ -178,7 +178,7 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                             </Link>
                             {isOwnProfile && (
                                 <Link
-                                    href={route('profile.saved')}
+                                    href={route('saved')}
                                     className={`py-4 border-b-2 transition ${
                                         activeTab === 'saved'
                                             ? 'border-purple-600 text-purple-600'

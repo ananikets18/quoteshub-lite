@@ -1,12 +1,20 @@
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import SearchBar from '@/Components/SearchBar';
 import QuoteCard from '@/Components/QuoteCard';
-import { Filter, X, Calendar, TrendingUp, Clock, Bookmark } from 'lucide-react';
+import { Filter, X, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Index({ auth, quotes, categories, popularTags, filters, collections = [] }) {
+export default function Index({
+    auth,
+    quotes,
+    categories,
+    popularTags,
+    filters,
+    collections = [],
+}) {
     const [showFilters, setShowFilters] = useState(false);
+
     const [localFilters, setLocalFilters] = useState({
         q: filters.q || '',
         category: filters.category || '',
@@ -17,257 +25,234 @@ export default function Index({ auth, quotes, categories, popularTags, filters, 
     });
 
     const handleFilterChange = (key, value) => {
-        const newFilters = { ...localFilters, [key]: value };
-        setLocalFilters(newFilters);
-        
-        // Remove empty filters
-        const cleanFilters = Object.entries(newFilters)
-            .filter(([_, v]) => v !== null && v !== '')
-            .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
-        
-        router.get('/search', cleanFilters, {
-            preserveState: true,
+        const next = { ...localFilters, [key]: value };
+        setLocalFilters(next);
+
+        const clean = Object.fromEntries(
+            Object.entries(next).filter(([_, v]) => v !== '' && v !== null)
+        );
+
+        router.get('/search', clean, {
             preserveScroll: true,
+            preserveState: true,
         });
     };
 
     const clearFilters = () => {
-        const resetFilters = {
-            q: filters.q || '',
+        const reset = {
+            q: localFilters.q,
             category: '',
             tag: '',
             start_date: '',
             end_date: '',
             sort: 'latest',
         };
-        setLocalFilters(resetFilters);
-        router.get('/search', { q: filters.q || '' });
+
+        setLocalFilters(reset);
+        router.get('/search', { q: reset.q });
     };
 
-    const hasActiveFilters = filters.category || filters.tag || filters.start_date || filters.end_date;
+    const hasActiveFilters =
+        localFilters.category ||
+        localFilters.tag ||
+        localFilters.start_date ||
+        localFilters.end_date ||
+        localFilters.sort !== 'latest';
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppLayout title="Search Quotes" showNav>
             <Head title="Search Quotes" />
 
-            <div className="max-w-7xl mx-auto">
-                {/* Search Header */}
-                <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg p-8 mb-6">
-                    <h1 className="text-3xl font-bold text-white mb-6 text-center">
-                        Search Quotes
-                    </h1>
-                    <div className="flex justify-center">
-                        <SearchBar initialValue={filters.q} />
-                    </div>
-                </div>
+            <div className="px-4 py-6 pb-20 space-y-6">
+                <SearchBar initialValue={localFilters.q} />
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    {/* Filters Sidebar */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                                    <Filter className="w-5 h-5 mr-2" />
-                                    Filters
-                                </h2>
-                                {hasActiveFilters && (
+                {/* Mobile Filter Toggle */}
+                <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="lg:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm"
+                >
+                    <Filter className="w-5 h-5" />
+                    {showFilters ? 'Hide Filters' : 'Show Filters'}
+                    {hasActiveFilters && (
+                        <span className="ml-2 px-2 py-0.5 bg-purple-100 text-purple-600 text-xs rounded-full">
+                            Active
+                        </span>
+                    )}
+                </button>
+
+                <div className="grid lg:grid-cols-4 gap-6">
+                    {/* Filters */}
+                    <div
+                        className={`${
+                            showFilters ? 'block' : 'hidden'
+                        } lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6`}
+                    >
+                        <div className="flex justify-between mb-4">
+                            <h2 className="font-semibold flex items-center gap-2">
+                                <Filter className="w-5 h-5" />
+                                Filters
+                            </h2>
+                            {hasActiveFilters && (
+                                <button
+                                    onClick={clearFilters}
+                                    className="text-sm text-purple-600"
+                                >
+                                    Clear all
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Sort */}
+                        <div className="mb-6">
+                            <label className="block text-sm mb-2">Sort By</label>
+                            <select
+                                value={localFilters.sort}
+                                onChange={(e) =>
+                                    handleFilterChange('sort', e.target.value)
+                                }
+                                className="w-full rounded-xl"
+                            >
+                                <option value="latest">Latest</option>
+                                <option value="popular">Most Popular</option>
+                                <option value="most_saved">Most Saved</option>
+                                <option value="oldest">Oldest</option>
+                            </select>
+                        </div>
+
+                        {/* Category */}
+                        <div className="mb-6">
+                            <label className="block text-sm mb-2">
+                                Category
+                            </label>
+                            <select
+                                value={localFilters.category}
+                                onChange={(e) =>
+                                    handleFilterChange(
+                                        'category',
+                                        e.target.value
+                                    )
+                                }
+                                className="w-full rounded-xl"
+                            >
+                                <option value="">All Categories</option>
+                                {categories.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                        {c.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Date */}
+                        <div className="mb-6">
+                            <label className="block text-sm mb-2 flex items-center gap-1">
+                                <Calendar className="w-4 h-4" />
+                                Date Range
+                            </label>
+                            <input
+                                type="date"
+                                value={localFilters.start_date}
+                                onChange={(e) =>
+                                    handleFilterChange(
+                                        'start_date',
+                                        e.target.value
+                                    )
+                                }
+                                className="w-full rounded-xl mb-2"
+                            />
+                            <input
+                                type="date"
+                                value={localFilters.end_date}
+                                onChange={(e) =>
+                                    handleFilterChange(
+                                        'end_date',
+                                        e.target.value
+                                    )
+                                }
+                                className="w-full rounded-xl"
+                            />
+                        </div>
+
+                        {/* Tags */}
+                        <div>
+                            <label className="block text-sm mb-2">
+                                Popular Tags
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                                {popularTags.map((tag) => (
                                     <button
-                                        onClick={clearFilters}
-                                        className="text-sm text-purple-600 hover:text-purple-700"
+                                        key={tag.id}
+                                        onClick={() =>
+                                            handleFilterChange('tag', tag.name)
+                                        }
+                                        className={`px-3 py-1 rounded-full text-xs ${
+                                            localFilters.tag === tag.name
+                                                ? 'bg-purple-600 text-white'
+                                                : 'bg-gray-100 dark:bg-gray-700'
+                                        }`}
                                     >
-                                        Clear all
+                                        {tag.name}
                                     </button>
-                                )}
-                            </div>
-
-                            {/* Sort By */}
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Sort By
-                                </label>
-                                <select
-                                    value={filters.sort}
-                                    onChange={(e) => handleFilterChange('sort', e.target.value)}
-                                    className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                                >
-                                    <option value="latest">Latest</option>
-                                    <option value="popular">Most Popular</option>
-                                    <option value="most_saved">Most Saved</option>
-                                    <option value="oldest">Oldest</option>
-                                </select>
-                            </div>
-
-                            {/* Category Filter */}
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Category
-                                </label>
-                                <select
-                                    value={filters.category || ''}
-                                    onChange={(e) => handleFilterChange('category', e.target.value)}
-                                    className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                                >
-                                    <option value="">All Categories</option>
-                                    {categories.map((category) => (
-                                        <option key={category.id} value={category.id}>
-                                            {category.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Date Range */}
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    <Calendar className="w-4 h-4 inline mr-1" />
-                                    Date Range
-                                </label>
-                                <div className="space-y-2">
-                                    <input
-                                        type="date"
-                                        value={filters.start_date || ''}
-                                        onChange={(e) => handleFilterChange('start_date', e.target.value)}
-                                        className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                                        placeholder="Start date"
-                                    />
-                                    <input
-                                        type="date"
-                                        value={filters.end_date || ''}
-                                        onChange={(e) => handleFilterChange('end_date', e.target.value)}
-                                        className="w-full rounded-lg border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                                        placeholder="End date"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Popular Tags */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Popular Tags
-                                </label>
-                                <div className="flex flex-wrap gap-2">
-                                    {popularTags.map((tag) => (
-                                        <button
-                                            key={tag.id}
-                                            onClick={() => handleFilterChange('tag', tag.name)}
-                                            className={`px-3 py-1 rounded-full text-xs transition ${
-                                                filters.tag === tag.name
-                                                    ? 'bg-purple-600 text-white'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
-                                        >
-                                            {tag.name}
-                                        </button>
-                                    ))}
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>
 
                     {/* Results */}
-                    <div className="lg:col-span-3">
-                        {/* Active Filters */}
-                        {hasActiveFilters && (
-                            <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-                                <div className="flex flex-wrap gap-2">
-                                    {filters.category && (
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-sm">
-                                            Category: {categories.find(c => c.id == filters.category)?.name}
-                                            <button
-                                                onClick={() => handleFilterChange('category', null)}
-                                                className="ml-2 hover:text-purple-900"
-                                            >
-                                                <X className="w-3 h-3" />
-                                            </button>
-                                        </span>
-                                    )}
-                                    {filters.tag && (
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-sm">
-                                            Tag: {filters.tag}
-                                            <button
-                                                onClick={() => handleFilterChange('tag', null)}
-                                                className="ml-2 hover:text-purple-900"
-                                            >
-                                                <X className="w-3 h-3" />
-                                            </button>
-                                        </span>
-                                    )}
-                                    {(filters.start_date || filters.end_date) && (
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-sm">
-                                            Date: {filters.start_date || 'Start'} - {filters.end_date || 'End'}
-                                            <button
-                                                onClick={() => {
-                                                    handleFilterChange('start_date', null);
-                                                    handleFilterChange('end_date', null);
-                                                }}
-                                                className="ml-2 hover:text-purple-900"
-                                            >
-                                                <X className="w-3 h-3" />
-                                            </button>
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                    <div className="lg:col-span-3 space-y-4">
+                        <p className="text-sm text-gray-600">
+                            {quotes.total} result
+                            {quotes.total !== 1 && 's'}
+                        </p>
 
-                        {/* Results Count */}
-                        <div className="mb-4">
-                            <p className="text-gray-600">
-                                {quotes.total} result{quotes.total !== 1 ? 's' : ''} found
-                                {filters.q && <span> for "<span className="font-semibold">{filters.q}</span>"</span>}
-                            </p>
-                        </div>
-
-                        {/* Quotes Grid */}
-                        {quotes.data.length > 0 ? (
+                        {quotes.data.length ? (
                             <>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {quotes.data.map((quote) => (
-                                        <QuoteCard 
-                                            key={quote.id} 
-                                            quote={quote} 
-                                            auth={auth}
-                                            collections={collections}
-                                        />
-                                    ))}
-                                </div>
+                                {quotes.data.map((quote) => (
+                                    <QuoteCard
+                                        key={quote.id}
+                                        quote={quote}
+                                        auth={auth}
+                                        collections={collections}
+                                    />
+                                ))}
 
-                                {/* Pagination */}
                                 {quotes.links.length > 3 && (
-                                    <div className="mt-6 flex justify-center space-x-2">
-                                        {quotes.links.map((link, index) => (
+                                    <div className="flex flex-wrap gap-2 justify-center mt-6">
+                                        {quotes.links.map((link, i) =>
                                             link.url ? (
                                                 <Link
-                                                    key={index}
+                                                    key={i}
                                                     href={link.url}
-                                                    className={`px-4 py-2 rounded-lg ${
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: link.label,
+                                                    }}
+                                                    className={`px-4 py-2 rounded-xl ${
                                                         link.active
                                                             ? 'bg-purple-600 text-white'
-                                                            : 'bg-white text-gray-700 hover:bg-gray-50'
+                                                            : 'bg-white dark:bg-gray-800'
                                                     }`}
-                                                    dangerouslySetInnerHTML={{ __html: link.label }}
                                                 />
                                             ) : (
                                                 <span
-                                                    key={index}
-                                                    className="px-4 py-2 rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed"
-                                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                                    key={i}
+                                                    className="px-4 py-2 rounded-xl opacity-50"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: link.label,
+                                                    }}
                                                 />
                                             )
-                                        ))}
+                                        )}
                                     </div>
                                 )}
                             </>
                         ) : (
-                            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                                <div className="text-6xl mb-4">🔍</div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">No results found</h3>
-                                <p className="text-gray-600 mb-6">
-                                    Try adjusting your search or filters
-                                </p>
+                            <div className="bg-white dark:bg-gray-800 p-12 rounded-2xl text-center">
+                                <h3 className="font-semibold mb-2">
+                                    No results found
+                                </h3>
                                 <button
                                     onClick={clearFilters}
-                                    className="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition"
+                                    className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-xl"
                                 >
                                     Clear Filters
                                 </button>
@@ -276,6 +261,6 @@ export default function Index({ auth, quotes, categories, popularTags, filters, 
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

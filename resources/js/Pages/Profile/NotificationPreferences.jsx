@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { Bell, BellOff, Volume2, VolumeX, Users } from 'lucide-react';
 
@@ -103,21 +103,24 @@ export default function NotificationPreferences({ auth, preferences }) {
     ];
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppLayout user={auth.user} showNav={true}>
             <Head title="Notification Preferences" />
 
-            <div className="py-12">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <Bell className="w-6 h-6" />
-                                Notification Preferences
-                            </h2>
-                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                Manage how and when you receive notifications
-                            </p>
-                        </div>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20 pt-4 px-4">
+                <div className="max-w-4xl mx-auto space-y-6">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-2xl shadow-lg">
+                        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                            <Bell className="w-6 h-6" />
+                            Notification Preferences
+                        </h2>
+                        <p className="mt-1 text-sm text-purple-100">
+                            Manage how and when you receive notifications
+                        </p>
+                    </div>
+
+                    {/* Card */}
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl">
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-8">
                             {/* Delivery Methods */}
@@ -289,15 +292,19 @@ export default function NotificationPreferences({ auth, preferences }) {
                             </div>
 
                             {/* Save Button */}
-                            <div className="flex items-center justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <PrimaryButton disabled={processing}>
+                            <div className="flex items-center justify-end pt-6">
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50"
+                                >
                                     {processing ? 'Saving...' : 'Save Preferences'}
-                                </PrimaryButton>
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

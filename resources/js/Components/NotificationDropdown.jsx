@@ -3,12 +3,13 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { Bell, Check, Trash2, Heart, Bookmark, UserPlus, Trophy, AlertTriangle, XCircle, Star, MessageCircle } from 'lucide-react';
 import axios from 'axios';
 
-export default function NotificationDropdown({ show, onClose }) {
+export default function NotificationDropdown({ show, onClose, buttonRef }) {
     const { auth } = usePage().props;
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hasMore, setHasMore] = useState(false);
     const dropdownRef = useRef(null);
+    const [position, setPosition] = useState({ top: 0, right: 0 });
 
     useEffect(() => {
         // Only load notifications if user is authenticated and dropdown is shown
@@ -16,6 +17,38 @@ export default function NotificationDropdown({ show, onClose }) {
             loadNotifications();
         }
     }, [show, auth?.user]);
+
+    // Calculate position based on button position
+    useEffect(() => {
+        if (show && buttonRef?.current) {
+            const rect = buttonRef.current.getBoundingClientRect();
+            setPosition({
+                top: rect.bottom + 8, // 8px below the button
+                right: window.innerWidth - rect.right
+            });
+        }
+    }, [show, buttonRef]);
+
+    // Lock body scroll when notification is open on mobile
+    useEffect(() => {
+        if (show) {
+            // Prevent body scroll on mobile
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+        } else {
+            // Restore body scroll
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+        };
+    }, [show]);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -126,16 +159,23 @@ export default function NotificationDropdown({ show, onClose }) {
 
     return (
         <>
-            {/* Mobile Backdrop */}
+            {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                className="fixed inset-0 bg-black/50 z-[55] md:bg-transparent"
                 onClick={onClose}
             />
 
             {/* Dropdown */}
-            <div ref={dropdownRef} className="fixed md:absolute top-0 md:top-auto right-0 md:right-0 left-0 md:left-auto mt-0 md:mt-2 md:w-96 w-full h-full md:h-auto md:max-w-md bg-white dark:bg-gray-800 md:rounded-lg rounded-none md:shadow-xl shadow-2xl border-0 md:border border-gray-200 dark:border-gray-700 z-50 md:max-h-[600px] flex flex-col">
-                {/* Header */}
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <div 
+                ref={dropdownRef} 
+                className="fixed top-0 right-0 w-full h-full md:w-96 md:h-auto md:max-w-md bg-white dark:bg-gray-800 md:rounded-xl rounded-none shadow-2xl md:shadow-xl border-0 md:border border-gray-200 dark:border-gray-700 z-[60] md:max-h-[600px] flex flex-col"
+                style={{
+                    top: window.innerWidth >= 768 ? `${position.top}px` : 0,
+                    right: window.innerWidth >= 768 ? `${position.right}px` : 0
+                }}
+            >
+                {/* Header - Fixed */}
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-shrink-0">
                     <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
                     <div className="flex items-center gap-2">
                         {notifications.some(n => !n.is_read) && (
@@ -156,8 +196,8 @@ export default function NotificationDropdown({ show, onClose }) {
                     </div>
                 </div>
 
-                {/* Notifications List */}
-                <div className="overflow-y-auto flex-1">
+                {/* Notifications List - Scrollable Content */}
+                <div className="overflow-y-auto flex-1 overscroll-contain">
                     {loading ? (
                         <div className="p-8 text-center text-gray-500">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>

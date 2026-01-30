@@ -20,6 +20,11 @@ class CollectionController extends Controller
      */
     public function index(Request $request): Response
     {
+        // Ensure user is authenticated
+        if (!$request->user()) {
+            abort(403, 'Unauthorized access to collections.');
+        }
+
         $collections = $request->user()
             ->collections()
             ->withCount('quotes')
@@ -36,12 +41,16 @@ class CollectionController extends Controller
      */
     public function show(Request $request, string $slug): Response
     {
-        $collection = Collection::where('slug', $slug)
-            ->where(function ($query) use ($request) {
-                $query->where('user_id', $request->user()?->id)
-                      ->orWhere('is_public', true);
-            })
-            ->firstOrFail();
+        $collection = Collection::where('slug', $slug)->firstOrFail();
+
+        // Authorization: Only owner can view private collections
+        if (!$collection->is_public) {
+            if (!$request->user() || $collection->user_id !== $request->user()->id) {
+                abort(403, 'This collection is private.');
+            }
+        }
+
+        $isOwner = $request->user() && $collection->user_id === $request->user()->id;
 
         $quotes = $collection->quotes()
             ->with(['user', 'categories', 'tags'])
@@ -62,8 +71,6 @@ class CollectionController extends Controller
                 return $quote;
             });
         }
-
-        $isOwner = $request->user()?->id === $collection->user_id;
         
         // Get user's collections if authenticated (for moving quotes between collections)
         $collections = $request->user() 

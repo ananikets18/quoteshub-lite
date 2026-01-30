@@ -9,7 +9,7 @@ import Toast from './Toast';
 import AuthPromptModal from './AuthPromptModal';
 import axios from 'axios';
 
-export default function QuoteCard({ quote, compact = false, auth, collections = [] }) {
+export default function QuoteCard({ quote, compact = false, auth, collections = [], onUnsave = null, showSavedContext = false }) {
     const [isLiked, setIsLiked] = useState(quote.is_liked || false);
     const [isSaved, setIsSaved] = useState(quote.is_saved || false);
     const [likesCount, setLikesCount] = useState(quote.likes_count || 0);
@@ -87,8 +87,18 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
 
         // Optimistic update - instant UI feedback
         const newIsSaved = !isSaved;
+        const wasUnsaved = isSaved && !newIsSaved;
+        
         setIsSaved(newIsSaved);
         setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
+
+        // If unsaving and callback provided (e.g., from Saved page), trigger fade out
+        if (wasUnsaved && onUnsave) {
+            setIsFadingOut(true);
+            setTimeout(() => {
+                onUnsave(quote.id);
+            }, 300); // Match the transition duration
+        }
 
         // Background sync with server
         router.post(`/quotes/${quote.id}/save`, {}, {
@@ -99,6 +109,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 // Revert on error
                 setIsSaved(!newIsSaved);
                 setSavesCount(newIsSaved ? savesCount : savesCount + 1);
+                setIsFadingOut(false);
                 showNotification('Failed to save quote. Please try again.', 'error');
             },
         });

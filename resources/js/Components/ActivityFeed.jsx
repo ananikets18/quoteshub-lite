@@ -46,7 +46,7 @@ export default function ActivityFeed() {
                 return (
                     <>
                         <Link
-                            href={`/u/${activity.user.username}`}
+                            href={`/${activity.user.username}`}
                             className="font-semibold hover:underline"
                         >
                             {activity.user.name}
@@ -64,7 +64,7 @@ export default function ActivityFeed() {
                 return (
                     <>
                         <Link
-                            href={`/u/${activity.user.username}`}
+                            href={`/${activity.user.username}`}
                             className="font-semibold hover:underline"
                         >
                             {activity.user.name}
@@ -82,7 +82,7 @@ export default function ActivityFeed() {
                 return (
                     <>
                         <Link
-                            href={`/u/${activity.user.username}`}
+                            href={`/${activity.user.username}`}
                             className="font-semibold hover:underline"
                         >
                             {activity.user.name}
@@ -94,7 +94,7 @@ export default function ActivityFeed() {
                 return (
                     <>
                         <Link
-                            href={`/u/${activity.user.username}`}
+                            href={`/${activity.user.username}`}
                             className="font-semibold hover:underline"
                         >
                             {activity.user.name}
@@ -173,7 +173,7 @@ export default function ActivityFeed() {
                         className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     >
                         {/* Avatar */}
-                        <Link href={`/u/${activity.user.username}`}>
+                        <Link href={`/${activity.user.username}`}>
                             <img
                                 src={getAvatar(activity.user)}
                                 alt={activity.user.name}

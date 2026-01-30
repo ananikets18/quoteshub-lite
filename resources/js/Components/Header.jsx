@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { usePage } from '@inertiajs/react';
+import { useState, useEffect, useRef } from 'react';
+import { usePage, Link } from '@inertiajs/react';
+import { createPortal } from 'react-dom';
 import { Flame, Bell, Settings } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 import axios from 'axios';
@@ -8,6 +9,12 @@ export default function Header({ title, showStreak = true, showNotifications = t
     const { auth } = usePage().props;
     const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [isMounted, setIsMounted] = useState(false);
+    const bellButtonRef = useRef(null);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // Fetch unread count on mount and periodically
     useEffect(() => {
@@ -63,6 +70,7 @@ export default function Header({ title, showStreak = true, showNotifications = t
                     {showNotifications && auth?.user && (
                         <div className="relative">
                             <button
+                                ref={bellButtonRef}
                                 onClick={handleBellClick}
                                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
                             >
@@ -74,19 +82,26 @@ export default function Header({ title, showStreak = true, showNotifications = t
                                 )}
                             </button>
 
-                            <NotificationDropdown
-                                show={showNotificationDropdown}
-                                onClose={() => {
-                                    setShowNotificationDropdown(false);
-                                    fetchUnreadCount(); // Refresh count when closing
-                                }}
-                            />
+                            {isMounted && typeof window !== 'undefined' && createPortal(
+                                <NotificationDropdown
+                                    show={showNotificationDropdown}
+                                    onClose={() => {
+                                        setShowNotificationDropdown(false);
+                                        fetchUnreadCount(); // Refresh count when closing
+                                    }}
+                                    buttonRef={bellButtonRef}
+                                />,
+                                document.body
+                            )}
                         </div>
                     )}
 
-                    <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <Link
+                        href="/settings"
+                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
                         <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                    </button>
+                    </Link>
                 </div>
             </div>
         </header>

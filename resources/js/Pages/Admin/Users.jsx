@@ -196,7 +196,7 @@ export default function UsersManagement({ auth, users, filters }) {
                                                     />
                                                     <div className="ml-4">
                                                         <Link
-                                                            href={`/u/${user.username}`}
+                                                            href={`/${user.username}`}
                                                             className="text-sm font-medium text-gray-900 hover:text-purple-600"
                                                         >
                                                             {user.name}

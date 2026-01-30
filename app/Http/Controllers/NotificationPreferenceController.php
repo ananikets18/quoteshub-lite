@@ -69,6 +69,14 @@ class NotificationPreferenceController extends Controller
             $validated
         );
 
+        // Return JSON response for AJAX requests
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification preferences updated successfully'
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Notification preferences updated successfully');
     }
 }

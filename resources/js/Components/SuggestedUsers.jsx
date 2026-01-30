@@ -82,7 +82,7 @@ export default function SuggestedUsers({ auth, inline = false }) {
                         >
                             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-600 transition-all">
                                 {/* Avatar */}
-                                <Link href={`/u/${user.username}`} className="block">
+                                <Link href={`/${user.username}`} className="block">
                                     <img
                                         src={getAvatar(user)}
                                         alt={user.name}
@@ -92,7 +92,7 @@ export default function SuggestedUsers({ auth, inline = false }) {
 
                                 {/* User Info */}
                                 <Link
-                                    href={`/u/${user.username}`}
+                                    href={`/${user.username}`}
                                     className="block text-center mb-3"
                                 >
                                     <h4 className="font-semibold text-sm text-gray-900 dark:text-white truncate hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
@@ -151,7 +151,7 @@ export default function SuggestedUsers({ auth, inline = false }) {
                         className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     >
                         {/* Avatar */}
-                        <Link href={`/u/${user.username}`}>
+                        <Link href={`/${user.username}`}>
                             <img
                                 src={getAvatar(user)}
                                 alt={user.name}
@@ -162,7 +162,7 @@ export default function SuggestedUsers({ auth, inline = false }) {
                         {/* User Info */}
                         <div className="flex-1 min-w-0">
                             <Link
-                                href={`/u/${user.username}`}
+                                href={`/${user.username}`}
                                 className="block"
                             >
                                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm hover:text-purple-600 dark:hover:text-purple-400 transition-colors">

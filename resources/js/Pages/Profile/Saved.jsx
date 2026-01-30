@@ -1,46 +1,51 @@
 import { Head, Link } from '@inertiajs/react';
+import { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import Pagination from '@/Components/Pagination';
 import { Bookmark, FolderPlus } from 'lucide-react';
 
 export default function Saved({ auth, quotes, collections = [] }) {
+    const [visibleQuotes, setVisibleQuotes] = useState(quotes.data.map(q => q.id));
+    
+    const handleUnsave = (quoteId) => {
+        setVisibleQuotes(prev => prev.filter(id => id !== quoteId));
+    };
+    
     return (
         <AppLayout title="Saved Quotes">
             <Head title="Saved Quotes" />
 
             <div className="px-4 py-6 pb-20">
-                {/* Header */}
-                <div className="mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                            <Bookmark className="w-7 h-7 mr-2 text-purple-600 dark:text-purple-400" />
-                            Saved Quotes
-                        </h1>
-                        <Link
-                            href={route('collections.index')}
-                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all"
-                        >
-                            <FolderPlus className="w-4 h-4" />
-                            Collections
-                        </Link>
-                    </div>
+                {/* Header with Collections Button */}
+                <div className="flex items-center justify-between mb-6">
                     <p className="text-gray-600 dark:text-gray-400">
-                        {quotes.total} quote{quotes.total !== 1 ? 's' : ''} saved
+                        {visibleQuotes.length} quote{visibleQuotes.length !== 1 ? 's' : ''} saved
                     </p>
+                    <Link
+                        href={route('collections.index')}
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all"
+                    >
+                        <FolderPlus className="w-4 h-4" />
+                        Collections
+                    </Link>
                 </div>
 
-                {quotes.data.length > 0 ? (
+                {visibleQuotes.length > 0 ? (
                     <>
                         <div className="space-y-4 mb-6">
-                            {quotes.data.map((quote) => (
-                                <QuoteCard 
-                                    key={quote.id} 
-                                    quote={quote} 
-                                    auth={auth}
-                                    collections={collections}
-                                />
-                            ))}
+                            {quotes.data
+                                .filter(quote => visibleQuotes.includes(quote.id))
+                                .map((quote) => (
+                                    <QuoteCard 
+                                        key={quote.id} 
+                                        quote={quote} 
+                                        auth={auth}
+                                        collections={collections}
+                                        onUnsave={handleUnsave}
+                                        showSavedContext={true}
+                                    />
+                                ))}
                         </div>
 
                         {quotes.links && quotes.links.length > 3 && (

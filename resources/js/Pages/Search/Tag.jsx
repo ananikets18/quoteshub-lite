@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import { Hash, TrendingUp, Clock, Bookmark } from 'lucide-react';
 
@@ -12,7 +12,7 @@ export default function Tag({ auth, tag, quotes, sort, collections = [] }) {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppLayout title={`#${tag}`} showNav={true}>
             <Head title={`#${tag.name} Quotes`} />
 
             <div className="max-w-5xl mx-auto">
@@ -94,6 +94,6 @@ export default function Tag({ auth, tag, quotes, sort, collections = [] }) {
                     </div>
                 )}
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

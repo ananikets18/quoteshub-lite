@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import { Folder, TrendingUp, Clock, Bookmark } from 'lucide-react';
 
@@ -12,7 +12,7 @@ export default function Category({ auth, category, quotes, sort, collections = [
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AppLayout title={category.name} showNav={true}>
             <Head title={`${category.name} Quotes`} />
 
             <div className="max-w-5xl mx-auto">
@@ -97,6 +97,6 @@ export default function Category({ auth, category, quotes, sort, collections = [
                     </div>
                 )}
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }
