@@ -91,8 +91,23 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
         );
     };
 
+    const getCategoryColor = (color) => {
+        // Fallback or mapping for pill styles
+        const colors = {
+            purple: 'bg-purple-100/50 text-purple-700 border-purple-200',
+            blue: 'bg-blue-100/50 text-blue-700 border-blue-200',
+            green: 'bg-green-100/50 text-green-700 border-green-200',
+            yellow: 'bg-yellow-100/50 text-yellow-700 border-yellow-200',
+            orange: 'bg-orange-100/50 text-orange-700 border-orange-200',
+            pink: 'bg-pink-100/50 text-pink-700 border-pink-200',
+            red: 'bg-red-100/50 text-red-700 border-red-200',
+            indigo: 'bg-indigo-100/50 text-indigo-700 border-indigo-200',
+        };
+        return colors[color] || colors.purple;
+    };
+
     const handleCategoryClick = (categorySlug) => {
-        router.visit(`/categories/${categorySlug}`);
+        router.visit(`/category/${categorySlug}`);
     };
 
     // Intersection Observer for infinite scroll (better performance)
@@ -171,13 +186,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                                     <button
                                         key={category.id}
                                         onClick={() => handleCategoryClick(category.slug)}
-                                        className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md"
-                                        style={{
-                                            backgroundColor: category.color + '15',
-                                            color: category.color,
-                                            borderColor: category.color + '30',
-                                            borderWidth: '1.5px',
-                                        }}
+                                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm border ${getCategoryColor(category.color)}`}
                                     >
                                         <span className="text-sm">{category.icon}</span>
                                         <span>{category.name}</span>

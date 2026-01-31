@@ -51,7 +51,7 @@ export default function Index({ auth, collections }) {
 
     const handleDelete = () => {
         if (!deletingCollection) return;
-        
+
         setIsDeleting(true);
         router.delete(`/collections/${deletingCollection.slug}`, {
             onSuccess: () => {
@@ -183,7 +183,7 @@ export default function Index({ auth, collections }) {
                         </p>
                         <button
                             onClick={() => setShowCreateModal(true)}
-                            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:shadow-lg transition-all"
+                            className="inline-flex items-center px-6 py-3 bg-[#5D41E6] hover:bg-[#4b33c2] text-white font-semibold rounded-full hover:shadow-lg transition-all"
                         >
                             <FolderPlus className="w-5 h-5 mr-2" />
                             Create Collection

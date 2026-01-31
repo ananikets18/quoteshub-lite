@@ -74,7 +74,7 @@ export default function CreateQuote({ categories }) {
                         disabled={processing || !data.content}
                         className={`px-4 py-2 rounded-full font-semibold text-sm transition-all flex items-center gap-2 ${!data.content
                             ? 'bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-600 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-xl hover:scale-105'
+                            : 'bg-[#5D41E6] hover:bg-[#4b33c2] text-white shadow-lg hover:shadow-xl hover:scale-105'
                             }`}
                         title="Post quote (Ctrl+Enter)"
                     >

@@ -248,7 +248,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 <div className="flex items-center justify-between px-3 sm:px-4 pt-2 sm:pt-3 pb-1.5 sm:pb-2">
                     <div className="flex items-center gap-2 sm:gap-3">
                         {/* Avatar */}
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-sm">
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#5D41E6] flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-sm">
                             {quote.user?.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
 
@@ -337,7 +337,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                     {(quote.author || quote.source) && (
                         <div className="mt-2 sm:mt-2.5 space-y-0.5">
                             {quote.author && (
-                                <p className="text-xs sm:text-sm font-semibold text-purple-600 dark:text-purple-400">
+                                <p className="text-xs sm:text-sm font-semibold text-[#5D41E6] dark:text-purple-400">
                                     — {quote.author}
                                 </p>
                             )}
@@ -397,13 +397,13 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                             <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors">
                                 <Bookmark
                                     className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all ${isSaved
-                                        ? 'fill-purple-600 text-purple-600 scale-105'
-                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-purple-600'
+                                        ? 'fill-[#5D41E6] text-[#5D41E6] scale-105'
+                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'
                                         }`}
                                 />
                             </div>
                             {savesCount > 0 && (
-                                <span className={`text-xs sm:text-sm font-medium ${isSaved ? 'text-purple-600' : 'text-gray-600 dark:text-gray-400'}`}>
+                                <span className={`text-xs sm:text-sm font-medium ${isSaved ? 'text-[#5D41E6]' : 'text-gray-600 dark:text-gray-400'}`}>
                                     {savesCount}
                                 </span>
                             )}
@@ -437,8 +437,8 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                                 <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors">
                                     <Folder
                                         className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all ${quote.collection_ids && quote.collection_ids.length > 0
-                                            ? 'fill-purple-600 text-purple-600'
-                                            : 'text-gray-600 dark:text-gray-400 group-hover:text-purple-600'
+                                            ? 'fill-[#5D41E6] text-[#5D41E6]'
+                                            : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'
                                             }`}
                                     />
                                 </div>

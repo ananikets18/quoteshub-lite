@@ -61,10 +61,10 @@ export default function Header({ title, showStreak = true, showNotifications = t
                 {/* Right: Streak & Actions */}
                 <div className="flex items-center gap-3">
                     {showStreak && auth?.user && (
-                        <div className="streak-badge">
+                        <Link href="/achievements" className="streak-badge hover:scale-105 transition-transform active:scale-95 cursor-pointer">
                             <Flame className="w-4 h-4" />
                             <span>{auth.user.daily_streak || 0}</span>
-                        </div>
+                        </Link>
                     )}
 
                     {showNotifications && auth?.user && (

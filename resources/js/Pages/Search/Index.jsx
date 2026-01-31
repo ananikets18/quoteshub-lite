@@ -66,6 +66,12 @@ export default function Index({
             <div className="px-4 py-6 pb-20 space-y-6">
                 <SearchBar initialValue={localFilters.q} />
 
+                <div className="flex justify-end">
+                    <Link href="/topics" className="text-sm font-medium text-#5D41E6 dark:text-purple-400 hover:underline flex items-center gap-1">
+                        Browse Topics <span aria-hidden="true">&rarr;</span>
+                    </Link>
+                </div>
+
                 {/* Mobile Filter Toggle */}
                 <button
                     onClick={() => setShowFilters(!showFilters)}
@@ -74,7 +80,7 @@ export default function Index({
                     <Filter className="w-5 h-5" />
                     {showFilters ? 'Hide Filters' : 'Show Filters'}
                     {hasActiveFilters && (
-                        <span className="ml-2 px-2 py-0.5 bg-purple-100 text-purple-600 text-xs rounded-full">
+                        <span className="ml-2 px-2 py-0.5 bg-purple-100 text-#5D41E6 text-xs rounded-full">
                             Active
                         </span>
                     )}
@@ -83,9 +89,8 @@ export default function Index({
                 <div className="grid lg:grid-cols-4 gap-6">
                     {/* Filters */}
                     <div
-                        className={`${
-                            showFilters ? 'block' : 'hidden'
-                        } lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6`}
+                        className={`${showFilters ? 'block' : 'hidden'
+                            } lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6`}
                     >
                         <div className="flex justify-between mb-4">
                             <h2 className="font-semibold flex items-center gap-2">
@@ -95,7 +100,7 @@ export default function Index({
                             {hasActiveFilters && (
                                 <button
                                     onClick={clearFilters}
-                                    className="text-sm text-purple-600"
+                                    className="text-sm text-#5D41E6"
                                 >
                                     Clear all
                                 </button>
@@ -185,11 +190,10 @@ export default function Index({
                                         onClick={() =>
                                             handleFilterChange('tag', tag.name)
                                         }
-                                        className={`px-3 py-1 rounded-full text-xs ${
-                                            localFilters.tag === tag.name
-                                                ? 'bg-purple-600 text-white'
-                                                : 'bg-gray-100 dark:bg-gray-700'
-                                        }`}
+                                        className={`px-3 py-1 rounded-full text-xs ${localFilters.tag === tag.name
+                                            ? 'bg-#5D41E6 text-white'
+                                            : 'bg-gray-100 dark:bg-gray-700'
+                                            }`}
                                     >
                                         {tag.name}
                                     </button>
@@ -226,11 +230,10 @@ export default function Index({
                                                     dangerouslySetInnerHTML={{
                                                         __html: link.label,
                                                     }}
-                                                    className={`px-4 py-2 rounded-xl ${
-                                                        link.active
-                                                            ? 'bg-purple-600 text-white'
-                                                            : 'bg-white dark:bg-gray-800'
-                                                    }`}
+                                                    className={`px-4 py-2 rounded-xl ${link.active
+                                                        ? 'bg-#5D41E6 text-white'
+                                                        : 'bg-white dark:bg-gray-800'
+                                                        }`}
                                                 />
                                             ) : (
                                                 <span
@@ -252,7 +255,7 @@ export default function Index({
                                 </h3>
                                 <button
                                     onClick={clearFilters}
-                                    className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-xl"
+                                    className="mt-4 px-6 py-3 bg-#5D41E6 text-white rounded-xl"
                                 >
                                     Clear Filters
                                 </button>

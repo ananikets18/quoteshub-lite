@@ -54,7 +54,7 @@ export default function AuthPromptModal({ show, onClose, action = 'like' }) {
 
                     {/* Icon */}
                     <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-[#5D41E6] flex items-center justify-center">
                             <Icon className="w-8 h-8 text-white" />
                         </div>
                     </div>
@@ -73,7 +73,7 @@ export default function AuthPromptModal({ show, onClose, action = 'like' }) {
                     <div className="space-y-3">
                         <Link
                             href="/login"
-                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#5D41E6] hover:bg-[#4b33c2] text-white font-semibold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all"
                         >
                             <LogIn className="w-5 h-5" />
                             Sign In

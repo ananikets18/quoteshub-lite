@@ -24,7 +24,7 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
 
     const handleRemoveQuote = () => {
         if (!quoteToRemove) return;
-        
+
         setIsDeleting(true);
         router.delete(`/collections/${collection.slug}/quotes/${quoteToRemove}`, {
             preserveState: true,
@@ -117,8 +117,8 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                         <div className="space-y-4">
                             {quotes.data.map((quote) => (
                                 <div key={quote.id} className="relative">
-                                    <QuoteCard 
-                                        quote={quote} 
+                                    <QuoteCard
+                                        quote={quote}
                                         auth={auth}
                                         collections={collections}
                                     />
@@ -145,7 +145,7 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                         <Folder className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Collection is empty</h3>
                         <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            {isOwner 
+                            {isOwner
                                 ? "Start adding quotes to this collection from your saved quotes!"
                                 : "This collection doesn't have any quotes yet."
                             }
@@ -153,7 +153,7 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                         {isOwner && (
                             <Link
                                 href={route('saved')}
-                                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:shadow-lg transition-all"
+                                className="inline-flex items-center px-6 py-3 bg-[#5D41E6] hover:bg-[#4b33c2] text-white font-semibold rounded-full hover:shadow-lg transition-all"
                             >
                                 View Saved Quotes
                             </Link>

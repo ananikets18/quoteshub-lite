@@ -20,9 +20,8 @@ export default function SearchBar({ initialValue = '' }) {
 
     return (
         <form onSubmit={handleSubmit} className="relative w-full max-w-2xl">
-            <div className={`relative flex items-center transition ${
-                isFocused ? 'ring-2 ring-purple-500' : ''
-            } rounded-lg bg-white shadow-sm`}>
+            <div className={`relative flex items-center transition ${isFocused ? 'ring-2 ring-[#5D41E6]' : ''
+                } rounded-lg bg-white shadow-sm`}>
                 <Search className="absolute left-4 w-5 h-5 text-gray-400" />
                 <input
                     type="text"

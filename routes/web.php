@@ -13,6 +13,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use App\Http\Controllers\TopicController;
+
 // Open Graph image generation (public route)
 Route::get('/api/og-image/{quote}', [OgImageController::class, 'generate'])->name('og-image.generate');
 
@@ -32,6 +34,9 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/', [FeedController::class, 'index'])->name('home');
 Route::get('/feed', [FeedController::class, 'index'])->name('feed');
+
+// Topics / Explore
+Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
 
 // Search routes
 Route::get('/search', [SearchController::class, 'index'])->name('search');

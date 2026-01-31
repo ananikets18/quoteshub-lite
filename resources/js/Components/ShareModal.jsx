@@ -71,8 +71,8 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
                     <button
                         onClick={() => setActiveTab('share')}
                         className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors ${activeTab === 'share'
-                                ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                            ? 'text-[#5D41E6] dark:text-purple-400 border-b-2 border-[#5D41E6] dark:border-purple-400'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                             }`}
                     >
                         Share on Social Media
@@ -80,8 +80,8 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
                     <button
                         onClick={() => setActiveTab('download')}
                         className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors ${activeTab === 'download'
-                                ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                            ? 'text-[#5D41E6] dark:text-purple-400 border-b-2 border-[#5D41E6] dark:border-purple-400'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                             }`}
                     >
                         Download as Image
@@ -106,7 +106,7 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
                                     />
                                     <button
                                         onClick={handleCopyLink}
-                                        className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
+                                        className="px-6 py-3 bg-[#5D41E6] hover:bg-[#4b33c2] text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
                                     >
                                         {copied ? (
                                             <>
@@ -190,7 +190,7 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
                                                     console.log('Share cancelled');
                                                 }
                                             }}
-                                            className="flex items-center justify-center gap-3 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-semibold transition-all hover:scale-105"
+                                            className="flex items-center justify-center gap-3 px-4 py-3 bg-[#5D41E6] hover:bg-[#4b33c2] text-white rounded-lg font-semibold transition-all hover:scale-105"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />

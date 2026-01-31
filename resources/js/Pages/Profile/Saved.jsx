@@ -7,11 +7,11 @@ import { Bookmark, FolderPlus } from 'lucide-react';
 
 export default function Saved({ auth, quotes, collections = [] }) {
     const [visibleQuotes, setVisibleQuotes] = useState(quotes.data.map(q => q.id));
-    
+
     const handleUnsave = (quoteId) => {
         setVisibleQuotes(prev => prev.filter(id => id !== quoteId));
     };
-    
+
     return (
         <AppLayout title="Saved Quotes">
             <Head title="Saved Quotes" />
@@ -24,7 +24,7 @@ export default function Saved({ auth, quotes, collections = [] }) {
                     </p>
                     <Link
                         href={route('collections.index')}
-                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all"
+                        className="flex items-center gap-2 px-4 py-2 bg-[#5D41E6] hover:bg-[#4b33c2] text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all"
                     >
                         <FolderPlus className="w-4 h-4" />
                         Collections
@@ -37,9 +37,9 @@ export default function Saved({ auth, quotes, collections = [] }) {
                             {quotes.data
                                 .filter(quote => visibleQuotes.includes(quote.id))
                                 .map((quote) => (
-                                    <QuoteCard 
-                                        key={quote.id} 
-                                        quote={quote} 
+                                    <QuoteCard
+                                        key={quote.id}
+                                        quote={quote}
                                         auth={auth}
                                         collections={collections}
                                         onUnsave={handleUnsave}
@@ -61,7 +61,7 @@ export default function Saved({ auth, quotes, collections = [] }) {
                         </p>
                         <Link
                             href="/feed"
-                            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:shadow-lg transition-all"
+                            className="inline-flex items-center px-6 py-3 bg-[#5D41E6] hover:bg-[#4b33c2] text-white font-semibold rounded-full hover:shadow-lg transition-all"
                         >
                             Explore Quotes
                         </Link>

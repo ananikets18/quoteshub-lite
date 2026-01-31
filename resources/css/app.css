@@ -41,6 +41,7 @@
 }
 
 @layer components {
+
     /* Quote Card Styles - Professional Version */
     .quote-card-professional {
         @apply relative overflow-hidden rounded-2xl border-2;
@@ -66,7 +67,7 @@
 
     /* Button Styles */
     .btn-primary {
-        @apply px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600;
+        @apply px-6 py-3 bg-[#5D41E6] hover:bg-[#4b33c2];
         @apply text-white font-semibold rounded-full shadow-lg;
         @apply transform transition-all duration-200 hover:scale-105 hover:shadow-xl;
         @apply active:scale-95;
@@ -89,7 +90,7 @@
     .input-field {
         @apply w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700;
         @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-white;
-        @apply focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20;
+        @apply focus:border-[#5D41E6] focus:ring-4 focus:ring-[#5D41E6]/20;
         @apply transition-all duration-200;
     }
 
@@ -113,7 +114,7 @@
     }
 
     .bottom-nav-item.active {
-        @apply text-purple-600 dark:text-purple-400;
+        @apply text-[#5D41E6] dark:text-purple-400;
     }
 
     /* Card Container */
@@ -150,14 +151,14 @@
     .fab {
         @apply fixed bottom-24 right-6 z-40;
         @apply w-14 h-14 rounded-full shadow-2xl;
-        @apply bg-gradient-to-r from-purple-600 to-pink-600;
+        @apply bg-[#5D41E6] hover:bg-[#4b33c2];
         @apply flex items-center justify-center text-white;
         @apply transform transition-all duration-300 hover:scale-110 active:scale-95;
     }
 
     /* Avatar */
     .avatar {
-        @apply rounded-full bg-gradient-to-br from-purple-400 to-pink-400;
+        @apply rounded-full bg-[#5D41E6];
         @apply flex items-center justify-center text-white font-bold;
     }
 
@@ -170,6 +171,7 @@
 }
 
 @layer utilities {
+
     /* Custom Gradients */
     .gradient-primary {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -189,7 +191,7 @@
 
     /* Text Gradients */
     .text-gradient-primary {
-        @apply bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent;
+        @apply text-[#5D41E6];
     }
 
     .text-gradient-accent {
@@ -230,6 +232,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -240,6 +243,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -251,6 +255,7 @@
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -299,6 +304,7 @@
         transform: translateY(100%);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;

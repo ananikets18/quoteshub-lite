@@ -102,8 +102,8 @@ export default function QuoteImageGenerator({ quote, colorScheme }) {
                             key={template.id}
                             onClick={() => setSelectedTemplate(template)}
                             className={`relative h-16 rounded-lg overflow-hidden transition-all ${selectedTemplate.id === template.id
-                                    ? 'ring-4 ring-purple-600 ring-offset-2 dark:ring-offset-gray-800'
-                                    : 'hover:scale-105'
+                                ? 'ring-4 ring-[#5D41E6] ring-offset-2 dark:ring-offset-gray-800'
+                                : 'hover:scale-105'
                                 }`}
                             style={{ background: template.gradient }}
                         >
@@ -132,7 +132,7 @@ export default function QuoteImageGenerator({ quote, colorScheme }) {
                 </div>
                 <button
                     onClick={() => setShowWatermark(!showWatermark)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${showWatermark ? 'bg-purple-600' : 'bg-gray-300 dark:bg-gray-600'
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${showWatermark ? 'bg-[#5D41E6]' : 'bg-gray-300 dark:bg-gray-600'
                         }`}
                 >
                     <span
@@ -210,7 +210,7 @@ export default function QuoteImageGenerator({ quote, colorScheme }) {
             <button
                 onClick={handleDownload}
                 disabled={isGenerating}
-                className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-3 text-lg shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+                className="w-full px-6 py-4 bg-[#5D41E6] hover:bg-[#4b33c2] disabled:bg-gray-400 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-3 text-lg shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
             >
                 {isGenerating ? (
                     <>

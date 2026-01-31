@@ -25,12 +25,12 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
         });
     };
 
-    const avatarUrl = profile.avatar 
-        ? `/storage/${profile.avatar}` 
+    const avatarUrl = profile.avatar
+        ? `/storage/${profile.avatar}`
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=random`;
 
-    const coverUrl = profile.cover_image 
-        ? `/storage/${profile.cover_image}` 
+    const coverUrl = profile.cover_image
+        ? `/storage/${profile.cover_image}`
         : null;
 
     return (
@@ -39,11 +39,11 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
 
             <div className="max-w-5xl mx-auto">
                 {/* Cover Image */}
-                <div className="relative h-64 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-lg overflow-hidden">
+                <div className="relative h-64 bg-[#5D41E6] rounded-t-lg overflow-hidden">
                     {coverUrl && (
-                        <img 
-                            src={coverUrl} 
-                            alt="Cover" 
+                        <img
+                            src={coverUrl}
+                            alt="Cover"
                             className="w-full h-full object-cover"
                         />
                     )}
@@ -54,8 +54,8 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end -mt-16 relative">
                         {/* Avatar */}
                         <div className="flex items-end space-x-4">
-                            <img 
-                                src={avatarUrl} 
+                            <img
+                                src={avatarUrl}
                                 alt={profile.name}
                                 className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
                             />
@@ -78,11 +78,10 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                             ) : (
                                 <button
                                     onClick={handleFollow}
-                                    className={`inline-flex items-center px-4 py-2 rounded-lg transition ${
-                                        following
-                                            ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                                            : 'bg-purple-600 hover:bg-purple-700 text-white'
-                                    }`}
+                                    className={`inline-flex items-center px-4 py-2 rounded-lg transition ${following
+                                        ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                                        : 'bg-[#5D41E6] hover:bg-[#4b33c2] text-white'
+                                        }`}
                                 >
                                     {following ? (
                                         <>
@@ -114,11 +113,11 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                                 </div>
                             )}
                             {profile.website && (
-                                <a 
-                                    href={profile.website} 
-                                    target="_blank" 
+                                <a
+                                    href={profile.website}
+                                    target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center text-purple-600 hover:underline"
+                                    className="flex items-center text-[#5D41E6] hover:underline"
                                 >
                                     <LinkIcon className="w-4 h-4 mr-1" />
                                     {profile.website.replace(/^https?:\/\//, '')}
@@ -156,22 +155,20 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                         <div className="flex space-x-8">
                             <Link
                                 href={`/${profile.username}`}
-                                className={`py-4 border-b-2 transition ${
-                                    activeTab === 'quotes'
-                                        ? 'border-purple-600 text-purple-600'
-                                        : 'border-transparent text-gray-600 hover:text-gray-900'
-                                }`}
+                                className={`py-4 border-b-2 transition ${activeTab === 'quotes'
+                                    ? 'border-purple-600 text-purple-600'
+                                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                                    }`}
                             >
                                 <FileText className="w-4 h-4 inline mr-2" />
                                 Quotes
                             </Link>
                             <Link
                                 href={`/${profile.username}/liked`}
-                                className={`py-4 border-b-2 transition ${
-                                    activeTab === 'liked'
-                                        ? 'border-purple-600 text-purple-600'
-                                        : 'border-transparent text-gray-600 hover:text-gray-900'
-                                }`}
+                                className={`py-4 border-b-2 transition ${activeTab === 'liked'
+                                    ? 'border-purple-600 text-purple-600'
+                                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                                    }`}
                             >
                                 <Heart className="w-4 h-4 inline mr-2" />
                                 Liked
@@ -179,11 +176,10 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                             {isOwnProfile && (
                                 <Link
                                     href={route('saved')}
-                                    className={`py-4 border-b-2 transition ${
-                                        activeTab === 'saved'
-                                            ? 'border-purple-600 text-purple-600'
-                                            : 'border-transparent text-gray-600 hover:text-gray-900'
-                                    }`}
+                                    className={`py-4 border-b-2 transition ${activeTab === 'saved'
+                                        ? 'border-[#5D41E6] text-[#5D41E6]'
+                                        : 'border-transparent text-gray-600 hover:text-gray-900'
+                                        }`}
                                 >
                                     <Bookmark className="w-4 h-4 inline mr-2" />
                                     Saved
@@ -198,9 +194,9 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                     {quotes.data.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {quotes.data.map((quote) => (
-                                <QuoteCard 
-                                    key={quote.id} 
-                                    quote={quote} 
+                                <QuoteCard
+                                    key={quote.id}
+                                    quote={quote}
                                     auth={auth}
                                 />
                             ))}
@@ -210,7 +206,7 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                             <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">No quotes yet</h3>
                             <p className="text-gray-600">
-                                {isOwnProfile 
+                                {isOwnProfile
                                     ? "Start sharing your favorite quotes with the world!"
                                     : "This user hasn't posted any quotes yet."
                                 }
