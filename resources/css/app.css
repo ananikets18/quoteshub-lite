@@ -101,9 +101,9 @@
         @apply transform transition-all duration-200 hover:scale-105;
     }
 
-    /* Bottom Navigation - mobile only (hidden md+) */
+    /* Bottom Navigation - visible on all screen sizes */
     .bottom-nav {
-        @apply fixed bottom-0 left-0 right-0 z-50 md:hidden;
+        @apply fixed bottom-0 left-0 right-0 z-50;
         @apply bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800;
         @apply shadow-2xl backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95;
     }

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         // Seed users with different roles
         $this->call([
             UserSeeder::class,
+            CreatorSeeder::class,
             CategorySeeder::class,
             QuoteSeeder::class,
         ]);

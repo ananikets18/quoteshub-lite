@@ -22,9 +22,13 @@ class OnboardingController extends Controller
             return redirect()->route('feed');
         }
 
+        // Get creators for follow step
+        $creators = $this->getCreators();
+
         return Inertia::render('Onboarding/Index', [
             'user' => $user,
             'currentStep' => $this->getCurrentStep($user),
+            'creators' => $creators,
         ]);
     }
 
@@ -141,5 +145,19 @@ class OnboardingController extends Controller
         }
         
         return 'complete';
+    }
+
+    /**
+     * Get creators for onboarding follow step
+     */
+    private function getCreators()
+    {
+        return \App\Models\User::whereIn('username', ['ananiket', 'quoteshub'])
+            ->select(['id', 'name', 'username', 'bio', 'avatar', 'followers_count'])
+            ->get()
+            ->map(function ($creator) {
+                $creator->is_following = auth()->user()?->isFollowing($creator);
+                return $creator;
+            });
     }
 }

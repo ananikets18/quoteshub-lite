@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Home, Search, PlusCircle, Bookmark, Bell } from 'lucide-react';
+import { Home, Search, PlusCircle, Bookmark, LayoutDashboard } from 'lucide-react';
 
 export default function BottomNav({ isVisible = true, auth = {}, unreadCount = 0 }) {
     const { url } = usePage();
@@ -10,7 +10,7 @@ export default function BottomNav({ isVisible = true, auth = {}, unreadCount = 0
         { name: 'Search', href: '/search', icon: Search, guestAware: false },
         { name: 'Create', href: '/quotes/create', icon: PlusCircle, guestAware: true },
         { name: 'Saved', href: '/saved', icon: Bookmark, guestAware: true },
-        { name: 'Notifications', href: '/notifications', icon: Bell, guestAware: true, badge: unreadCount },
+        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, guestAware: true },
     ].map((item) => ({
         ...item,
         href: item.guestAware && isGuest ? '/login' : item.href,
@@ -20,13 +20,13 @@ export default function BottomNav({ isVisible = true, auth = {}, unreadCount = 0
     const isActive = (item) => {
         if (item.isGuestLink) return false;
         if (item.href === '/feed') return url === '/' || url === '/feed';
-        if (item.href === '/notifications') return url.startsWith('/notifications');
+        if (item.href === '/dashboard') return url.startsWith('/dashboard');
         return url.startsWith(item.href);
     };
 
     return (
         <nav
-            className={`bottom-nav safe-area-bottom transition-transform duration-300 md:hidden ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
+            className={`bottom-nav safe-area-bottom transition-transform duration-300 ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}
             aria-label="Main navigation"
         >
             <div className="flex items-center justify-around max-w-lg mx-auto">
@@ -47,14 +47,6 @@ export default function BottomNav({ isVisible = true, auth = {}, unreadCount = 0
                                     strokeWidth={active ? 2.5 : 2}
                                     aria-hidden
                                 />
-                                {item.badge > 0 && (
-                                    <span
-                                        className="absolute -top-1.5 -right-1.5 min-w-[1rem] h-4 px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full"
-                                        aria-label={`${item.badge} unread notifications`}
-                                    >
-                                        {item.badge > 9 ? '9+' : item.badge}
-                                    </span>
-                                )}
                             </span>
                             <span className={`text-xs font-medium ${active ? 'font-semibold' : ''}`}>
                                 {item.name}

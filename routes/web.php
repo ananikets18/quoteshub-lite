@@ -233,6 +233,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/users/{username}/follow', [FollowController::class, 'unfollow'])->name('users.unfollow');
     Route::get('/following-feed', [FollowController::class, 'feed'])->name('following.feed');
     
+    // API routes for follow functionality (for onboarding)
+    Route::post('/follow/{userId}', [App\Http\Controllers\Api\FollowController::class, 'follow']);
+    Route::delete('/follow/{userId}', [App\Http\Controllers\Api\FollowController::class, 'unfollow']);
+    
     // Admin routes
     Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');

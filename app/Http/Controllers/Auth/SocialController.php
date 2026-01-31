@@ -50,9 +50,13 @@ class SocialController extends Controller
                 Auth::login($newUser);
             }
 
-            return redirect()->intended(route('dashboard', absolute: false));
+            return redirect()->intended(route('feed', absolute: false));
 
         } catch (Exception $e) {
+            \Log::error('Google OAuth Error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect(route('login'))->with('error', 'Something went wrong with Google Login. Please try again.');
         }
     }

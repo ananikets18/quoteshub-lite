@@ -5,7 +5,7 @@ import { Sparkles, Heart, User, Users, CheckCircle, ArrowRight, X } from 'lucide
 import axios from 'axios';
 import Toast from '@/Components/Toast';
 
-export default function Onboarding({ user, currentStep: initialStep }) {
+export default function Onboarding({ user, currentStep: initialStep, creators }) {
     const [currentStep, setCurrentStep] = useState(initialStep || 'welcome');
     const [loading, setLoading] = useState(false);
     const [showToast, setShowToast] = useState(false);
@@ -164,7 +164,7 @@ export default function Onboarding({ user, currentStep: initialStep }) {
                                 <ProfileStep onNext={handleNext} loading={loading} user={user} />
                             )}
                             {currentStep === 'follow' && (
-                                <FollowStep onNext={handleNext} loading={loading} />
+                                <FollowStep onNext={handleNext} loading={loading} creators={creators} />
                             )}
                         </div>
                     </div>
@@ -403,16 +403,8 @@ function ProfileStep({ onNext, loading, user }) {
 }
 
 // Follow Step Component
-function FollowStep({ onNext, loading }) {
+function FollowStep({ onNext, loading, creators }) {
     const [selectedUsers, setSelectedUsers] = useState([]);
-
-    // Mock suggested users - in production, fetch from API
-    const suggestedUsers = [
-        { id: 1, name: 'Quote Master', username: 'quotemaster', followers: 1200 },
-        { id: 2, name: 'Wisdom Seeker', username: 'wisdomseeker', followers: 850 },
-        { id: 3, name: 'Daily Inspiration', username: 'dailyinspire', followers: 2100 },
-        { id: 4, name: 'Life Coach', username: 'lifecoach', followers: 1500 },
-    ];
 
     const toggleUser = (userId) => {
         setSelectedUsers(prev =>
@@ -420,6 +412,38 @@ function FollowStep({ onNext, loading }) {
                 ? prev.filter(id => id !== userId)
                 : [...prev, userId]
         );
+    };
+
+    const handleFollowUser = async (userId) => {
+        try {
+            const response = await axios.post(`/follow/${userId}`, {}, {
+                headers: {
+                    'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content,
+                },
+            });
+            
+            if (response.data.success) {
+                setSelectedUsers(prev => [...prev, userId]);
+            }
+        } catch (error) {
+            console.error('Failed to follow user:', error);
+        }
+    };
+
+    const handleUnfollowUser = async (userId) => {
+        try {
+            const response = await axios.delete(`/follow/${userId}`, {
+                headers: {
+                    'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]')?.content,
+                },
+            });
+            
+            if (response.data.success) {
+                setSelectedUsers(prev => prev.filter(id => id !== userId));
+            }
+        } catch (error) {
+            console.error('Failed to unfollow user:', error);
+        }
     };
 
     const handleNext = () => {
@@ -430,38 +454,58 @@ function FollowStep({ onNext, loading }) {
         <div>
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    Follow inspiring people
+                    Follow our creators
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                    Start building your feed (optional)
+                    Stay updated with quotes from Aniket Shinde (founder) and QuotesHub official
                 </p>
             </div>
 
             <div className="space-y-3 mb-8">
-                {suggestedUsers.map(user => (
+                {creators?.map(creator => (
                     <div
-                        key={user.id}
+                        key={creator.id}
                         className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-                                {user.name.charAt(0)}
-                            </div>
+                            {creator.avatar ? (
+                                <img 
+                                    src={creator.avatar} 
+                                    alt={creator.name}
+                                    className="w-12 h-12 rounded-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
+                                    {creator.name.charAt(0)}
+                                </div>
+                            )}
                             <div>
-                                <h3 className="font-semibold text-gray-900 dark:text-white">{user.name}</h3>
+                                <h3 className="font-semibold text-gray-900 dark:text-white">{creator.name}</h3>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    @{user.username} · {user.followers} followers
+                                    @{creator.username} · {creator.followers_count || 0} followers
                                 </p>
+                                {creator.bio && (
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                                        {creator.bio}
+                                    </p>
+                                )}
                             </div>
                         </div>
                         <button
-                            onClick={() => toggleUser(user.id)}
-                            className={`px-4 py-2 rounded-full font-medium transition-all ${selectedUsers.includes(user.id)
-                                ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                                : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                                }`}
+                            onClick={() => {
+                                if (selectedUsers.includes(creator.id)) {
+                                    handleUnfollowUser(creator.id);
+                                } else {
+                                    handleFollowUser(creator.id);
+                                }
+                            }}
+                            className={`px-4 py-2 rounded-full font-medium transition-all ${
+                                selectedUsers.includes(creator.id) || creator.is_following
+                                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                    : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                            }`}
                         >
-                            {selectedUsers.includes(user.id) ? 'Following' : 'Follow'}
+                            {selectedUsers.includes(creator.id) || creator.is_following ? 'Following' : 'Follow'}
                         </button>
                     </div>
                 ))}
