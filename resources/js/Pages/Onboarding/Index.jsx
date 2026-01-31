@@ -404,17 +404,21 @@ function ProfileStep({ onNext, loading, user }) {
 
 // Follow Step Component
 function FollowStep({ onNext, loading, creators }) {
-    const [selectedUsers, setSelectedUsers] = useState([]);
-
-    const toggleUser = (userId) => {
-        setSelectedUsers(prev =>
-            prev.includes(userId)
-                ? prev.filter(id => id !== userId)
-                : [...prev, userId]
-        );
-    };
+    const [followingState, setFollowingState] = useState(() => {
+        // Initialize with server-provided following state
+        const initial = {};
+        creators?.forEach(creator => {
+            initial[creator.id] = creator.is_following || false;
+        });
+        return initial;
+    });
+    const [loadingUsers, setLoadingUsers] = useState({});
+    const [error, setError] = useState(null);
 
     const handleFollowUser = async (userId) => {
+        setLoadingUsers(prev => ({ ...prev, [userId]: true }));
+        setError(null);
+        
         try {
             const response = await axios.post(`/follow/${userId}`, {}, {
                 headers: {
@@ -423,14 +427,22 @@ function FollowStep({ onNext, loading, creators }) {
             });
             
             if (response.data.success) {
-                setSelectedUsers(prev => [...prev, userId]);
+                setFollowingState(prev => ({ ...prev, [userId]: true }));
             }
         } catch (error) {
             console.error('Failed to follow user:', error);
+            setError('Failed to follow user. Please try again.');
+            // Revert optimistic update if any
+            setFollowingState(prev => ({ ...prev, [userId]: false }));
+        } finally {
+            setLoadingUsers(prev => ({ ...prev, [userId]: false }));
         }
     };
 
     const handleUnfollowUser = async (userId) => {
+        setLoadingUsers(prev => ({ ...prev, [userId]: true }));
+        setError(null);
+        
         try {
             const response = await axios.delete(`/follow/${userId}`, {
                 headers: {
@@ -439,15 +451,21 @@ function FollowStep({ onNext, loading, creators }) {
             });
             
             if (response.data.success) {
-                setSelectedUsers(prev => prev.filter(id => id !== userId));
+                setFollowingState(prev => ({ ...prev, [userId]: false }));
             }
         } catch (error) {
             console.error('Failed to unfollow user:', error);
+            setError('Failed to unfollow user. Please try again.');
+            // Revert optimistic update if any
+            setFollowingState(prev => ({ ...prev, [userId]: true }));
+        } finally {
+            setLoadingUsers(prev => ({ ...prev, [userId]: false }));
         }
     };
 
     const handleNext = () => {
-        onNext({ following: selectedUsers });
+        // No need to send following data - already handled by API calls
+        onNext({});
     };
 
     return (
@@ -459,56 +477,71 @@ function FollowStep({ onNext, loading, creators }) {
                 <p className="text-gray-600 dark:text-gray-400">
                     Stay updated with quotes from Aniket Shinde (founder) and QuotesHub official
                 </p>
+                
+                {/* Error Message */}
+                {error && (
+                    <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+                            {error}
+                        </p>
+                    </div>
+                )}
             </div>
 
             <div className="space-y-3 mb-8">
-                {creators?.map(creator => (
-                    <div
-                        key={creator.id}
-                        className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                    >
-                        <div className="flex items-center gap-3">
-                            {creator.avatar ? (
-                                <img 
-                                    src={creator.avatar} 
-                                    alt={creator.name}
-                                    className="w-12 h-12 rounded-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-                                    {creator.name.charAt(0)}
-                                </div>
-                            )}
-                            <div>
-                                <h3 className="font-semibold text-gray-900 dark:text-white">{creator.name}</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    @{creator.username} · {creator.followers_count || 0} followers
-                                </p>
-                                {creator.bio && (
-                                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-                                        {creator.bio}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => {
-                                if (selectedUsers.includes(creator.id)) {
-                                    handleUnfollowUser(creator.id);
-                                } else {
-                                    handleFollowUser(creator.id);
-                                }
-                            }}
-                            className={`px-4 py-2 rounded-full font-medium transition-all ${
-                                selectedUsers.includes(creator.id) || creator.is_following
-                                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                                    : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                            }`}
+                {creators?.map(creator => {
+                    const isFollowing = followingState[creator.id] || false;
+                    const isLoading = loadingUsers[creator.id] || false;
+                    
+                    return (
+                        <div
+                            key={creator.id}
+                            className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                         >
-                            {selectedUsers.includes(creator.id) || creator.is_following ? 'Following' : 'Follow'}
-                        </button>
-                    </div>
-                ))}
+                            <div className="flex items-center gap-3">
+                                {creator.avatar ? (
+                                    <img 
+                                        src={creator.avatar} 
+                                        alt={creator.name}
+                                        className="w-12 h-12 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
+                                        {creator.name.charAt(0)}
+                                    </div>
+                                )}
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 dark:text-white">{creator.name}</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        @{creator.username} · {creator.followers_count || 0} followers
+                                    </p>
+                                    {creator.bio && (
+                                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                                            {creator.bio}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    if (isFollowing) {
+                                        handleUnfollowUser(creator.id);
+                                    } else {
+                                        handleFollowUser(creator.id);
+                                    }
+                                }}
+                                disabled={isLoading}
+                                className={`px-4 py-2 rounded-full font-medium transition-all min-w-[100px] ${
+                                    isFollowing
+                                        ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                                        : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg'
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            >
+                                {isLoading ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
+                            </button>
+                        </div>
+                    );
+                })}
             </div>
 
             <button
