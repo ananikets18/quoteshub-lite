@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Home, Search, PlusCircle, Bookmark, User } from 'lucide-react';
+import { Home, Search, PlusCircle, Bookmark, LayoutDashboard } from 'lucide-react';
 
 export default function BottomNav({ isVisible = true }) {
     const { url } = usePage();
@@ -9,7 +9,7 @@ export default function BottomNav({ isVisible = true }) {
         { name: 'Search', href: '/search', icon: Search },
         { name: 'Create', href: '/quotes/create', icon: PlusCircle },
         { name: 'Saved', href: '/saved', icon: Bookmark },
-        { name: 'Profile', href: '/profile', icon: User },
+        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     ];
 
     const isActive = (href) => {

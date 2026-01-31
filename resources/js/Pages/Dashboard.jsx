@@ -10,52 +10,50 @@ export default function Dashboard({ auth, stats }) {
             <div className="px-4 py-6 pb-20">
                 {/* This Week Highlights */}
                 {stats?.this_week && (stats.this_week.quotes > 0 || stats.this_week.likes > 0 || stats.this_week.followers > 0) && (
-                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-5 mb-6 text-white shadow-lg">
-                        <div className="flex items-center gap-2 mb-3">
-                            <Zap className="w-5 h-5" />
-                            <h2 className="text-lg font-bold">This Week's Progress</h2>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-purple-100 dark:border-gray-700 p-5 mb-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-white">This Week's Progress</h2>
                         </div>
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="text-center">
-                                <div className="text-2xl font-bold">{stats.this_week.quotes}</div>
-                                <div className="text-xs opacity-90">Quotes</div>
+                        <div className="grid grid-cols-3 gap-3 divide-x divide-gray-100 dark:divide-gray-700">
+                            <div className="text-center px-2">
+                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.this_week.quotes}</div>
+                                <div className="text-xs text-gray-500 font-medium uppercase mt-1">Quotes</div>
                             </div>
-                            <div className="text-center">
-                                <div className="text-2xl font-bold">{stats.this_week.likes}</div>
-                                <div className="text-xs opacity-90">Likes</div>
+                            <div className="text-center px-2">
+                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.this_week.likes}</div>
+                                <div className="text-xs text-gray-500 font-medium uppercase mt-1">Likes</div>
                             </div>
-                            <div className="text-center">
-                                <div className="text-2xl font-bold">{stats.this_week.followers}</div>
-                                <div className="text-xs opacity-90">Followers</div>
+                            <div className="text-center px-2">
+                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.this_week.followers}</div>
+                                <div className="text-xs text-gray-500 font-medium uppercase mt-1">Followers</div>
                             </div>
                         </div>
                     </div>
                 )}
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-4 text-white shadow-lg">
-                        <BookOpen className="w-6 h-6 opacity-80 mb-2" />
-                        <div className="text-3xl font-bold mb-1">{stats?.quotes_count || 0}</div>
-                        <div className="text-sm opacity-90">Your Quotes</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl p-4 text-white shadow-lg">
-                        <Heart className="w-6 h-6 opacity-80 mb-2" />
-                        <div className="text-3xl font-bold mb-1">{stats?.total_likes || 0}</div>
-                        <div className="text-sm opacity-90">Total Likes</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-4 text-white shadow-lg">
-                        <Users className="w-6 h-6 opacity-80 mb-2" />
-                        <div className="text-3xl font-bold mb-1">{stats?.followers_count || 0}</div>
-                        <div className="text-sm opacity-90">Followers</div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl p-4 text-white shadow-lg">
-                        <TrendingUp className="w-6 h-6 opacity-80 mb-2" />
-                        <div className="text-3xl font-bold mb-1">{stats?.daily_streak || 0}</div>
-                        <div className="text-sm opacity-90">Day Streak</div>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+                        <div className="text-center group cursor-default">
+                            <div className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] transition-colors">{stats?.quotes_count || 0}</div>
+                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-2">Quotes</div>
+                        </div>
+                        <div className="text-center group cursor-default">
+                            <div className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] transition-colors">{stats?.total_likes || 0}</div>
+                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-2">Total Likes</div>
+                        </div>
+                        <div className="text-center group cursor-default">
+                            <div className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] transition-colors">{stats?.followers_count || 0}</div>
+                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-2">Followers</div>
+                        </div>
+                        <Link href="/achievements" className="text-center group cursor-pointer">
+                            <div className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] transition-colors flex items-center justify-center gap-1">
+                                {stats?.daily_streak || 0}
+                                <Zap className="w-5 h-5 text-orange-500" />
+                            </div>
+                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-2">Day Streak</div>
+                        </Link>
                     </div>
                 </div>
 
@@ -76,7 +74,7 @@ export default function Dashboard({ auth, stats }) {
                                 <span>{Math.round(Math.max(stats?.total_likes || 0, stats?.total_saves || 0, stats?.followers_count || 0) * 0.25)}</span>
                                 <span>0</span>
                             </div>
-                            
+
                             {/* Grid lines */}
                             <div className="absolute left-12 right-0 top-0 bottom-0 flex flex-col justify-between">
                                 {[...Array(5)].map((_, i) => (
@@ -92,10 +90,10 @@ export default function Dashboard({ auth, stats }) {
                                         <div className="text-xs font-bold text-gray-900 dark:text-white mb-1">
                                             {stats?.total_likes || 0}
                                         </div>
-                                        <div 
+                                        <div
                                             className="w-full bg-gradient-to-t from-red-500 to-pink-500 rounded-t-lg transition-all duration-700 ease-out min-h-[4px] relative group"
-                                            style={{ 
-                                                height: `${Math.max((stats?.total_likes || 0) / Math.max(stats?.total_likes || 1, stats?.total_saves || 1, stats?.followers_count || 1) * 100, 2)}%` 
+                                            style={{
+                                                height: `${Math.max((stats?.total_likes || 0) / Math.max(stats?.total_likes || 1, stats?.total_saves || 1, stats?.followers_count || 1) * 100, 2)}%`
                                             }}
                                         >
                                             <div className="absolute inset-0 bg-white/20 rounded-t-lg opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -113,10 +111,10 @@ export default function Dashboard({ auth, stats }) {
                                         <div className="text-xs font-bold text-gray-900 dark:text-white mb-1">
                                             {stats?.total_saves || 0}
                                         </div>
-                                        <div 
+                                        <div
                                             className="w-full bg-gradient-to-t from-purple-500 to-pink-500 rounded-t-lg transition-all duration-700 ease-out min-h-[4px] relative group"
-                                            style={{ 
-                                                height: `${Math.max((stats?.total_saves || 0) / Math.max(stats?.total_likes || 1, stats?.total_saves || 1, stats?.followers_count || 1) * 100, 2)}%` 
+                                            style={{
+                                                height: `${Math.max((stats?.total_saves || 0) / Math.max(stats?.total_likes || 1, stats?.total_saves || 1, stats?.followers_count || 1) * 100, 2)}%`
                                             }}
                                         >
                                             <div className="absolute inset-0 bg-white/20 rounded-t-lg opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -134,10 +132,10 @@ export default function Dashboard({ auth, stats }) {
                                         <div className="text-xs font-bold text-gray-900 dark:text-white mb-1">
                                             {stats?.followers_count || 0}
                                         </div>
-                                        <div 
+                                        <div
                                             className="w-full bg-gradient-to-t from-blue-500 to-cyan-500 rounded-t-lg transition-all duration-700 ease-out min-h-[4px] relative group"
-                                            style={{ 
-                                                height: `${Math.max((stats?.followers_count || 0) / Math.max(stats?.total_likes || 1, stats?.total_saves || 1, stats?.followers_count || 1) * 100, 2)}%` 
+                                            style={{
+                                                height: `${Math.max((stats?.followers_count || 0) / Math.max(stats?.total_likes || 1, stats?.total_saves || 1, stats?.followers_count || 1) * 100, 2)}%`
                                             }}
                                         >
                                             <div className="absolute inset-0 bg-white/20 rounded-t-lg opacity-0 group-hover:opacity-100 transition-opacity" />
