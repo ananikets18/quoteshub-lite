@@ -36,7 +36,10 @@ class EmailVerificationNotificationController extends Controller
         
         if (RateLimiter::tooManyAttempts($key, 3)) {
             $seconds = RateLimiter::availableIn($key);
-            $minutes = ceil($seconds / 60);
+            
+            $message = $seconds < 60 
+                ? "Too many verification emails sent. Please try again in {$seconds} seconds."
+                : "Too many verification emails sent. Please try again in " . ceil($seconds / 60) . " minute(s).";
             
             Log::warning('Rate limit exceeded for email verification', [
                 'user_id' => $request->user()->id,
@@ -46,7 +49,7 @@ class EmailVerificationNotificationController extends Controller
             ]);
             
             throw ValidationException::withMessages([
-                'email' => "Too many verification emails sent. Please try again in {$minutes} minute(s).",
+                'email' => $message,
             ]);
         }
 
