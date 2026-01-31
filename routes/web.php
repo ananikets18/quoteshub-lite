@@ -54,92 +54,94 @@ Route::inertia('/cookies', 'Static/Cookies')->name('cookies');
 Route::get('/dashboard', function () {
     $user = auth()->user();
     
-    // Get user stats
-    $stats = [
-        'quotes_count' => $user->quotes_count ?? 0,
-        'followers_count' => $user->followers_count ?? 0,
-        'following_count' => $user->following_count ?? 0,
-        'daily_streak' => $user->daily_streak ?? 0,
-        'total_likes' => $user->quotes()->withCount('likes')->get()->sum('likes_count'),
-        'total_saves' => $user->quotes()->withCount('saves')->get()->sum('saves_count'),
-        'total_views' => $user->quotes()->sum('views_count'),
-        
-        // Recent activity
-        'recent_quotes' => $user->quotes()
-            ->latest()
-            ->take(3)
-            ->withCount(['likes', 'saves'])
-            ->get()
-            ->map(function ($quote) {
-                return [
-                    'id' => $quote->id,
-                    'content' => $quote->content,
-                    'likes_count' => $quote->likes_count ?? 0,
-                    'saves_count' => $quote->saves_count ?? 0,
-                    'views_count' => $quote->views_count ?? 0,
-                    'time_ago' => $quote->created_at->diffForHumans(),
-                ];
-            }),
-        
-        // Top performing quote
-        'top_quote' => $user->quotes()
-            ->withCount(['likes', 'saves'])
-            ->orderByDesc('likes_count')
-            ->first()
-            ?->only(['id', 'content', 'likes_count', 'saves_count']),
-        
-        // Collections
-        'collections_count' => $user->collections()->count(),
-        'public_collections' => $user->collections()
-            ->where('is_public', true)
-            ->withCount('quotes')
-            ->latest()
-            ->take(3)
-            ->get()
-            ->map(function ($collection) {
-                return [
-                    'id' => $collection->id,
-                    'name' => $collection->name,
-                    'description' => $collection->description,
-                    'quotes_count' => $collection->quotes_count ?? 0,
-                ];
-            }),
-        
-        // Recent activity from following
-        'following_activity' => $user->following()
-            ->with(['quotes' => function ($query) {
-                $query->latest()->take(1)->withCount('likes');
-            }])
-            ->take(5)
-            ->get()
-            ->filter(fn($followed) => $followed->quotes->isNotEmpty())
-            ->map(function ($followed) {
-                $quote = $followed->quotes->first();
-                return [
-                    'user' => [
-                        'id' => $followed->id,
-                        'name' => $followed->name,
-                        'username' => $followed->username,
-                        'avatar' => $followed->avatar,
-                    ],
-                    'quote' => [
+    // Cache dashboard stats for 5 minutes
+    $stats = \Illuminate\Support\Facades\Cache::remember('dashboard_stats_' . $user->id, 300, function () use ($user) {
+        return [
+            'quotes_count' => $user->quotes_count ?? $user->quotes()->count(),
+            'followers_count' => $user->followers_count ?? $user->followers()->count(),
+            'following_count' => $user->following_count ?? $user->following()->count(),
+            'daily_streak' => $user->daily_streak ?? 0,
+            
+            // Optimized: Use SQL Sum instead of collection sum
+            'total_likes' => $user->quotes()->sum('likes_count'),
+            'total_saves' => $user->quotes()->sum('saves_count'),
+            'total_views' => $user->quotes()->sum('views_count'),
+            
+            // Recent activity
+            'recent_quotes' => $user->quotes()
+                ->latest()
+                ->take(3)
+                ->get()
+                ->map(function ($quote) {
+                    return [
                         'id' => $quote->id,
                         'content' => $quote->content,
                         'likes_count' => $quote->likes_count ?? 0,
+                        'saves_count' => $quote->saves_count ?? 0,
+                        'views_count' => $quote->views_count ?? 0,
                         'time_ago' => $quote->created_at->diffForHumans(),
-                    ],
-                ];
-            })->values(),
-        
-        // This week stats (compare to last week)
-        'this_week' => [
-            'quotes' => $user->quotes()->where('created_at', '>=', now()->startOfWeek())->count(),
-            'likes' => $user->quotes()
-                ->whereHas('likes', fn($q) => $q->where('created_at', '>=', now()->startOfWeek()))
-                ->count(),
-            'followers' => $user->followers()->wherePivot('created_at', '>=', now()->startOfWeek())->count(),
-        ],
-    ];
+                    ];
+                }),
+            
+            // Top performing quote
+            'top_quote' => $user->quotes()
+                ->orderByDesc('likes_count')
+                ->first()
+                ?->only(['id', 'content', 'likes_count', 'saves_count']),
+            
+            // Collections
+            'collections_count' => $user->collections()->count(),
+            'public_collections' => $user->collections()
+                ->where('is_public', true)
+                ->withCount('quotes')
+                ->latest()
+                ->take(3)
+                ->get()
+                ->map(function ($collection) {
+                    return [
+                        'id' => $collection->id,
+                        'name' => $collection->name,
+                        'description' => $collection->description,
+                        'quotes_count' => $collection->quotes_count ?? 0,
+                    ];
+                }),
+            
+            // Recent activity from following
+            'following_activity' => $user->following()
+                ->with(['quotes' => function ($query) {
+                    $query->latest()->take(1);
+                }])
+                ->take(5)
+                ->get()
+                ->filter(fn($followed) => $followed->quotes->isNotEmpty())
+                ->map(function ($followed) {
+                    $quote = $followed->quotes->first();
+                    return [
+                        'user' => [
+                            'id' => $followed->id,
+                            'name' => $followed->name,
+                            'username' => $followed->username,
+                            'avatar' => $followed->avatar,
+                        ],
+                        'quote' => [
+                            'id' => $quote->id,
+                            'content' => $quote->content,
+                            'likes_count' => $quote->likes_count ?? 0,
+                            'time_ago' => $quote->created_at->diffForHumans(),
+                        ],
+                    ];
+                })->values(),
+            
+            // This week stats (compare to last week)
+            'this_week' => [
+                'quotes' => $user->quotes()->where('created_at', '>=', now()->startOfWeek())->count(),
+                'likes' => \App\Models\Like::whereHas('quote', fn($q) => $q->where('user_id', $user->id))
+                    ->where('created_at', '>=', now()->startOfWeek())
+                    ->count(),
+                'followers' => $user->followers()->wherePivot('created_at', '>=', now()->startOfWeek())->count(),
+            ],
+        ];
+    });
     
     return Inertia::render('Dashboard', [
         'stats' => $stats,
@@ -169,7 +171,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/quotes/{quote}/report', [QuoteController::class, 'report'])->name('quotes.report')->middleware('throttle:5,1');
     
     // Profile management
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update')->middleware('throttle:10,1');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy')->middleware('throttle:3,1');
     
@@ -204,6 +206,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'show_email' => $user->show_email ?? false,
                 'show_activity_status' => $user->show_activity_status ?? true,
             ],
+            'mustVerifyEmail' => $user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail,
+            'status' => session('status'),
         ]);
     })->name('settings');
     
@@ -270,5 +274,5 @@ require __DIR__.'/auth.php';
 // Public profile routes - MUST BE LAST (wildcard catches everything)
 Route::get('/{username}/followers', [FollowController::class, 'followers'])->name('profile.followers');
 Route::get('/{username}/following', [FollowController::class, 'following'])->name('profile.following');
-Route::get('/{username}/liked', [ProfileController::class, 'liked'])->name('profile.liked');
+
 Route::get('/{username}', [ProfileController::class, 'show'])->name('profile.show');

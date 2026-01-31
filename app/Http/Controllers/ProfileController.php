@@ -72,44 +72,7 @@ class ProfileController extends Controller
         ]);
     }
     
-    /**
-     * Get user's liked quotes.
-     */
-    public function liked(Request $request, string $username): Response
-    {
-        $user = User::where('username', $username)->firstOrFail();
-        
-        $quotes = $user->likedQuotes()
-            ->with(['user', 'categories', 'tags'])
-            ->withCount(['likes', 'saves'])
-            ->latest('likes.created_at')
-            ->paginate(12);
-        
-        // Add user interaction flags if authenticated
-        if ($request->user()) {
-            $quotes->getCollection()->transform(function ($quote) use ($request) {
-                $quote->is_liked = $quote->isLikedBy($request->user());
-                $quote->is_saved = $quote->isSavedBy($request->user());
-                // Add collection IDs this quote is in
-                $quote->collection_ids = $quote->collections()
-                    ->where('user_id', $request->user()->id)
-                    ->pluck('collections.id')
-                    ->toArray();
-                return $quote;
-            });
-        }
-        
-        // Get user's collections if authenticated
-        $collections = $request->user() 
-            ? $request->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
-            : [];
-        
-        return Inertia::render('Profile/Liked', [
-            'profile' => $user,
-            'quotes' => $quotes,
-            'collections' => $collections,
-        ]);
-    }
+
     
     /**
      * Get user's saved quotes.
@@ -156,16 +119,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): Response
-    {
-        return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => session('status'),
-        ]);
-    }
+
 
     /**
      * Update the user's profile information.
@@ -201,7 +155,7 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('settings')->with('status', 'profile-updated');
     }
 
     /**

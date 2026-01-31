@@ -102,6 +102,19 @@ export default function Header({ title, showStreak = true, showNotifications = t
                     >
                         <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                     </Link>
+
+                    {auth?.user && (
+                        <Link
+                            href={`/${auth.user.username}`}
+                            className="ml-1"
+                        >
+                            <img
+                                src={auth.user.avatar ? `/storage/${auth.user.avatar}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user.name)}&background=random`}
+                                alt={auth.user.name}
+                                className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 object-cover"
+                            />
+                        </Link>
+                    )}
                 </div>
             </div>
         </header>
