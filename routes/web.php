@@ -186,6 +186,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         return Inertia::render('Settings', [
             'preferences' => $preferences,
+            'privacy' => [
+                'profile_is_private' => $user->profile_is_private ?? false,
+                'show_email' => $user->show_email ?? false,
+                'show_activity_status' => $user->show_activity_status ?? true,
+            ],
         ]);
     })->name('settings');
     
@@ -195,6 +200,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Notification preferences
     Route::get('/profile/notification-preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'edit'])->name('profile.notification-preferences.edit');
     Route::post('/profile/notification-preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('profile.notification-preferences.update')->middleware('throttle:10,1');
+
+    // Privacy settings
+    Route::post('/settings/privacy', [App\Http\Controllers\SettingsController::class, 'updatePrivacy'])->name('settings.privacy.update')->middleware('throttle:10,1');
+    
+    // Blocked users
+    Route::get('/settings/blocked-users', [App\Http\Controllers\SettingsController::class, 'blockedUsers'])->name('settings.blocked-users');
+    Route::post('/users/{username}/block', [App\Http\Controllers\SettingsController::class, 'blockUser'])->name('users.block')->middleware('throttle:10,1');
+    Route::delete('/users/{username}/block', [App\Http\Controllers\SettingsController::class, 'unblockUser'])->name('users.unblock')->middleware('throttle:10,1');
+    
+    // Account deletion
+    Route::delete('/settings/account', [App\Http\Controllers\SettingsController::class, 'deleteAccount'])->name('settings.account.delete')->middleware('throttle:3,1');
 
     
     // Collections (private to user)

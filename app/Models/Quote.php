@@ -18,7 +18,6 @@ class Quote extends Model
         'content',
         'author',
         'source',
-        'background_gradient',
         'status',
         'is_featured',
         'likes_count',

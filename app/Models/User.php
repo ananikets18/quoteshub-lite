@@ -60,6 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
         
         // Status flags
         'is_active',
+        
+        // Privacy settings
+        'profile_is_private',
+        'show_email',
+        'show_activity_status',
     ];
 
     /**
@@ -95,6 +100,11 @@ class User extends Authenticatable implements MustVerifyEmail
             'followers_count' => 'integer',
             'following_count' => 'integer',
             'daily_streak' => 'integer',
+            
+            // Privacy settings
+            'profile_is_private' => 'boolean',
+            'show_email' => 'boolean',
+            'show_activity_status' => 'boolean',
         ];
     }
 
@@ -196,6 +206,23 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(UserNotificationPreference::class);
     }
 
+    /**
+     * Get users that this user has blocked
+     */
+    public function blockedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'blocked_users', 'user_id', 'blocked_user_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get users who have blocked this user
+     */
+    public function blockedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'blocked_users', 'blocked_user_id', 'user_id')
+            ->withTimestamps();
+    }
 
     /**
      * Check if user is following another user
@@ -203,6 +230,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isFollowing(User $user): bool
     {
         return $this->following()->where('following_id', $user->id)->exists();
+    }
+
+    /**
+     * Check if user has blocked another user
+     */
+    public function isBlocking(User $user): bool
+    {
+        return $this->blockedUsers()->where('blocked_user_id', $user->id)->exists();
+    }
+
+    /**
+     * Check if user is blocked by another user
+     */
+    public function isBlockedBy(User $user): bool
+    {
+        return $this->blockedBy()->where('user_id', $user->id)->exists();
     }
 
     /**

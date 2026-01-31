@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('reason'); // spam, inappropriate, copyright, etc.
             $table->text('details')->nullable(); // Additional details
             $table->enum('status', ['pending', 'reviewed', 'action_taken', 'dismissed'])->default('pending');
-            $table->foreignId('reviewed_by')->nullable()->constrained('users')->nullOnDelete(); // Admin who reviewed
+            $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null'); // Admin who reviewed
             $table->text('admin_notes')->nullable();
             $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();

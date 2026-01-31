@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import InputError from '@/Components/InputError';
 import { useFormShortcuts } from '@/Hooks/useKeyboardShortcuts';
 import {
     Type,
@@ -9,6 +10,9 @@ import {
     ArrowLeft,
     Check
 } from 'lucide-react';
+
+const DEFAULT_GRADIENT = null; // Removed
+
 
 export default function CreateQuote({ categories }) {
     // Simplified state
@@ -24,7 +28,17 @@ export default function CreateQuote({ categories }) {
     const handleSubmit = (e) => {
         if (e) e.preventDefault();
         if (!data.content || processing) return;
-        post(route('quotes.store'));
+
+        post(route('quotes.store'), {
+            onError: (errors) => {
+                // Ensure the tab with errors is visible
+                if (errors.content || errors.author || errors.source) {
+                    setActiveTab('text');
+                } else if (errors.category_ids) {
+                    setActiveTab('tags');
+                }
+            }
+        });
     };
 
     // Keyboard shortcut: Ctrl/Cmd + Enter to submit
@@ -165,6 +179,7 @@ export default function CreateQuote({ categories }) {
                                                 {data.content.length}/500
                                             </span>
                                         </div>
+                                        <InputError message={errors.content} className="mt-2" />
                                     </div>
 
                                     <div className="space-y-4">
@@ -177,6 +192,7 @@ export default function CreateQuote({ categories }) {
                                                 placeholder="e.g. Steve Jobs"
                                                 className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-purple-500"
                                             />
+                                            <InputError message={errors.author} className="mt-2" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Source (Optional)</label>
@@ -187,6 +203,7 @@ export default function CreateQuote({ categories }) {
                                                 placeholder="e.g. Stanford Speech"
                                                 className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-purple-500"
                                             />
+                                            <InputError message={errors.source} className="mt-2" />
                                         </div>
                                     </div>
                                 </div>

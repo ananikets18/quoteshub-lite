@@ -17,7 +17,6 @@ return new class extends Migration
             $table->text('content');
             $table->string('author')->nullable();
             $table->string('source')->nullable(); // Book, speech, etc.
-            $table->string('background_gradient')->default('linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->boolean('is_featured')->default(false);
             $table->integer('likes_count')->default(0);

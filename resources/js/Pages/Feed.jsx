@@ -27,12 +27,10 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
             { id: 'foryou', label: 'For You', icon: Sparkles },
             { id: 'latest', label: 'Latest', icon: Clock },
             { id: 'trending', label: 'Trending', icon: TrendingUp },
-            { id: 'featured', label: 'Featured', icon: Star },
         ]
         : [
             { id: 'latest', label: 'Latest', icon: Clock },
             { id: 'trending', label: 'Trending', icon: TrendingUp },
-            { id: 'featured', label: 'Featured', icon: Star },
         ];
 
     const loadMore = useCallback(() => {
@@ -66,7 +64,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
 
     const changeFilter = (filterId) => {
         if (filterId === activeFilter) return;
-        
+
         setActiveFilter(filterId);
         setPage(1);
         setInitialLoading(true);

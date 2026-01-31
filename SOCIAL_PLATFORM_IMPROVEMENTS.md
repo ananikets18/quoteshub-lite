@@ -4,7 +4,7 @@
 
 ### Homepage/Feed (Feed.jsx)
 **What's Good:**
-- ✅ Clean filter tabs (For You, Latest, Trending, Featured)
+- ✅ Clean filter tabs (For You, Latest, Trending)
 - ✅ Category horizontal scroll
 - ✅ Infinite scroll
 - ✅ Responsive design
@@ -273,7 +273,7 @@ New:     ❤️ Love  💪 Inspire  😂 Funny  🤔 Thoughtful  🔥 Fire
 ├─────────────────────────────────────────────────────────────┤
 │  Categories (Horizontal Scroll)                             │
 ├─────────────────────────────────────────────────────────────┤
-│  Filters: For You | Latest | Trending | Featured           │
+│  Filters: For You | Latest | Trending                     │
 ├──────────────────────────────┬──────────────────────────────┤
 │                              │  🔥 Trending Now             │
 │                              │  ─────────────────           │

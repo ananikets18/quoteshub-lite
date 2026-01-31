@@ -28,9 +28,6 @@ class FeedController extends Controller
             case 'trending':
                 $query->trending();
                 break;
-            case 'featured':
-                $query->featured()->latest();
-                break;
             case 'popular':
                 $query->popular();
                 break;

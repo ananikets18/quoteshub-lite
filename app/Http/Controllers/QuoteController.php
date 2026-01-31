@@ -43,7 +43,7 @@ class QuoteController extends Controller
 
         // Check rate limiting
         if ($this->moderationService->isRateLimited($user)) {
-            $rateLimitInfo = $this->moderationService->getRemainingQuotes($user);
+             $rateLimitInfo = $this->moderationService->getRemainingQuotes($user);
             return back()->withErrors([
                 'content' => "You've reached your quote limit. Please wait before posting more. (Limit: {$rateLimitInfo['limit']} quotes per hour)"
             ])->withInput();
@@ -53,7 +53,6 @@ class QuoteController extends Controller
             'content' => 'required|string|min:10|max:500',
             'author' => 'required|string|max:100',
             'source' => 'nullable|string|max:200',
-            'background_gradient' => 'required|string',
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'exists:categories,id',
         ]);
@@ -89,7 +88,6 @@ class QuoteController extends Controller
             'content' => $validated['content'],
             'author' => $validated['author'],
             'source' => $validated['source'] ?? null,
-            'background_gradient' => $validated['background_gradient'],
             'status' => 'approved', // MVP: Auto-approve all quotes. Moderation via report system.
             'is_featured' => false,
         ]);

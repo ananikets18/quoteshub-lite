@@ -1,10 +1,10 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
-import { User, Lock, Bell, Shield, Eye, Moon, Sun, Trash2, LogOut, ChevronRight } from 'lucide-react';
+import { User, Lock, Bell, Shield, Eye, Moon, Sun, Trash2, LogOut, ChevronRight, UserX, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import axios from 'axios';
 
-export default function Settings({ auth, preferences = {} }) {
+export default function Settings({ auth, preferences = {}, privacy = {} }) {
     const [darkMode, setDarkMode] = useState(
         document.documentElement.classList.contains('dark')
     );
@@ -18,12 +18,22 @@ export default function Settings({ auth, preferences = {} }) {
         comment_added: preferences.comment_added ?? true,
         notification_sounds: preferences.notification_sounds ?? true,
     });
+    const [privacySettings, setPrivacySettings] = useState({
+        profile_is_private: privacy.profile_is_private ?? false,
+        show_email: privacy.show_email ?? false,
+        show_activity_status: privacy.show_activity_status ?? true,
+    });
     const [saving, setSaving] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deletePassword, setDeletePassword] = useState('');
+    const [deleteConfirmation, setDeleteConfirmation] = useState('');
+    const [deleteError, setDeleteError] = useState('');
+    const [deleting, setDeleting] = useState(false);
 
     const toggleDarkMode = () => {
         const newMode = !darkMode;
         setDarkMode(newMode);
-        
+
         if (newMode) {
             document.documentElement.classList.add('dark');
             localStorage.setItem('theme', 'dark');
@@ -36,7 +46,7 @@ export default function Settings({ auth, preferences = {} }) {
     const handleNotificationToggle = async (field) => {
         const newValue = !notifPrefs[field];
         setNotifPrefs(prev => ({ ...prev, [field]: newValue }));
-        
+
         setSaving(true);
         try {
             await axios.post('/profile/notification-preferences', {
@@ -49,6 +59,57 @@ export default function Settings({ auth, preferences = {} }) {
             setNotifPrefs(prev => ({ ...prev, [field]: !newValue }));
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handlePrivacyToggle = async (field) => {
+        const newValue = !privacySettings[field];
+        setPrivacySettings(prev => ({ ...prev, [field]: newValue }));
+
+        setSaving(true);
+        try {
+            await axios.post('/settings/privacy', {
+                ...privacySettings,
+                [field]: newValue
+            });
+        } catch (error) {
+            console.error('Failed to update privacy settings:', error);
+            // Revert on error
+            setPrivacySettings(prev => ({ ...prev, [field]: !newValue }));
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleDeleteAccount = async (e) => {
+        e.preventDefault();
+        setDeleteError('');
+
+        if (deleteConfirmation !== 'DELETE') {
+            setDeleteError('Please type DELETE to confirm');
+            return;
+        }
+
+        if (!deletePassword) {
+            setDeleteError('Please enter your password');
+            return;
+        }
+
+        setDeleting(true);
+        try {
+            await router.delete('/settings/account', {
+                data: {
+                    password: deletePassword,
+                    confirmation: deleteConfirmation,
+                },
+                onError: (errors) => {
+                    setDeleteError(errors.password || 'Failed to delete account');
+                    setDeleting(false);
+                },
+            });
+        } catch (error) {
+            setDeleteError('Failed to delete account');
+            setDeleting(false);
         }
     };
 
@@ -168,16 +229,34 @@ export default function Settings({ auth, preferences = {} }) {
             color: 'from-green-500 to-emerald-500',
             items: [
                 {
-                    label: 'Profile Visibility',
-                    description: 'Control who can see your profile',
-                    href: '/profile',
+                    label: 'Private Profile',
+                    description: privacySettings.profile_is_private ? 'Only followers can see your quotes' : 'Anyone can see your quotes',
                     icon: Eye,
+                    toggle: true,
+                    value: privacySettings.profile_is_private,
+                    onChange: () => handlePrivacyToggle('profile_is_private'),
                 },
                 {
-                    label: 'Quote Privacy',
-                    description: 'Manage who can see your quotes',
-                    href: '/profile',
+                    label: 'Show Email',
+                    description: privacySettings.show_email ? 'Email visible on profile' : 'Email hidden from profile',
                     icon: Shield,
+                    toggle: true,
+                    value: privacySettings.show_email,
+                    onChange: () => handlePrivacyToggle('show_email'),
+                },
+                {
+                    label: 'Show Activity Status',
+                    description: privacySettings.show_activity_status ? 'Others can see when you\'re active' : 'Activity status hidden',
+                    icon: Eye,
+                    toggle: true,
+                    value: privacySettings.show_activity_status,
+                    onChange: () => handlePrivacyToggle('show_activity_status'),
+                },
+                {
+                    label: 'Blocked Users',
+                    description: 'Manage users you have blocked',
+                    href: '/settings/blocked-users',
+                    icon: UserX,
                 },
             ],
         },
@@ -189,9 +268,9 @@ export default function Settings({ auth, preferences = {} }) {
                 {
                     label: 'Delete Account',
                     description: 'Permanently delete your account and all data',
-                    href: '/profile',
                     icon: Trash2,
                     danger: true,
+                    action: () => setShowDeleteModal(true),
                 },
                 {
                     label: 'Logout',
@@ -272,16 +351,14 @@ export default function Settings({ auth, preferences = {} }) {
                                                     <button
                                                         onClick={item.onChange}
                                                         disabled={saving}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex-shrink-0 ${
-                                                            item.value
-                                                                ? 'bg-purple-600'
-                                                                : 'bg-gray-200 dark:bg-gray-700'
-                                                        } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex-shrink-0 ${item.value
+                                                            ? 'bg-purple-600'
+                                                            : 'bg-gray-200 dark:bg-gray-700'
+                                                            } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     >
                                                         <span
-                                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                                item.value ? 'translate-x-6' : 'translate-x-1'
-                                                            }`}
+                                                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${item.value ? 'translate-x-6' : 'translate-x-1'
+                                                                }`}
                                                         />
                                                     </button>
                                                 </div>
@@ -293,25 +370,22 @@ export default function Settings({ auth, preferences = {} }) {
                                                 <button
                                                     key={index}
                                                     onClick={item.action}
-                                                    className={`w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left ${
-                                                        item.danger ? 'hover:bg-red-50 dark:hover:bg-red-900/10' : ''
-                                                    }`}
+                                                    className={`w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left ${item.danger ? 'hover:bg-red-50 dark:hover:bg-red-900/10' : ''
+                                                        }`}
                                                 >
                                                     <div className="flex items-center gap-3 flex-1">
                                                         <ItemIcon
-                                                            className={`w-5 h-5 flex-shrink-0 ${
-                                                                item.danger
-                                                                    ? 'text-red-500'
-                                                                    : 'text-gray-400'
-                                                            }`}
+                                                            className={`w-5 h-5 flex-shrink-0 ${item.danger
+                                                                ? 'text-red-500'
+                                                                : 'text-gray-400'
+                                                                }`}
                                                         />
                                                         <div className="flex-1 min-w-0">
                                                             <div
-                                                                className={`font-medium ${
-                                                                    item.danger
-                                                                        ? 'text-red-600 dark:text-red-400'
-                                                                        : 'text-gray-900 dark:text-white'
-                                                                }`}
+                                                                className={`font-medium ${item.danger
+                                                                    ? 'text-red-600 dark:text-red-400'
+                                                                    : 'text-gray-900 dark:text-white'
+                                                                    }`}
                                                             >
                                                                 {item.label}
                                                             </div>
@@ -329,25 +403,22 @@ export default function Settings({ auth, preferences = {} }) {
                                             <Link
                                                 key={index}
                                                 href={item.href}
-                                                className={`px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-                                                    item.danger ? 'hover:bg-red-50 dark:hover:bg-red-900/10' : ''
-                                                }`}
+                                                className={`px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${item.danger ? 'hover:bg-red-50 dark:hover:bg-red-900/10' : ''
+                                                    }`}
                                             >
                                                 <div className="flex items-center gap-3 flex-1">
                                                     <ItemIcon
-                                                        className={`w-5 h-5 flex-shrink-0 ${
-                                                            item.danger
-                                                                ? 'text-red-500'
-                                                                : 'text-gray-400'
-                                                        }`}
+                                                        className={`w-5 h-5 flex-shrink-0 ${item.danger
+                                                            ? 'text-red-500'
+                                                            : 'text-gray-400'
+                                                            }`}
                                                     />
                                                     <div className="flex-1 min-w-0">
                                                         <div
-                                                            className={`font-medium ${
-                                                                item.danger
-                                                                    ? 'text-red-600 dark:text-red-400'
-                                                                    : 'text-gray-900 dark:text-white'
-                                                            }`}
+                                                            className={`font-medium ${item.danger
+                                                                ? 'text-red-600 dark:text-red-400'
+                                                                : 'text-gray-900 dark:text-white'
+                                                                }`}
                                                         >
                                                             {item.label}
                                                         </div>
@@ -386,6 +457,95 @@ export default function Settings({ auth, preferences = {} }) {
                     </div>
                 </div>
             </div>
+
+            {/* Delete Account Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        {/* Modal Header */}
+                        <div className="px-6 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                    <AlertTriangle className="w-5 h-5 text-white" />
+                                </div>
+                                <h2 className="text-lg font-bold">Delete Account</h2>
+                            </div>
+                        </div>
+
+                        {/* Modal Body */}
+                        <form onSubmit={handleDeleteAccount} className="p-6">
+                            <div className="mb-6">
+                                <p className="text-gray-900 dark:text-white font-medium mb-2">
+                                    Are you absolutely sure?
+                                </p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                    This action cannot be undone. This will permanently delete your account and remove all your data including quotes, likes, saves, and followers.
+                                </p>
+                            </div>
+
+                            {deleteError && (
+                                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                                    <p className="text-sm text-red-600 dark:text-red-400">{deleteError}</p>
+                                </div>
+                            )}
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Type <span className="font-bold text-red-600">DELETE</span> to confirm
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={deleteConfirmation}
+                                        onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                        placeholder="DELETE"
+                                        disabled={deleting}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Enter your password
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={deletePassword}
+                                        onChange={(e) => setDeletePassword(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                        placeholder="Password"
+                                        disabled={deleting}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Modal Actions */}
+                            <div className="flex gap-3 mt-6">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowDeleteModal(false);
+                                        setDeletePassword('');
+                                        setDeleteConfirmation('');
+                                        setDeleteError('');
+                                    }}
+                                    disabled={deleting}
+                                    className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={deleting || deleteConfirmation !== 'DELETE' || !deletePassword}
+                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {deleting ? 'Deleting...' : 'Delete Account'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

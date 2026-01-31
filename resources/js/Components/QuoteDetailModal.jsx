@@ -159,8 +159,10 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
 
         // Create gradient
         const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        // Parse gradient colors from quote.background_gradient
-        ctx.fillStyle = quote.background_gradient || '#667eea';
+        // Default gradient since we removed it from DB
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Add quote text
