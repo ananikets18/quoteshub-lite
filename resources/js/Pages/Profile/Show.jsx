@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import Pagination from '@/Components/Pagination';
@@ -35,7 +36,11 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
 
     return (
         <AppLayout title={`${profile.name}'s Profile`} showNav={true}>
-            <Head title={`${profile.name} (@${profile.username})`} />
+            <SeoHead
+                title={`${profile.name} (@${profile.username})`}
+                description={`Check out ${profile.name}'s profile on QuotesHub. Views their collections, recent quotes, and statistics.`}
+                image={profile.avatar ? `/storage/${profile.avatar}` : null}
+            />
 
             <div className="max-w-5xl mx-auto">
                 {/* Cover Image */}
@@ -53,17 +58,19 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                 <div className="bg-white rounded-b-lg shadow-sm px-6 pb-6 pt-2">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end relative">
                         {/* Avatar & Name */}
-                        <div className="flex items-end">
-                            <div className="-mt-12 mr-4 relative z-10">
+                        <div className="flex items-end min-w-0 flex-1">
+                            <div className="-mt-12 mr-4 relative z-10 flex-shrink-0">
                                 <img
                                     src={avatarUrl}
                                     alt={profile.name}
                                     className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
                                 />
                             </div>
-                            <div className="mb-1">
-                                <h1 className="text-3xl font-bold text-gray-900 leading-none">{profile.name}</h1>
-                                <p className="text-gray-600">@{profile.username}</p>
+                            <div className="mb-1 min-w-0 flex-1">
+                                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-none truncate pr-2" title={profile.name}>
+                                    {profile.name}
+                                </h1>
+                                <p className="text-gray-600 truncate">@{profile.username}</p>
                             </div>
                         </div>
 

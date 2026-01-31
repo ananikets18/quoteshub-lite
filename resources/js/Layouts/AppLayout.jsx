@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import Header from '@/Components/Header';
 import BottomNav from '@/Components/BottomNav';
@@ -6,11 +6,21 @@ import KeyboardShortcutsModal from '@/Components/KeyboardShortcutsModal';
 import { useGlobalShortcuts } from '@/Hooks/useKeyboardShortcuts';
 import useScrollDirection from '@/Hooks/useScrollDirection';
 import Footer from '@/Components/Footer';
+import Toast from '@/Components/Toast';
 
 export default function AppLayout({ children, title, showHeader = true, showNav = true }) {
-    const { auth } = usePage().props;
+    const { auth, flash } = usePage().props;
     const [showShortcutsModal, setShowShortcutsModal] = useState(false);
     const { scrollDirection, scrollY } = useScrollDirection();
+    const [toast, setToast] = useState(null);
+
+    useEffect(() => {
+        if (flash?.success) {
+            setToast({ message: flash.success, type: 'success' });
+        } else if (flash?.error) {
+            setToast({ message: flash.error, type: 'error' });
+        }
+    }, [flash]);
 
     // Global keyboard shortcuts
     useGlobalShortcuts({
@@ -39,6 +49,15 @@ export default function AppLayout({ children, title, showHeader = true, showNav 
 
                 {showNav && <BottomNav isVisible={isNavVisible} />}
             </div>
+
+            {toast && (
+                <Toast
+                    show={true}
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
 
             {/* Keyboard Shortcuts Help Modal */}
             <KeyboardShortcutsModal

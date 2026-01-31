@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import { User, Lock, Bell, Shield, Moon, Sun, Monitor } from 'lucide-react';
 import { useState } from 'react';
@@ -79,7 +80,10 @@ export default function Settings({ auth, preferences = {}, privacy = {}, mustVer
 
     return (
         <AppLayout title="Settings">
-            <Head title="Settings" />
+            <SeoHead
+                title="Settings"
+                description="Manage your profile information, password, notification preferences, and privacy settings."
+            />
 
             <div className="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8 pb-32">
                 <div className="mb-8 px-4 sm:px-0">

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { router, usePage } from '@inertiajs/react';
+import { router, usePage, Head } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import QuoteCardSkeleton from '@/Components/QuoteCardSkeleton';
@@ -94,14 +95,14 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
     const getCategoryColor = (color) => {
         // Fallback or mapping for pill styles
         const colors = {
-            purple: 'bg-purple-100/50 text-purple-700 border-purple-200',
-            blue: 'bg-blue-100/50 text-blue-700 border-blue-200',
-            green: 'bg-green-100/50 text-green-700 border-green-200',
-            yellow: 'bg-yellow-100/50 text-yellow-700 border-yellow-200',
-            orange: 'bg-orange-100/50 text-orange-700 border-orange-200',
-            pink: 'bg-pink-100/50 text-pink-700 border-pink-200',
-            red: 'bg-red-100/50 text-red-700 border-red-200',
-            indigo: 'bg-indigo-100/50 text-indigo-700 border-indigo-200',
+            purple: 'bg-purple-100/50 text-purple-700 border-purple-200 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30',
+            blue: 'bg-blue-100/50 text-blue-700 border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30',
+            green: 'bg-green-100/50 text-green-700 border-green-200 dark:bg-green-500/20 dark:text-green-300 dark:border-green-500/30',
+            yellow: 'bg-yellow-100/50 text-yellow-800 border-yellow-200 dark:bg-yellow-500/20 dark:text-yellow-300 dark:border-yellow-500/30',
+            orange: 'bg-orange-100/50 text-orange-800 border-orange-200 dark:bg-orange-500/20 dark:text-orange-300 dark:border-orange-500/30',
+            pink: 'bg-pink-100/50 text-pink-700 border-pink-200 dark:bg-pink-500/20 dark:text-pink-300 dark:border-pink-500/30',
+            red: 'bg-red-100/50 text-red-700 border-red-200 dark:bg-red-500/20 dark:text-red-300 dark:border-red-500/30',
+            indigo: 'bg-indigo-100/50 text-indigo-700 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/30',
         };
         return colors[color] || colors.purple;
     };
@@ -140,6 +141,10 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
 
     return (
         <AppLayout title="QuotesHub">
+            <SeoHead
+                title="Feed - QuotesHub"
+                description="Your personalized feed of inspiring quotes. Discover, like, and share wisdom from around the world."
+            />
             {/* Sticky Header Section - Hides on scroll down */}
             <div className={`sticky top-[60px] z-30 bg-gray-50 dark:bg-gray-900 transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
                 }`}>

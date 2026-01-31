@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import { FolderPlus, Folder, Lock, Globe, Trash2, Edit, ChevronRight, AlertTriangle } from 'lucide-react';
 import Modal from '@/Components/Modal';
@@ -79,7 +80,10 @@ export default function Index({ auth, collections }) {
 
     return (
         <AppLayout user={auth.user} showNav={true}>
-            <Head title="My Collections" />
+            <SeoHead
+                title="My Collections"
+                description="Organize your favorite quotes into custom collections. Keep them private or share them with the community."
+            />
 
             <div className="px-4 py-6 pb-20">
                 {/* Header */}

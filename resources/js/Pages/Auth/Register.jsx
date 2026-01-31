@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import { useEffect, useRef } from 'react';
 
 export default function Register() {
@@ -33,7 +34,10 @@ export default function Register() {
 
     return (
         <>
-            <Head title="Register" />
+            <SeoHead
+                title="Join QuotesHub"
+                description="Create an account on QuotesHub today. Start collecting pieces of wisdom and sharing them with the world."
+            />
 
             <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
                 <h1 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>Register</h1>

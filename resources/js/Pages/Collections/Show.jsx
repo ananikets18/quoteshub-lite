@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import QuoteCard from '@/Components/QuoteCard';
 import Pagination from '@/Components/Pagination';
@@ -44,7 +45,10 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
 
     return (
         <AppLayout user={auth.user} showNav={true}>
-            <Head title={collection.name} />
+            <SeoHead
+                title={`${collection.name} - Collection`}
+                description={collection.description || `Explore the "${collection.name}" collection on QuotesHub. A curated set of inspiring quotes.`}
+            />
 
             <div className="px-4 py-6 pb-20">
                 {/* Back Link */}

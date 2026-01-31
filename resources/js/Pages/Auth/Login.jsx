@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import { useEffect, useRef } from 'react';
 
 export default function Login({ status, canResetPassword }) {
@@ -34,7 +35,10 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <>
-            <Head title="Login" />
+            <SeoHead
+                title="Login"
+                description="Welcome back! Login to your QuotesHub account to share, save, and discover inspiring quotes."
+            />
 
             <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
                 <h1 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>Login</h1>

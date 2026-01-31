@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import InputError from '@/Components/InputError';
 import { useFormShortcuts } from '@/Hooks/useKeyboardShortcuts';
@@ -57,6 +58,10 @@ export default function CreateQuote({ categories }) {
 
     return (
         <AppLayout title="Create Quote" showHeader={false} showNav={false}>
+            <SeoHead
+                title="Create a Quote"
+                description="Share your favorite quotes or your own wisdom with the world. Create beautiful cards with custom backgrounds and topics."
+            />
             {/* Custom Full Screen Layout */}
             <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
 

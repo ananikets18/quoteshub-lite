@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import {
-    Type,
     Type,
     Tag,
     Save,
@@ -35,6 +35,10 @@ export default function EditQuote({ quote, categories }) {
 
     return (
         <AppLayout title="Edit Quote" showHeader={false} showNav={false}>
+            <SeoHead
+                title="Edit Quote"
+                description="Modify your quote, update its author, source, or topics."
+            />
             {/* Custom Full Screen Layout */}
             <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
 

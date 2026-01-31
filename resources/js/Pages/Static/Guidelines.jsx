@@ -1,10 +1,14 @@
 import { Head } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 
 export default function Guidelines() {
     return (
         <AppLayout title="Community Guidelines">
-            <Head title="Community Guidelines" />
+            <SeoHead
+                title="Community Guidelines"
+                description="Our standards for the QuotesHub community. Learn how to keep our platform a safe and inspiring place for everyone."
+            />
 
             <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 md:p-8">
                 <div className="prose dark:prose-invert max-w-none">

@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const handleImageError = () => {
@@ -14,7 +15,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
     return (
         <>
-            <Head title="Welcome" />
+            <SeoHead
+                title="Welcome"
+                description="QuotesHub - The ultimate destination for inspiring quotes. Join our community to discover, share, and organize your favorite wisdom."
+            />
             <div className="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
                 <img
                     id="background"

@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import SearchBar from '@/Components/SearchBar';
 import QuoteCard from '@/Components/QuoteCard';
@@ -61,7 +62,10 @@ export default function Index({
 
     return (
         <AppLayout title="Search Quotes" showNav>
-            <Head title="Search Quotes" />
+            <SeoHead
+                title={`Search: ${localFilters.q || 'All Quotes'}`}
+                description={`Search results for '${localFilters.q || 'quotes'}' on QuotesHub. Filter by category, tag, and more.`}
+            />
 
             <div className="px-4 py-6 pb-20 space-y-6">
                 <SearchBar initialValue={localFilters.q} />
@@ -73,137 +77,141 @@ export default function Index({
                 </div>
 
                 {/* Mobile Filter Toggle */}
-                <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className="lg:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm"
-                >
-                    <Filter className="w-5 h-5" />
-                    {showFilters ? 'Hide Filters' : 'Show Filters'}
-                    {hasActiveFilters && (
-                        <span className="ml-2 px-2 py-0.5 bg-purple-100 text-#5D41E6 text-xs rounded-full">
-                            Active
-                        </span>
-                    )}
-                </button>
+                {quotes.total > 0 && (
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="lg:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm"
+                    >
+                        <Filter className="w-5 h-5" />
+                        {showFilters ? 'Hide Filters' : 'Show Filters'}
+                        {hasActiveFilters && (
+                            <span className="ml-2 px-2 py-0.5 bg-purple-100 text-[#5D41E6] text-xs rounded-full">
+                                Active
+                            </span>
+                        )}
+                    </button>
+                )}
 
                 <div className="grid lg:grid-cols-4 gap-6">
                     {/* Filters */}
-                    <div
-                        className={`${showFilters ? 'block' : 'hidden'
-                            } lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6`}
-                    >
-                        <div className="flex justify-between mb-4">
-                            <h2 className="font-semibold flex items-center gap-2">
-                                <Filter className="w-5 h-5" />
-                                Filters
-                            </h2>
-                            {hasActiveFilters && (
-                                <button
-                                    onClick={clearFilters}
-                                    className="text-sm text-#5D41E6"
-                                >
-                                    Clear all
-                                </button>
-                            )}
-                        </div>
-
-                        {/* Sort */}
-                        <div className="mb-6">
-                            <label className="block text-sm mb-2">Sort By</label>
-                            <select
-                                value={localFilters.sort}
-                                onChange={(e) =>
-                                    handleFilterChange('sort', e.target.value)
-                                }
-                                className="w-full rounded-xl"
-                            >
-                                <option value="latest">Latest</option>
-                                <option value="popular">Most Popular</option>
-                                <option value="most_saved">Most Saved</option>
-                                <option value="oldest">Oldest</option>
-                            </select>
-                        </div>
-
-                        {/* Category */}
-                        <div className="mb-6">
-                            <label className="block text-sm mb-2">
-                                Category
-                            </label>
-                            <select
-                                value={localFilters.category}
-                                onChange={(e) =>
-                                    handleFilterChange(
-                                        'category',
-                                        e.target.value
-                                    )
-                                }
-                                className="w-full rounded-xl"
-                            >
-                                <option value="">All Categories</option>
-                                {categories.map((c) => (
-                                    <option key={c.id} value={c.id}>
-                                        {c.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Date */}
-                        <div className="mb-6">
-                            <label className="block text-sm mb-2 flex items-center gap-1">
-                                <Calendar className="w-4 h-4" />
-                                Date Range
-                            </label>
-                            <input
-                                type="date"
-                                value={localFilters.start_date}
-                                onChange={(e) =>
-                                    handleFilterChange(
-                                        'start_date',
-                                        e.target.value
-                                    )
-                                }
-                                className="w-full rounded-xl mb-2"
-                            />
-                            <input
-                                type="date"
-                                value={localFilters.end_date}
-                                onChange={(e) =>
-                                    handleFilterChange(
-                                        'end_date',
-                                        e.target.value
-                                    )
-                                }
-                                className="w-full rounded-xl"
-                            />
-                        </div>
-
-                        {/* Tags */}
-                        <div>
-                            <label className="block text-sm mb-2">
-                                Popular Tags
-                            </label>
-                            <div className="flex flex-wrap gap-2">
-                                {popularTags.map((tag) => (
+                    {quotes.total > 0 && (
+                        <div
+                            className={`${showFilters ? 'block' : 'hidden'
+                                } lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6`}
+                        >
+                            <div className="flex justify-between mb-4">
+                                <h2 className="font-semibold flex items-center gap-2">
+                                    <Filter className="w-5 h-5" />
+                                    Filters
+                                </h2>
+                                {hasActiveFilters && (
                                     <button
-                                        key={tag.id}
-                                        onClick={() =>
-                                            handleFilterChange('tag', tag.name)
-                                        }
-                                        className={`px-3 py-1 rounded-full text-xs ${localFilters.tag === tag.name
-                                            ? 'bg-#5D41E6 text-white'
-                                            : 'bg-gray-100 dark:bg-gray-700'
-                                            }`}
+                                        onClick={clearFilters}
+                                        className="text-sm text-[#5D41E6]"
                                     >
-                                        {tag.name}
+                                        Clear all
                                     </button>
-                                ))}
+                                )}
+                            </div>
+
+                            {/* Sort */}
+                            <div className="mb-6">
+                                <label className="block text-sm mb-2">Sort By</label>
+                                <select
+                                    value={localFilters.sort}
+                                    onChange={(e) =>
+                                        handleFilterChange('sort', e.target.value)
+                                    }
+                                    className="w-full rounded-xl"
+                                >
+                                    <option value="latest">Latest</option>
+                                    <option value="popular">Most Popular</option>
+                                    <option value="most_saved">Most Saved</option>
+                                    <option value="oldest">Oldest</option>
+                                </select>
+                            </div>
+
+                            {/* Category */}
+                            <div className="mb-6">
+                                <label className="block text-sm mb-2">
+                                    Category
+                                </label>
+                                <select
+                                    value={localFilters.category}
+                                    onChange={(e) =>
+                                        handleFilterChange(
+                                            'category',
+                                            e.target.value
+                                        )
+                                    }
+                                    className="w-full rounded-xl"
+                                >
+                                    <option value="">All Categories</option>
+                                    {categories.map((c) => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Date */}
+                            <div className="mb-6">
+                                <label className="block text-sm mb-2 flex items-center gap-1">
+                                    <Calendar className="w-4 h-4" />
+                                    Date Range
+                                </label>
+                                <input
+                                    type="date"
+                                    value={localFilters.start_date}
+                                    onChange={(e) =>
+                                        handleFilterChange(
+                                            'start_date',
+                                            e.target.value
+                                        )
+                                    }
+                                    className="w-full rounded-xl mb-2"
+                                />
+                                <input
+                                    type="date"
+                                    value={localFilters.end_date}
+                                    onChange={(e) =>
+                                        handleFilterChange(
+                                            'end_date',
+                                            e.target.value
+                                        )
+                                    }
+                                    className="w-full rounded-xl"
+                                />
+                            </div>
+
+                            {/* Tags */}
+                            <div>
+                                <label className="block text-sm mb-2">
+                                    Popular Tags
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                    {popularTags.map((tag) => (
+                                        <button
+                                            key={tag.id}
+                                            onClick={() =>
+                                                handleFilterChange('tag', tag.name)
+                                            }
+                                            className={`px-3 py-1 rounded-full text-xs ${localFilters.tag === tag.name
+                                                ? 'bg-[#5D41E6] text-white'
+                                                : 'bg-gray-100 dark:bg-gray-700'
+                                                }`}
+                                        >
+                                            {tag.name}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Results */}
-                    <div className="lg:col-span-3 space-y-4">
+                    <div className={`${quotes.total > 0 ? 'lg:col-span-3' : 'lg:col-span-4'} space-y-4`}>
                         <p className="text-sm text-gray-600">
                             {quotes.total} result
                             {quotes.total !== 1 && 's'}
@@ -231,7 +239,7 @@ export default function Index({
                                                         __html: link.label,
                                                     }}
                                                     className={`px-4 py-2 rounded-xl ${link.active
-                                                        ? 'bg-#5D41E6 text-white'
+                                                        ? 'bg-[#5D41E6] text-white'
                                                         : 'bg-white dark:bg-gray-800'
                                                         }`}
                                                 />
@@ -255,7 +263,7 @@ export default function Index({
                                 </h3>
                                 <button
                                     onClick={clearFilters}
-                                    className="mt-4 px-6 py-3 bg-#5D41E6 text-white rounded-xl"
+                                    className="mt-4 px-6 py-3 bg-[#5D41E6] text-white rounded-xl"
                                 >
                                     Clear Filters
                                 </button>

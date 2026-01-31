@@ -1,11 +1,15 @@
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import { Mail, MessageSquare, Twitter } from 'lucide-react';
 
 export default function Contact() {
     return (
         <AppLayout title="Contact Us">
-            <Head title="Contact Us" />
+            <SeoHead
+                title="Contact Us"
+                description="Have a question or feedback? Reach out to the QuotesHub team. We'd love to hear from you."
+            />
 
             <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 md:p-8">
                 <div className="text-center max-w-2xl mx-auto">

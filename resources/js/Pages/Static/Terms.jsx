@@ -1,10 +1,14 @@
 import { Head } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 
 export default function Terms() {
     return (
         <AppLayout title="Terms of Service">
-            <Head title="Terms of Service" />
+            <SeoHead
+                title="Terms of Service"
+                description="Read our terms of service to understand your rights and responsibilities when using QuotesHub."
+            />
 
             <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 md:p-8">
                 <div className="prose dark:prose-invert max-w-none">

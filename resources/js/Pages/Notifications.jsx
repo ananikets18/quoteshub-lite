@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import { Bell, Check, Trash2, Heart, Bookmark, UserPlus, Trophy, AlertTriangle, XCircle, Star, MessageCircle, CheckCheck, X } from 'lucide-react';
 import axios from 'axios';
@@ -125,6 +126,10 @@ export default function Notifications() {
 
     return (
         <AppLayout>
+            <SeoHead
+                title="Notifications"
+                description="Stay updated with your activity on QuotesHub. See who followed you, liked your quotes, or saved your content."
+            />
             <div className="max-w-3xl mx-auto px-4 py-6 pb-20">
                 {/* Header */}
                 <div className="mb-6">
@@ -140,8 +145,8 @@ export default function Notifications() {
                             <button
                                 onClick={() => setFilter('all')}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                                     }`}
                             >
                                 All
@@ -149,8 +154,8 @@ export default function Notifications() {
                             <button
                                 onClick={() => setFilter('unread')}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'unread'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                                     }`}
                             >
                                 Unread {unreadCount > 0 && `(${unreadCount})`}

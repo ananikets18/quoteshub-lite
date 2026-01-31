@@ -1,11 +1,15 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import { Home, TrendingUp, BookOpen, Users, Sparkles, ArrowRight, Heart, Bookmark, Eye, BarChart3, Award, Zap, Clock, TrendingDown } from 'lucide-react';
 
 export default function Dashboard({ auth, stats }) {
     return (
         <AppLayout title="Dashboard">
-            <Head title="Dashboard" />
+            <SeoHead
+                title="Dashboard"
+                description="View your personal quote statistics, engagement metrics, and recent activity on QuotesHub."
+            />
 
             <div className="px-4 py-6 pb-20">
                 {/* This Week Highlights */}

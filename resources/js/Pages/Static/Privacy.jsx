@@ -1,10 +1,14 @@
 import { Head } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 
 export default function Privacy() {
     return (
         <AppLayout title="Privacy Policy">
-            <Head title="Privacy Policy" />
+            <SeoHead
+                title="Privacy Policy"
+                description="Your privacy matters to us. Learn how QuotesHub collects, uses, and protects your personal data."
+            />
 
             <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 md:p-8">
                 <div className="prose dark:prose-invert max-w-none">

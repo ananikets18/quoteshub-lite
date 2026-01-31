@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import { Trophy, Lock, Star, Flame, Zap, Award, Target, Share2, Crown } from 'lucide-react';
 
@@ -32,7 +33,10 @@ export default function Achievements({ auth, achievements, progress, totalPoints
 
     return (
         <AppLayout user={auth.user} showNav={true}>
-            <Head title="Achievements & Streak" />
+            <SeoHead
+                title="Achievements & Streak"
+                description="Track your progress, unlock badges, and maintain your daily streak on QuotesHub. See your level and earned XP."
+            />
 
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
                 {/* 1. Streak Hero Section */}
@@ -192,8 +196,8 @@ export default function Achievements({ auth, achievements, progress, totalPoints
                                                 <div
                                                     key={achievement.type}
                                                     className={`group relative flex flex-col items-center p-4 rounded-2xl border transition-all duration-200 ${achievement.unlocked
-                                                            ? 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500/50'
-                                                            : 'bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 grayscale opacity-60 hover:opacity-100'
+                                                        ? 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500/50'
+                                                        : 'bg-gray-50/50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 grayscale opacity-60 hover:opacity-100'
                                                         }`}
                                                 >
                                                     <div className={`text-4xl mb-3 transition-transform duration-300 ${achievement.unlocked ? 'group-hover:scale-110 group-hover:rotate-6' : ''}`}>

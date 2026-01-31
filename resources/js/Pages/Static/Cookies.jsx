@@ -1,10 +1,14 @@
 import { Head } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 
 export default function Cookies() {
     return (
         <AppLayout title="Cookie Policy">
-            <Head title="Cookie Policy" />
+            <SeoHead
+                title="Cookie Policy"
+                description="Learn about how QuotesHub uses cookies and similar technologies to improve your experience."
+            />
 
             <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 md:p-8">
                 <div className="prose dark:prose-invert max-w-none">

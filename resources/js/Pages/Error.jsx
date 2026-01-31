@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import { Home, ArrowLeft } from 'lucide-react';
 
 export default function Error({ status }) {
@@ -18,7 +19,7 @@ export default function Error({ status }) {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 text-center">
-            <Head title={title} />
+            <SeoHead title={title} description={description} />
 
             <div className="space-y-6 max-w-md w-full">
                 {/* Minimal Brand */}

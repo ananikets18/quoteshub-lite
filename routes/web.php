@@ -159,7 +159,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     
     Route::get('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
-    Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store');
+    Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store')->middleware('throttle:10,1');
     Route::get('/quotes/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
     Route::put('/quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
     Route::delete('/quotes/{quote}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
