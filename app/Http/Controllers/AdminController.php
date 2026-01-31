@@ -13,16 +13,7 @@ use Inertia\Response;
 
 class AdminController extends Controller
 {
-    public function __construct()
-    {
-        // Only allow admins
-        $this->middleware(function ($request, $next) {
-            if ($request->user()->role !== 'admin') {
-                abort(403, 'Unauthorized');
-            }
-            return $next($request);
-        });
-    }
+    // Admin role check is handled in routes
 
     /**
      * Show admin dashboard.

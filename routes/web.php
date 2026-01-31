@@ -200,6 +200,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Saved quotes (private - requires auth)
     Route::get('/saved', [ProfileController::class, 'saved'])->name('saved');
     
+    // Profile management
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    
     // Notification preferences
     Route::get('/profile/notification-preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'edit'])->name('profile.notification-preferences.edit');
     Route::post('/profile/notification-preferences', [App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('profile.notification-preferences.update')->middleware('throttle:10,1');
@@ -231,7 +234,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/following-feed', [FollowController::class, 'feed'])->name('following.feed');
     
     // Admin routes
-    Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
         Route::post('/reports/{report}/review', [AdminController::class, 'reviewReport'])->name('admin.reports.review');

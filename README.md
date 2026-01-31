@@ -65,6 +65,23 @@ npm run dev
 - `VITE_APP_NAME=QuotesHub` – Used in browser tab titles (optional; defaults to QuotesHub)
 - See `.env.example` for database, mail, Redis, and Pusher options.
 
+## Documentation
+
+Comprehensive documentation is available in the [`/docs`](./docs/) folder:
+
+- **[Deployment Guide](./docs/DEPLOYMENT_CHECKLIST.md)** - Complete production deployment checklist
+- **[Feature Documentation](./docs/README.md)** - All system features and implementation details
+- **[Security Guide](./docs/SECURITY_TEST_CHECKLIST.md)** - Security testing and validation
+- **[Admin Guide](./docs/CONTENT_MODERATION_SYSTEM.md)** - Admin panel and moderation tools
+
+## Admin Access
+
+Two admin accounts are pre-configured:
+- **Aniket Shinde**: `ananiket.pshinde18@gmail.com` / `Aniket@123`
+- **Adnois Wins**: `adnois.wins@gmail.com` / `Adonis@123`
+
+Access the admin panel at `/admin` after logging in.
+
 ## License
 
 MIT.

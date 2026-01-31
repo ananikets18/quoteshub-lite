@@ -16,6 +16,13 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable;
     
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['is_admin'];
+    
+    /**
      * Send the email verification notification.
      *
      * @return void
@@ -331,6 +338,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function unreadNotificationsCount(): int
     {
         return $this->notifications()->whereNull('read_at')->count();
+    }
+
+    /**
+     * Get the is_admin attribute
+     */
+    public function getIsAdminAttribute(): bool
+    {
+        return $this->isAdmin();
     }
 
     /**
