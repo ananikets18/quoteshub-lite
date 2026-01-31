@@ -88,7 +88,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
         // Optimistic update - instant UI feedback
         const newIsSaved = !isSaved;
         const wasUnsaved = isSaved && !newIsSaved;
-        
+
         setIsSaved(newIsSaved);
         setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
 
@@ -242,7 +242,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
             onClick={handleCardClick}
         >
             {/* Clean Card Container - Instagram/Twitter Style */}
-            <div className="bg-white p-3.5 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700/50">
+            <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700/50">
 
                 {/* Header: User Info */}
                 <div className="flex items-center justify-between px-3 sm:px-4 pt-2 sm:pt-3 pb-1.5 sm:pb-2">

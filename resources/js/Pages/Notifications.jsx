@@ -22,7 +22,7 @@ export default function Notifications() {
         try {
             setLoading(true);
             const response = await axios.get('/api/notifications', {
-                params: { 
+                params: {
                     per_page: 30,
                     unread_only: filter === 'unread' ? 1 : 0
                 }
@@ -39,7 +39,7 @@ export default function Notifications() {
     const markAsRead = async (notificationId) => {
         try {
             await axios.post(`/api/notifications/${notificationId}/read`);
-            setNotifications(notifications.map(n => 
+            setNotifications(notifications.map(n =>
                 n.id === notificationId ? { ...n, is_read: true, read_at: new Date() } : n
             ));
         } catch (error) {
@@ -67,7 +67,7 @@ export default function Notifications() {
 
     const deleteAllRead = async () => {
         if (deleting) return;
-        
+
         try {
             setDeleting(true);
             await axios.delete('/api/notifications/read/all');
@@ -84,7 +84,7 @@ export default function Notifications() {
         if (!notification.is_read) {
             markAsRead(notification.id);
         }
-        
+
         if (notification.url) {
             router.visit(notification.url);
         }
@@ -102,7 +102,7 @@ export default function Notifications() {
             'message-circle': MessageCircle,
             'bell': Bell,
         };
-        
+
         const IconComponent = iconMap[iconName] || Bell;
         return <IconComponent className="w-6 h-6" />;
     };
@@ -139,21 +139,19 @@ export default function Notifications() {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setFilter('all')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                    filter === 'all'
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all'
                                         ? 'bg-blue-600 text-white'
                                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                                }`}
+                                    }`}
                             >
                                 All
                             </button>
                             <button
                                 onClick={() => setFilter('unread')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                    filter === 'unread'
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'unread'
                                         ? 'bg-blue-600 text-white'
                                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                                }`}
+                                    }`}
                             >
                                 Unread {unreadCount > 0 && `(${unreadCount})`}
                             </button>
@@ -185,7 +183,7 @@ export default function Notifications() {
 
                 {/* Delete Confirmation Modal */}
                 {showDeleteModal && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200">
                         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
                             {/* Header */}
                             <div className="flex items-start justify-between mb-4">
@@ -255,7 +253,7 @@ export default function Notifications() {
                             {filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}
                         </h3>
                         <p className="text-gray-600 dark:text-gray-400">
-                            {filter === 'unread' 
+                            {filter === 'unread'
                                 ? "You're all caught up!"
                                 : "When you get notifications, they'll appear here"}
                         </p>
@@ -266,9 +264,8 @@ export default function Notifications() {
                             <div
                                 key={notification.id}
                                 onClick={() => handleNotificationClick(notification)}
-                                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-all cursor-pointer ${
-                                    !notification.is_read ? 'ring-2 ring-blue-500/20' : ''
-                                }`}
+                                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-all cursor-pointer ${!notification.is_read ? 'ring-2 ring-blue-500/20' : ''
+                                    }`}
                             >
                                 <div className="flex items-start gap-4">
                                     {/* Icon */}

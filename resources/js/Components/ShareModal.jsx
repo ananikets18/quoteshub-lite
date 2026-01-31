@@ -48,8 +48,8 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div 
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
@@ -70,21 +70,19 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
                 <div className="flex border-b border-gray-200 dark:border-gray-700">
                     <button
                         onClick={() => setActiveTab('share')}
-                        className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors ${
-                            activeTab === 'share'
+                        className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors ${activeTab === 'share'
                                 ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                        }`}
+                            }`}
                     >
                         Share on Social Media
                     </button>
                     <button
                         onClick={() => setActiveTab('download')}
-                        className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors ${
-                            activeTab === 'download'
+                        className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors ${activeTab === 'download'
                                 ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                        }`}
+                            }`}
                     >
                         Download as Image
                     </button>

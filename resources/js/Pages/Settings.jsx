@@ -460,7 +460,7 @@ export default function Settings({ auth, preferences = {}, privacy = {} }) {
 
             {/* Delete Account Modal */}
             {showDeleteModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700 overflow-hidden">
                         {/* Modal Header */}
                         <div className="px-6 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white">

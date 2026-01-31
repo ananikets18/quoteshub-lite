@@ -34,12 +34,12 @@ export default function AuthPromptModal({ show, onClose, action = 'like' }) {
         <>
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-fade-in"
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] animate-fade-in"
                 onClick={onClose}
             />
 
             {/* Modal */}
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none">
                 <div
                     className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 pointer-events-auto animate-scale-in"
                     onClick={(e) => e.stopPropagation()}

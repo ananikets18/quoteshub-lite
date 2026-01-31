@@ -6,11 +6,12 @@ window.axios = axios;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.axios.defaults.withCredentials = true;
+window.axios.defaults.withXSRFToken = true;
 
 // Set CSRF token for all requests
-const token = document.head.querySelector('meta[name="csrf-token"]');
-if (token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+const csrfToken = document.head.querySelector('meta[name="csrf-token"]');
+if (csrfToken) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken.content;
 }
 
 // Laravel Echo configuration for real-time notifications

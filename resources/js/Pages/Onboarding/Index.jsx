@@ -172,7 +172,7 @@ export default function Onboarding({ user, currentStep: initialStep }) {
 
             {/* Skip Confirmation Modal */}
             {showSkipModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200">
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
@@ -317,7 +317,7 @@ function InterestsStep({ onNext, loading }) {
                 <p className="text-gray-600 dark:text-gray-400">
                     Select topics you'd like to see in your feed
                 </p>
-                
+
                 {/* Error Message */}
                 <div id="category-error" className="hidden mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                     <p className="text-sm text-red-600 dark:text-red-400 font-medium">

@@ -5,7 +5,7 @@ import QuoteCard from '@/Components/QuoteCard';
 import QuoteCardSkeleton from '@/Components/QuoteCardSkeleton';
 import SuggestedUsers from '@/Components/SuggestedUsers';
 import useScrollDirection from '@/Hooks/useScrollDirection';
-import { TrendingUp, Clock, Star, Sparkles, Loader2 } from 'lucide-react';
+import { TrendingUp, Clock, Sparkles, Loader2, ChevronRight } from 'lucide-react';
 
 export default function Feed({ quotes: initialQuotes, categories, collections = [] }) {
     const { auth } = usePage().props;
@@ -24,13 +24,13 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
 
     const filters = auth.user
         ? [
-            { id: 'foryou', label: 'For You', icon: Sparkles },
-            { id: 'latest', label: 'Latest', icon: Clock },
-            { id: 'trending', label: 'Trending', icon: TrendingUp },
+            { id: 'foryou', label: 'For You', icon: Sparkles, description: 'Personalized feed' },
+            { id: 'latest', label: 'Latest', icon: Clock, description: 'Recent quotes' },
+            { id: 'trending', label: 'Trending', icon: TrendingUp, description: 'Popular now' },
         ]
         : [
-            { id: 'latest', label: 'Latest', icon: Clock },
-            { id: 'trending', label: 'Trending', icon: TrendingUp },
+            { id: 'latest', label: 'Latest', icon: Clock, description: 'Recent quotes' },
+            { id: 'trending', label: 'Trending', icon: TrendingUp, description: 'Popular now' },
         ];
 
     const loadMore = useCallback(() => {
@@ -91,6 +91,10 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
         );
     };
 
+    const handleCategoryClick = (categorySlug) => {
+        router.visit(`/categories/${categorySlug}`);
+    };
+
     // Intersection Observer for infinite scroll (better performance)
     useEffect(() => {
         const options = {
@@ -122,97 +126,163 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
     return (
         <AppLayout title="QuotesHub">
             {/* Sticky Header Section - Hides on scroll down */}
-            <div className={`sticky top-[60px] z-30 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+            <div className={`sticky top-[60px] z-30 bg-gray-50 dark:bg-gray-900 transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
                 }`}>
 
-                {/* Categories Horizontal Scroll */}
-                <div className="bg-white dark:bg-gray-900 px-4 py-3">
-                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                        {categories?.map((category) => (
-                            <button
-                                key={category.id}
-                                className="category-badge flex-shrink-0"
-                                style={{
-                                    backgroundColor: category.color + '20',
-                                    color: category.color,
-                                    borderColor: category.color + '40',
-                                    borderWidth: '1px',
-                                }}
-                            >
-                                <span>{category.icon}</span>
-                                <span>{category.name}</span>
-                            </button>
-                        ))}
+                {/* Filter Tabs - Enhanced Design */}
+                <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+                    <div className="max-w-3xl mx-auto px-4 py-3">
+                        <div className="flex items-center gap-2">
+                            {filters.map((filter) => {
+                                const Icon = filter.icon;
+                                const isActive = activeFilter === filter.id;
+
+                                return (
+                                    <button
+                                        key={filter.id}
+                                        onClick={() => changeFilter(filter.id)}
+                                        className={`flex-1 group relative px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
+                                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/30'
+                                            : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                            }`}
+                                    >
+                                        <div className="flex items-center justify-center gap-2">
+                                            <Icon className={`w-4 h-4 ${isActive ? 'animate-pulse' : ''}`} />
+                                            <span className="whitespace-nowrap">{filter.label}</span>
+                                        </div>
+
+                                        {/* Active indicator */}
+                                        {isActive && (
+                                            <div className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 w-12 h-0.5 bg-white rounded-full" />
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
 
-                {/* Filter Tabs */}
-                <div className="bg-white dark:bg-gray-900 overflow-x-auto no-scrollbar">
-                    <div className="flex items-center gap-1 px-4 min-w-max">
-                        {filters.map((filter) => {
-                            const Icon = filter.icon;
-                            const isActive = activeFilter === filter.id;
-
-                            return (
-                                <button
-                                    key={filter.id}
-                                    onClick={() => changeFilter(filter.id)}
-                                    className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-all whitespace-nowrap ${isActive
-                                        ? 'border-purple-600 text-purple-600 dark:text-purple-400 font-semibold'
-                                        : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
-                                        }`}
-                                >
-                                    <Icon className="w-4 h-4" />
-                                    <span className="text-sm">{filter.label}</span>
-                                </button>
-                            );
-                        })}
+                {/* Categories Horizontal Scroll - Enhanced */}
+                {categories && categories.length > 0 && (
+                    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                        <div className="max-w-3xl mx-auto px-4 py-3">
+                            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                                {categories?.map((category) => (
+                                    <button
+                                        key={category.id}
+                                        onClick={() => handleCategoryClick(category.slug)}
+                                        className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md"
+                                        style={{
+                                            backgroundColor: category.color + '15',
+                                            color: category.color,
+                                            borderColor: category.color + '30',
+                                            borderWidth: '1.5px',
+                                        }}
+                                    >
+                                        <span className="text-sm">{category.icon}</span>
+                                        <span>{category.name}</span>
+                                        <ChevronRight className="w-3 h-3 opacity-50" />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
-            {/* Main Content - Edge to Edge */}
+            {/* Main Content */}
             <div className="max-w-3xl mx-auto">
+                {/* Welcome Banner for New Users */}
+                {auth.user && activeFilter === 'foryou' && quotes.length === 0 && !initialLoading && (
+                    <div className="mx-4 mt-4 mb-6 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-6 text-white shadow-xl">
+                        <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+                                <Sparkles className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold mb-2">Welcome to QuotesHub! 🎉</h3>
+                                <p className="text-sm text-white/90 leading-relaxed">
+                                    Start exploring quotes, like and save your favorites to get personalized recommendations tailored just for you!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {initialLoading ? (
-                    <div className="space-y-4 px-4">
+                    <div className="space-y-0 mt-4">
                         {[...Array(5)].map((_, i) => (
                             <QuoteCardSkeleton key={`skeleton-${i}`} />
                         ))}
                     </div>
                 ) : quotes.length === 0 ? (
-                    <div className="text-center py-12 mx-4 bg-white dark:bg-gray-800 rounded-lg">
-                        <p className="text-gray-500 dark:text-gray-400 text-lg">
-                            {activeFilter === 'foryou'
-                                ? 'Start liking and saving quotes to get personalized recommendations!'
-                                : 'No quotes yet. Be the first to create one!'
-                            }
-                        </p>
+                    <div className="mx-4 mt-8 mb-12">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+                            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 flex items-center justify-center">
+                                {activeFilter === 'foryou' ? (
+                                    <Sparkles className="w-10 h-10 text-purple-600 dark:text-purple-400" />
+                                ) : activeFilter === 'trending' ? (
+                                    <TrendingUp className="w-10 h-10 text-purple-600 dark:text-purple-400" />
+                                ) : (
+                                    <Clock className="w-10 h-10 text-purple-600 dark:text-purple-400" />
+                                )}
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                {activeFilter === 'foryou' ? 'No Personalized Quotes Yet' : 'No Quotes Found'}
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm max-w-md mx-auto">
+                                {activeFilter === 'foryou'
+                                    ? 'Start liking and saving quotes to get personalized recommendations!'
+                                    : 'No quotes available at the moment. Check back soon or create your own!'}
+                            </p>
+                            {!auth.user && (
+                                <button
+                                    onClick={() => router.visit('/register')}
+                                    className="mt-6 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                                >
+                                    Get Started
+                                </button>
+                            )}
+                        </div>
                     </div>
                 ) : (
                     <>
-                        {quotes.map((quote, index) => (
-                            <div key={`quote-${quote.id}`}>
-                                <QuoteCard quote={quote} auth={auth} collections={collections} />
+                        {/* Quotes List */}
+                        <div className="mt-4">
+                            {quotes.map((quote, index) => (
+                                <div key={`quote-${quote.id}`}>
+                                    <QuoteCard quote={quote} auth={auth} collections={collections} />
 
-                                {/* Insert Suggested Users ONLY ONCE after 5th quote in "For You" feed */}
-                                {activeFilter === 'foryou' && auth.user && index === 4 && (
-                                    <SuggestedUsers auth={auth} inline={true} />
-                                )}
-                            </div>
-                        ))}
+                                    {/* Insert Suggested Users ONLY ONCE after 5th quote in "For You" feed */}
+                                    {activeFilter === 'foryou' && auth.user && index === 4 && (
+                                        <SuggestedUsers auth={auth} inline={true} />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
 
                         {/* Infinite Scroll Sentinel */}
-                        <div ref={sentinelRef} className="h-20 flex items-center justify-center">
+                        <div ref={sentinelRef} className="h-24 flex items-center justify-center mb-4">
                             {loading && (
-                                <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
-                                    <Loader2 className="w-6 h-6 animate-spin" />
-                                    <span className="text-sm font-medium">Loading more quotes...</span>
+                                <div className="flex flex-col items-center gap-3 py-8">
+                                    <div className="relative">
+                                        <Loader2 className="w-8 h-8 text-purple-600 dark:text-purple-400 animate-spin" />
+                                        <div className="absolute inset-0 w-8 h-8 border-2 border-purple-200 dark:border-purple-800 rounded-full animate-ping" />
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                        Loading more quotes...
+                                    </span>
                                 </div>
                             )}
                             {!hasMore && quotes.length > 0 && (
-                                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                                    You've reached the end 🎉
-                                </p>
+                                <div className="py-8 text-center">
+                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full">
+                                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                            You've reached the end
+                                        </span>
+                                        <span className="text-lg">🎉</span>
+                                    </div>
+                                </div>
                             )}
                         </div>
                     </>

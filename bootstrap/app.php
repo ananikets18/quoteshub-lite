@@ -20,6 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\EnsureOnboardingCompleted::class,
         ]);
 
+        // Enable session-based authentication for API routes
+        // This allows API calls from the Inertia frontend to authenticate using sessions
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
+
         // Register middleware aliases
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,

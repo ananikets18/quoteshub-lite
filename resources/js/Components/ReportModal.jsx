@@ -18,10 +18,10 @@ export default function ReportModal({ show, onClose, quoteId, onSubmit }) {
 
     const handleSubmit = () => {
         if (!selectedReason) return;
-        
+
         setIsSubmitting(true);
         onSubmit?.({ reason: selectedReason, description, quoteId });
-        
+
         // Reset and close
         setTimeout(() => {
             setIsSubmitting(false);
@@ -72,30 +72,26 @@ export default function ReportModal({ show, onClose, quoteId, onSubmit }) {
                                 {REPORT_REASONS.map((reason) => {
                                     const Icon = reason.icon;
                                     const isSelected = selectedReason === reason.id;
-                                    
+
                                     return (
                                         <button
                                             key={reason.id}
                                             type="button"
                                             onClick={() => setSelectedReason(reason.id)}
-                                            className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left group ${
-                                                isSelected
+                                            className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left group ${isSelected
                                                     ? 'border-red-500 bg-red-50 dark:bg-red-900/20 shadow-md'
                                                     : 'border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-700 hover:bg-gray-50 dark:hover:bg-gray-800/50'
-                                            }`}
+                                                }`}
                                         >
-                                            <div className={`p-2 rounded-lg transition-colors ${
-                                                isSelected 
-                                                    ? 'bg-red-100 dark:bg-red-900/30' 
+                                            <div className={`p-2 rounded-lg transition-colors ${isSelected
+                                                    ? 'bg-red-100 dark:bg-red-900/30'
                                                     : 'bg-gray-100 dark:bg-gray-800 group-hover:bg-red-50 dark:group-hover:bg-red-900/20'
-                                            }`}>
-                                                <Icon className={`w-5 h-5 transition-colors ${
-                                                    isSelected ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
-                                                }`} />
+                                                }`}>
+                                                <Icon className={`w-5 h-5 transition-colors ${isSelected ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
+                                                    }`} />
                                             </div>
-                                            <span className={`text-sm font-medium transition-colors ${
-                                                isSelected ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'
-                                            }`}>
+                                            <span className={`text-sm font-medium transition-colors ${isSelected ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'
+                                                }`}>
                                                 {reason.label}
                                             </span>
                                         </button>
@@ -144,13 +140,13 @@ export default function ReportModal({ show, onClose, quoteId, onSubmit }) {
                 {show && (
                     <>
                         {/* Backdrop */}
-                        <div 
-                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity"
+                        <div
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity"
                             onClick={handleClose}
                         />
 
                         {/* Bottom Sheet */}
-                        <div 
+                        <div
                             className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 rounded-t-3xl shadow-2xl max-h-[85vh] overflow-hidden flex flex-col transition-transform duration-300 ease-out"
                             style={{ animation: 'slideUp 0.3s ease-out' }}
                         >
@@ -182,23 +178,21 @@ export default function ReportModal({ show, onClose, quoteId, onSubmit }) {
                                         {REPORT_REASONS.map((reason) => {
                                             const Icon = reason.icon;
                                             const isSelected = selectedReason === reason.id;
-                                            
+
                                             return (
                                                 <button
                                                     key={reason.id}
                                                     type="button"
                                                     onClick={() => setSelectedReason(reason.id)}
-                                                    className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left active:scale-[0.98] ${
-                                                        isSelected
+                                                    className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left active:scale-[0.98] ${isSelected
                                                             ? 'border-red-500 bg-red-50 dark:bg-red-900/20 shadow-md'
                                                             : 'border-gray-200 dark:border-gray-700 active:border-red-300'
-                                                    }`}
+                                                        }`}
                                                 >
-                                                    <div className={`p-2 rounded-lg transition-colors ${
-                                                        isSelected 
-                                                            ? 'bg-red-100 dark:bg-red-900/30' 
+                                                    <div className={`p-2 rounded-lg transition-colors ${isSelected
+                                                            ? 'bg-red-100 dark:bg-red-900/30'
                                                             : 'bg-gray-100 dark:bg-gray-800'
-                                                    }`}>
+                                                        }`}>
                                                         <Icon className={`w-5 h-5 ${isSelected ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`} />
                                                     </div>
                                                     <span className={`font-medium ${isSelected ? 'text-red-600 dark:text-red-400' : 'text-gray-700 dark:text-gray-300'}`}>
