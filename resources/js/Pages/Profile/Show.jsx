@@ -80,14 +80,14 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                                 <div className="flex gap-2">
                                     <Link
                                         href={route('settings')}
-                                        className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 hover:border-gray-300 transition shadow-sm"
+                                        className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 transition shadow-sm"
                                     >
                                         <Edit className="w-4 h-4 mr-2" />
                                         Edit Profile
                                     </Link>
                                     <button
                                         onClick={() => router.post('/logout')}
-                                        className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-red-600 text-sm font-medium rounded-xl hover:bg-red-50 hover:border-red-100 transition shadow-sm"
+                                        className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-red-600 dark:text-red-400 text-sm font-medium rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-100 dark:hover:border-red-800 transition shadow-sm"
                                     >
                                         <LogOut className="w-4 h-4 mr-2" />
                                         Logout

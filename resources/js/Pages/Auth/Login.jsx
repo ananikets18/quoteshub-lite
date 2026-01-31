@@ -147,6 +147,7 @@ export default function Login({ status, canResetPassword, flash, errors: inertia
                                     type="email"
                                     name="email"
                                     value={data.email}
+                                    placeholder="you@example.com"
                                     className="block w-full pl-11 py-3 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl focus:ring-[#5D41E6] focus:border-[#5D41E6] transition-all"
                                     autoComplete="username"
                                     isFocused={true}
@@ -178,6 +179,7 @@ export default function Login({ status, canResetPassword, flash, errors: inertia
                                     type="password"
                                     name="password"
                                     value={data.password}
+                                    placeholder="Enter your password"
                                     className="block w-full pl-11 py-3 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl focus:ring-[#5D41E6] focus:border-[#5D41E6] transition-all"
                                     autoComplete="current-password"
                                     onChange={(e) => setData('password', e.target.value)}

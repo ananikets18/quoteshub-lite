@@ -136,6 +136,7 @@ export default function Register({ flash, errors: inertiaErrors }) {
                                     id="name"
                                     name="name"
                                     value={data.name}
+                                    placeholder="Jane Doe"
                                     className="block w-full pl-10 py-2.5 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl focus:ring-[#5D41E6] focus:border-[#5D41E6] transition-all text-sm"
                                     autoComplete="name"
                                     isFocused={true}
@@ -157,6 +158,7 @@ export default function Register({ flash, errors: inertiaErrors }) {
                                     id="username"
                                     name="username"
                                     value={data.username}
+                                    placeholder="janedoe"
                                     className="block w-full pl-10 py-2.5 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl focus:ring-[#5D41E6] focus:border-[#5D41E6] transition-all text-sm"
                                     autoComplete="username"
                                     onChange={(e) => setData('username', e.target.value)}
@@ -178,6 +180,7 @@ export default function Register({ flash, errors: inertiaErrors }) {
                                     type="email"
                                     name="email"
                                     value={data.email}
+                                    placeholder="you@example.com"
                                     className="block w-full pl-10 py-2.5 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl focus:ring-[#5D41E6] focus:border-[#5D41E6] transition-all text-sm"
                                     autoComplete="email"
                                     onChange={(e) => setData('email', e.target.value)}
@@ -200,6 +203,7 @@ export default function Register({ flash, errors: inertiaErrors }) {
                                         type="password"
                                         name="password"
                                         value={data.password}
+                                        placeholder="Create a strong password"
                                         className="block w-full pl-10 py-2.5 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl focus:ring-[#5D41E6] focus:border-[#5D41E6] transition-all text-sm"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password', e.target.value)}
@@ -218,6 +222,7 @@ export default function Register({ flash, errors: inertiaErrors }) {
                                         type="password"
                                         name="password_confirmation"
                                         value={data.password_confirmation}
+                                        placeholder="Re-enter your password"
                                         className="block w-full pl-10 py-2.5 bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 rounded-xl focus:ring-[#5D41E6] focus:border-[#5D41E6] transition-all text-sm"
                                         autoComplete="new-password"
                                         onChange={(e) => setData('password_confirmation', e.target.value)}

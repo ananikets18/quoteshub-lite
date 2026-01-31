@@ -129,7 +129,7 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                                     {isOwner && (
                                         <button
                                             onClick={() => openRemoveQuoteModal(quote.id)}
-                                            className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-red-100 text-gray-600 hover:text-red-600 rounded-lg transition shadow-sm"
+                                            className="absolute top-2 right-2 p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition shadow-sm"
                                             title="Remove from collection"
                                         >
                                             <Trash2 className="w-4 h-4" />

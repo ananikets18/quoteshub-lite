@@ -73,14 +73,14 @@ export default function Category({ auth, category, quotes, sort, collections = [
                                             className={`px-4 py-2 rounded-lg ${
                                                 link.active
                                                     ? 'bg-purple-600 text-white'
-                                                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                                                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                             }`}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     ) : (
                                         <span
                                             key={index}
-                                            className="px-4 py-2 rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed"
+                                            className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     )
