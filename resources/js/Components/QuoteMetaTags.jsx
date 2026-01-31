@@ -1,12 +1,14 @@
 import { Head } from '@inertiajs/react';
 
+const APP_NAME = 'QuotesHub';
+
 export default function QuoteMetaTags({ quote }) {
-    const title = `"${quote.content.substring(0, 60)}${quote.content.length > 60 ? '...' : ''}" - ${quote.author || 'Unknown'}`;
+    const baseTitle = `"${quote.content.substring(0, 60)}${quote.content.length > 60 ? '...' : ''}" - ${quote.author || 'Unknown'}`;
+    const title = `${baseTitle} - ${APP_NAME}`;
     const description = `${quote.content} - ${quote.author || 'Unknown'}. Discover and share inspiring quotes on QuotesHub.`;
     const url = typeof window !== 'undefined' ? window.location.href : '';
-
-    // Generate a simple OG image URL (you can create a backend endpoint to generate dynamic images)
-    const ogImage = `/api/og-image/${quote.id}`;
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const ogImage = url ? `${origin}/api/og-image/${quote.id}` : `/api/og-image/${quote.id}`;
 
     return (
         <Head>
@@ -17,6 +19,7 @@ export default function QuoteMetaTags({ quote }) {
             <meta property="og:type" content="article" />
             <meta property="og:url" content={url} />
             <meta property="og:title" content={title} />
+            <meta property="og:site_name" content={APP_NAME} />
             <meta property="og:description" content={description} />
             <meta property="og:image" content={ogImage} />
 

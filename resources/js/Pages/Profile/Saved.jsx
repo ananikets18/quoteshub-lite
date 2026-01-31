@@ -1,6 +1,7 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
+import SeoHead from '@/Components/SeoHead';
 import QuoteCard from '@/Components/QuoteCard';
 import Pagination from '@/Components/Pagination';
 import { Bookmark, FolderPlus } from 'lucide-react';
@@ -14,7 +15,7 @@ export default function Saved({ auth, quotes, collections = [] }) {
 
     return (
         <AppLayout title="Saved Quotes">
-            <Head title="Saved Quotes" />
+            <SeoHead title="Saved Quotes" description="Your saved quotes and collections on QuotesHub." />
 
             <div className="px-4 py-6 pb-20">
                 {/* Header with Collections Button */}

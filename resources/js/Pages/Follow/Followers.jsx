@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import SeoHead from '@/Components/SeoHead';
 import Pagination from '@/Components/Pagination';
 import { Users, UserPlus, UserCheck, ArrowLeft } from 'lucide-react';
 
@@ -30,7 +31,7 @@ export default function Followers({ auth, user, followers }) {
 
     return (
         <AppLayout user={auth.user} showNav={true}>
-            <Head title={`${user.name}'s Followers`} />
+            <SeoHead title={`${user.name}'s Followers`} description={`See who follows ${user.name} on QuotesHub.`} />
 
             <div className="px-4 py-6 pb-20">
                 <Link

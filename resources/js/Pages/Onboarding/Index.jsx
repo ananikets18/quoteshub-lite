@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import { Sparkles, Heart, User, Users, CheckCircle, ArrowRight, X } from 'lucide-react';
 import axios from 'axios';
 import Toast from '@/Components/Toast';
@@ -101,7 +102,7 @@ export default function Onboarding({ user, currentStep: initialStep }) {
 
     return (
         <>
-            <Head title="Welcome to QuotesHub" />
+            <SeoHead title="Welcome to QuotesHub" description="Complete your QuotesHub profile and discover quotes tailored to you." />
 
             <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
                 {/* Skip Button */}

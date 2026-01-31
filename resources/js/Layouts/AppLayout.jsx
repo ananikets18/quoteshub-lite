@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Head, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import Header from '@/Components/Header';
 import BottomNav from '@/Components/BottomNav';
 import KeyboardShortcutsModal from '@/Components/KeyboardShortcutsModal';
@@ -11,8 +12,31 @@ import Toast from '@/Components/Toast';
 export default function AppLayout({ children, title, showHeader = true, showNav = true }) {
     const { auth, flash } = usePage().props;
     const [showShortcutsModal, setShowShortcutsModal] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
     const { scrollDirection, scrollY } = useScrollDirection();
     const [toast, setToast] = useState(null);
+
+    const refreshUnreadCount = useCallback(async () => {
+        if (!auth?.user) return;
+        try {
+            const { data } = await axios.get('/api/notifications/unread-count');
+            setUnreadCount(data.count);
+        } catch (e) {
+            if (e.response?.status !== 401) console.error('Unread count:', e);
+        }
+    }, [auth?.user]);
+
+    useEffect(() => {
+        if (auth?.user) {
+            refreshUnreadCount();
+            const interval = setInterval(() => {
+                if (document.visibilityState === 'visible') refreshUnreadCount();
+            }, 60000);
+            return () => clearInterval(interval);
+        } else {
+            setUnreadCount(0);
+        }
+    }, [auth?.user, refreshUnreadCount]);
 
     useEffect(() => {
         if (flash?.success) {
@@ -39,15 +63,28 @@ export default function AppLayout({ children, title, showHeader = true, showNav 
                 className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900"
                 data-user-username={auth.user?.username}
             >
-                {showHeader && <Header title={title} isVisible={isNavVisible} />}
+                {showHeader && (
+                    <Header
+                        title={title}
+                        isVisible={isNavVisible}
+                        unreadCount={unreadCount}
+                        refreshUnreadCount={refreshUnreadCount}
+                    />
+                )}
 
-                <main className={`flex-grow max-w-lg mx-auto w-full ${showNav ? 'pb-20' : 'pb-10'}`}>
+                <main className={`flex-grow max-w-lg mx-auto w-full ${showNav ? 'pb-20 md:pb-10' : 'pb-10'}`}>
                     {children}
                 </main>
 
                 <Footer />
 
-                {showNav && <BottomNav isVisible={isNavVisible} />}
+                {showNav && (
+                    <BottomNav
+                        isVisible={isNavVisible}
+                        auth={auth}
+                        unreadCount={unreadCount}
+                    />
+                )}
             </div>
 
             {toast && (

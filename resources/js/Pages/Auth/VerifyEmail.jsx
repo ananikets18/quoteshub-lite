@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
 import { Mail, ArrowRight, Loader2, LogOut, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function VerifyEmail({ status }) {
@@ -14,7 +15,7 @@ export default function VerifyEmail({ status }) {
 
     return (
         <GuestLayout>
-            <Head title="Verify Email" />
+            <SeoHead title="Verify Email" description="Verify your email address to complete your QuotesHub registration." />
 
             <div className="w-full sm:max-w-md mx-auto overflow-hidden bg-white dark:bg-gray-800 shadow-2xl rounded-2xl border border-gray-100 dark:border-gray-700">
                 {/* Decorative Header */}

@@ -101,20 +101,26 @@
         @apply transform transition-all duration-200 hover:scale-105;
     }
 
-    /* Bottom Navigation */
+    /* Bottom Navigation - mobile only (hidden md+) */
     .bottom-nav {
-        @apply fixed bottom-0 left-0 right-0 z-50;
+        @apply fixed bottom-0 left-0 right-0 z-50 md:hidden;
         @apply bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800;
         @apply shadow-2xl backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95;
     }
 
     .bottom-nav-item {
-        @apply flex flex-col items-center justify-center gap-1 py-2 px-4;
-        @apply text-gray-600 dark:text-gray-400 transition-all duration-200;
+        @apply flex flex-col items-center justify-center gap-1 py-2 px-4 min-w-[4rem];
+        @apply text-gray-600 dark:text-gray-400 transition-all duration-200 rounded-lg;
+        @apply hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95;
+        @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900;
     }
 
     .bottom-nav-item.active {
-        @apply text-[#5D41E6] dark:text-purple-400;
+        @apply text-primary-600 dark:text-purple-400;
+    }
+
+    .bottom-nav-item.bottom-nav-item-guest {
+        @apply opacity-60;
     }
 
     /* Card Container */

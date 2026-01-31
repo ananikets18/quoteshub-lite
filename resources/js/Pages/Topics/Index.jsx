@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import SeoHead from '@/Components/SeoHead';
 import { Hash, ArrowRight, Compass, Sparkles, BookOpen } from 'lucide-react';
 
 export default function Index({ auth, categories, tags }) {
@@ -21,7 +22,7 @@ export default function Index({ auth, categories, tags }) {
 
     return (
         <AppLayout title="Topics & Categories" showNav={true}>
-            <Head title="Topics & Categories" />
+            <SeoHead title="Topics & Categories" description="Explore quotes by topic and category on QuotesHub." />
 
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
                 {/* Header */}

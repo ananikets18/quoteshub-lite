@@ -1,54 +1,61 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import { createPortal } from 'react-dom';
+import axios from 'axios';
 import { Flame, Bell, Settings } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
-import axios from 'axios';
 
-export default function Header({ title, showStreak = true, showNotifications = true, isVisible = true }) {
+export default function Header({
+    title,
+    showStreak = true,
+    showNotifications = true,
+    isVisible = true,
+    unreadCount: unreadCountProp,
+    refreshUnreadCount: refreshUnreadCountProp,
+}) {
     const { auth } = usePage().props;
     const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
+    const [localUnreadCount, setLocalUnreadCount] = useState(0);
     const [isMounted, setIsMounted] = useState(false);
     const bellButtonRef = useRef(null);
+
+    const useSharedCount = refreshUnreadCountProp != null;
+    const unreadCount = useSharedCount ? (unreadCountProp ?? 0) : localUnreadCount;
+
+    const fetchUnreadCount = useCallback(async () => {
+        if (!auth?.user) return;
+        try {
+            const { data } = await axios.get('/api/notifications/unread-count');
+            setLocalUnreadCount(data.count);
+        } catch (e) {
+            if (e.response?.status !== 401) console.error('Unread count:', e);
+        }
+    }, [auth?.user]);
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    // Fetch unread count on mount and periodically
     useEffect(() => {
-        if (auth?.user && showNotifications) {
+        if (auth?.user && showNotifications && !useSharedCount) {
             fetchUnreadCount();
-
-            // Poll for new notifications every 60 seconds, only if visible
             const interval = setInterval(() => {
-                if (document.visibilityState === 'visible') {
-                    fetchUnreadCount();
-                }
+                if (document.visibilityState === 'visible') fetchUnreadCount();
             }, 60000);
-
             return () => clearInterval(interval);
         }
-    }, [auth?.user, showNotifications]);
+    }, [auth?.user, showNotifications, useSharedCount, fetchUnreadCount]);
 
-    const fetchUnreadCount = async () => {
-        try {
-            const response = await axios.get('/api/notifications/unread-count');
-            setUnreadCount(response.data.count);
-        } catch (error) {
-            // Silently fail if user is not authenticated (401)
-            if (error.response?.status !== 401) {
-                console.error('Failed to fetch unread count:', error);
-            }
-        }
-    };
+    const refreshUnreadCount = useSharedCount ? refreshUnreadCountProp : fetchUnreadCount;
 
     const handleBellClick = () => {
         setShowNotificationDropdown(!showNotificationDropdown);
-        if (!showNotificationDropdown) {
-            fetchUnreadCount(); // Refresh count when opening
-        }
+        if (!showNotificationDropdown) refreshUnreadCount?.();
+    };
+
+    const handleDropdownClose = () => {
+        setShowNotificationDropdown(false);
+        refreshUnreadCount?.();
     };
 
     return (
@@ -89,10 +96,7 @@ export default function Header({ title, showStreak = true, showNotifications = t
                             {isMounted && typeof window !== 'undefined' && createPortal(
                                 <NotificationDropdown
                                     show={showNotificationDropdown}
-                                    onClose={() => {
-                                        setShowNotificationDropdown(false);
-                                        fetchUnreadCount(); // Refresh count when closing
-                                    }}
+                                    onClose={handleDropdownClose}
                                     buttonRef={bellButtonRef}
                                 />,
                                 document.body

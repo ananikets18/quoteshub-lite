@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SeoHead from '@/Components/SeoHead';
 import Pagination from '@/Components/Pagination';
 import { Users, Search, Shield, User, Ban, Check, X, AlertTriangle, Trash2 } from 'lucide-react';
 
@@ -113,7 +114,7 @@ export default function UsersManagement({ auth, users, filters }) {
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="User Management" />
+            <SeoHead title="User Management" description="Manage user accounts and permissions on QuotesHub admin." />
 
             <div className="max-w-7xl mx-auto">
                 <div className="bg-white rounded-lg shadow-sm p-6 mb-6">

@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import SeoHead from '@/Components/SeoHead';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import { User, Lock, ArrowLeft } from 'lucide-react';
@@ -7,7 +8,7 @@ import { User, Lock, ArrowLeft } from 'lucide-react';
 export default function Edit({ auth, mustVerifyEmail, status }) {
     return (
         <AppLayout title="Profile Settings">
-            <Head title="Profile Settings" />
+            <SeoHead title="Profile Settings" description="Manage your QuotesHub profile, avatar, and password." />
 
             <div className="px-4 py-6 pb-20">
                 {/* Header */}

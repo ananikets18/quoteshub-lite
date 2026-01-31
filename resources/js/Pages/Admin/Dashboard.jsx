@@ -1,11 +1,12 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SeoHead from '@/Components/SeoHead';
 import { Shield, AlertTriangle, Users, FileText, TrendingUp } from 'lucide-react';
 
 export default function Dashboard({ auth, stats }) {
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Admin Dashboard" />
+            <SeoHead title="Admin Dashboard" description="Moderate and manage QuotesHub from the admin dashboard." />
 
             <div className="max-w-7xl mx-auto">
                 <div className="bg-white rounded-lg shadow-sm p-6 mb-6">

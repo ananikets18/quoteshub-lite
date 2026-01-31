@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import SeoHead from '@/Components/SeoHead';
 import { ArrowLeft, UserX, Shield } from 'lucide-react';
 import { useState } from 'react';
 import axios from 'axios';
@@ -23,7 +24,7 @@ export default function BlockedUsers({ auth, blockedUsers: initialBlockedUsers =
 
     return (
         <AppLayout title="Blocked Users">
-            <Head title="Blocked Users" />
+            <SeoHead title="Blocked Users" description="Manage your blocked users on QuotesHub." />
 
             <div className="px-4 py-6 pb-20">
                 {/* Header */}

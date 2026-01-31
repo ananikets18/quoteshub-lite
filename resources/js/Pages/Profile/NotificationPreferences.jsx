@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Head, router, useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import SeoHead from '@/Components/SeoHead';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { Bell, BellOff, Volume2, VolumeX, Users } from 'lucide-react';
 
@@ -104,7 +105,7 @@ export default function NotificationPreferences({ auth, preferences }) {
 
     return (
         <AppLayout user={auth.user} showNav={true}>
-            <Head title="Notification Preferences" />
+            <SeoHead title="Notification Preferences" description="Manage how you receive notifications on QuotesHub." />
 
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20 pt-4 px-4">
                 <div className="max-w-4xl mx-auto space-y-6">

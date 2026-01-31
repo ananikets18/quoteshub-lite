@@ -7,7 +7,7 @@ import { Users, UserPlus } from 'lucide-react';
 export default function Feed({ auth, quotes, followingCount, collections = [] }) {
     return (
         <AppLayout user={auth.user} showNav={true}>
-            <Head title="Following Feed" />
+            <SeoHead title="Following Feed" description="Quotes from the people you follow on QuotesHub." />
 
             <div className="px-4 py-6 pb-20">
                 <div className="mb-6">

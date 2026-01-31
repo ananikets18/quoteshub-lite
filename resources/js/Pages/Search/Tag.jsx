@@ -1,5 +1,6 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import SeoHead from '@/Components/SeoHead';
 import QuoteCard from '@/Components/QuoteCard';
 import { Hash, TrendingUp, Clock, Bookmark } from 'lucide-react';
 
@@ -13,7 +14,7 @@ export default function Tag({ auth, tag, quotes, sort, collections = [] }) {
 
     return (
         <AppLayout title={`#${tag}`} showNav={true}>
-            <Head title={`#${tag.name} Quotes`} />
+            <SeoHead title={`#${tag.name} Quotes`} description={`Explore quotes tagged with #${tag.name} on QuotesHub.`} />
 
             <div className="max-w-5xl mx-auto">
                 {/* Tag Header */}

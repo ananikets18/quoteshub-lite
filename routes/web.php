@@ -53,43 +53,34 @@ Route::inertia('/cookies', 'Static/Cookies')->name('cookies');
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
-    
-    // Cache dashboard stats for 5 minutes
-    $stats = \Illuminate\Support\Facades\Cache::remember('dashboard_stats_' . $user->id, 300, function () use ($user) {
+    $cacheKey = 'dashboard_stats_' . $user->id;
+    $ttl = 300; // 5 minutes
+
+    $buildStats = function () use ($user) {
         return [
             'quotes_count' => $user->quotes_count ?? $user->quotes()->count(),
             'followers_count' => $user->followers_count ?? $user->followers()->count(),
             'following_count' => $user->following_count ?? $user->following()->count(),
             'daily_streak' => $user->daily_streak ?? 0,
-            
-            // Optimized: Use SQL Sum instead of collection sum
             'total_likes' => $user->quotes()->sum('likes_count'),
             'total_saves' => $user->quotes()->sum('saves_count'),
             'total_views' => $user->quotes()->sum('views_count'),
-            
-            // Recent activity
             'recent_quotes' => $user->quotes()
                 ->latest()
                 ->take(3)
                 ->get()
-                ->map(function ($quote) {
-                    return [
-                        'id' => $quote->id,
-                        'content' => $quote->content,
-                        'likes_count' => $quote->likes_count ?? 0,
-                        'saves_count' => $quote->saves_count ?? 0,
-                        'views_count' => $quote->views_count ?? 0,
-                        'time_ago' => $quote->created_at->diffForHumans(),
-                    ];
-                }),
-            
-            // Top performing quote
+                ->map(fn ($quote) => [
+                    'id' => $quote->id,
+                    'content' => $quote->content,
+                    'likes_count' => $quote->likes_count ?? 0,
+                    'saves_count' => $quote->saves_count ?? 0,
+                    'views_count' => $quote->views_count ?? 0,
+                    'time_ago' => $quote->created_at->diffForHumans(),
+                ]),
             'top_quote' => $user->quotes()
                 ->orderByDesc('likes_count')
                 ->first()
                 ?->only(['id', 'content', 'likes_count', 'saves_count']),
-            
-            // Collections
             'collections_count' => $user->collections()->count(),
             'public_collections' => $user->collections()
                 ->where('is_public', true)
@@ -97,52 +88,47 @@ Route::get('/dashboard', function () {
                 ->latest()
                 ->take(3)
                 ->get()
-                ->map(function ($collection) {
-                    return [
-                        'id' => $collection->id,
-                        'name' => $collection->name,
-                        'description' => $collection->description,
-                        'quotes_count' => $collection->quotes_count ?? 0,
-                    ];
-                }),
-            
-            // Recent activity from following
+                ->map(fn ($c) => [
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'description' => $c->description,
+                    'quotes_count' => $c->quotes_count ?? 0,
+                ]),
             'following_activity' => $user->following()
-                ->with(['quotes' => function ($query) {
-                    $query->latest()->take(1);
-                }])
+                ->with(['quotes' => fn ($q) => $q->latest()->take(1)])
                 ->take(5)
                 ->get()
-                ->filter(fn($followed) => $followed->quotes->isNotEmpty())
-                ->map(function ($followed) {
-                    $quote = $followed->quotes->first();
-                    return [
-                        'user' => [
-                            'id' => $followed->id,
-                            'name' => $followed->name,
-                            'username' => $followed->username,
-                            'avatar' => $followed->avatar,
-                        ],
-                        'quote' => [
-                            'id' => $quote->id,
-                            'content' => $quote->content,
-                            'likes_count' => $quote->likes_count ?? 0,
-                            'time_ago' => $quote->created_at->diffForHumans(),
-                        ],
-                    ];
-                })->values(),
-            
-            // This week stats (compare to last week)
+                ->filter(fn ($f) => $f->quotes->isNotEmpty())
+                ->map(fn ($f) => [
+                    'user' => [
+                        'id' => $f->id,
+                        'name' => $f->name,
+                        'username' => $f->username,
+                        'avatar' => $f->avatar,
+                    ],
+                    'quote' => [
+                        'id' => $f->quotes->first()->id,
+                        'content' => $f->quotes->first()->content,
+                        'likes_count' => $f->quotes->first()->likes_count ?? 0,
+                        'time_ago' => $f->quotes->first()->created_at->diffForHumans(),
+                    ],
+                ])->values(),
             'this_week' => [
                 'quotes' => $user->quotes()->where('created_at', '>=', now()->startOfWeek())->count(),
-                'likes' => \App\Models\Like::whereHas('quote', fn($q) => $q->where('user_id', $user->id))
-                    ->where('created_at', '>=', now()->startOfWeek())
-                    ->count(),
+                'likes' => \App\Models\Like::whereHas('quote', fn ($q) => $q->where('user_id', $user->id))
+                    ->where('created_at', '>=', now()->startOfWeek())->count(),
                 'followers' => $user->followers()->wherePivot('created_at', '>=', now()->startOfWeek())->count(),
             ],
         ];
-    });
-    
+    };
+
+    // Redis only for this core feature (minimal Upstash usage); fallback to default cache if Redis unavailable
+    try {
+        $stats = \Illuminate\Support\Facades\Cache::store('redis')->remember($cacheKey, $ttl, $buildStats);
+    } catch (\Throwable $e) {
+        $stats = \Illuminate\Support\Facades\Cache::remember($cacheKey, $ttl, $buildStats);
+    }
+
     return Inertia::render('Dashboard', [
         'stats' => $stats,
     ]);

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SeoHead from '@/Components/SeoHead';
 import Pagination from '@/Components/Pagination';
 import { AlertTriangle, CheckCircle, XCircle, Eye, MessageSquare } from 'lucide-react';
 import Modal from '@/Components/Modal';
@@ -56,7 +57,7 @@ export default function Reports({ auth, reports, currentStatus }) {
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Reports Management" />
+            <SeoHead title="Reports Management" description="Review and manage content reports on QuotesHub admin." />
 
             <div className="max-w-7xl mx-auto">
                 <div className="bg-white rounded-lg shadow-sm p-6 mb-6">

@@ -1,5 +1,6 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import SeoHead from '@/Components/SeoHead';
 import QuoteCard from '@/Components/QuoteCard';
 import { Folder, TrendingUp, Clock, Bookmark } from 'lucide-react';
 
@@ -13,7 +14,7 @@ export default function Category({ auth, category, quotes, sort, collections = [
 
     return (
         <AppLayout title={category.name} showNav={true}>
-            <Head title={`${category.name} Quotes`} />
+            <SeoHead title={`${category.name} Quotes`} description={category.description || `Explore ${category.name} quotes on QuotesHub.`} />
 
             <div className="max-w-5xl mx-auto">
                 {/* Category Header */}
