@@ -54,6 +54,7 @@ export default function UpdatePasswordForm() {
                 <input
                     type="password"
                     value={data.current_password}
+                    placeholder="Enter your current password"
                     onChange={(e) =>
                         setData('current_password', e.target.value)
                     }
@@ -77,6 +78,7 @@ export default function UpdatePasswordForm() {
                 <input
                     type="password"
                     value={data.password}
+                    placeholder="Create a strong password"
                     onChange={(e) => setData('password', e.target.value)}
                     autoComplete="new-password"
                     required
@@ -98,6 +100,7 @@ export default function UpdatePasswordForm() {
                 <input
                     type="password"
                     value={data.password_confirmation}
+                    placeholder="Re-enter your new password"
                     onChange={(e) =>
                         setData('password_confirmation', e.target.value)
                     }
