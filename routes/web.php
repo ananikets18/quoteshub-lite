@@ -134,7 +134,7 @@ Route::get('/dashboard', function () {
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'noindex'])->group(function () {
     // Notifications
     Route::get('/notifications', function () {
         return Inertia::render('Notifications');
@@ -238,7 +238,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/follow/{userId}', [App\Http\Controllers\Api\FollowController::class, 'unfollow']);
     
     // Admin routes
-    Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::prefix('admin')->middleware(['auth', 'admin', 'noindex'])->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
         Route::post('/reports/{report}/review', [AdminController::class, 'reviewReport'])->name('admin.reports.review');

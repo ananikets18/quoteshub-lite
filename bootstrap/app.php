@@ -33,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'active' => \App\Http\Middleware\EnsureUserIsActive::class,
             'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
             'onboarding' => \App\Http\Middleware\EnsureOnboardingCompleted::class,
+            'noindex' => \App\Http\Middleware\RobotsNoIndex::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
