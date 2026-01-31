@@ -43,6 +43,14 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/category/{slug}', [SearchController::class, 'category'])->name('category.show');
 Route::get('/tag/{name}', [SearchController::class, 'tag'])->name('tag.show');
 
+// Static Pages
+Route::inertia('/about', 'Static/About')->name('about');
+Route::inertia('/privacy', 'Static/Privacy')->name('privacy');
+Route::inertia('/terms', 'Static/Terms')->name('terms');
+Route::inertia('/guidelines', 'Static/Guidelines')->name('guidelines');
+Route::inertia('/contact', 'Static/Contact')->name('contact');
+Route::inertia('/cookies', 'Static/Cookies')->name('cookies');
+
 Route::get('/dashboard', function () {
     $user = auth()->user();
     

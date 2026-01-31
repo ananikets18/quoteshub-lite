@@ -5,6 +5,7 @@ import BottomNav from '@/Components/BottomNav';
 import KeyboardShortcutsModal from '@/Components/KeyboardShortcutsModal';
 import { useGlobalShortcuts } from '@/Hooks/useKeyboardShortcuts';
 import useScrollDirection from '@/Hooks/useScrollDirection';
+import Footer from '@/Components/Footer';
 
 export default function AppLayout({ children, title, showHeader = true, showNav = true }) {
     const { auth } = usePage().props;
@@ -25,14 +26,16 @@ export default function AppLayout({ children, title, showHeader = true, showNav 
             <Head title={title} />
 
             <div
-                className="min-h-screen bg-gray-50 dark:bg-gray-900"
+                className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900"
                 data-user-username={auth.user?.username}
             >
                 {showHeader && <Header title={title} isVisible={isNavVisible} />}
 
-                <main className={`max-w-lg mx-auto ${showNav ? 'pb-20' : ''}`}>
+                <main className={`flex-grow max-w-lg mx-auto w-full ${showNav ? 'pb-20' : 'pb-10'}`}>
                     {children}
                 </main>
+
+                <Footer />
 
                 {showNav && <BottomNav isVisible={isNavVisible} />}
             </div>

@@ -36,5 +36,21 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Record not found.'], 404);
+            }
+            return \Inertia\Inertia::render('Error', ['status' => 404])
+                ->toResponse($request)
+                ->setStatusCode(404);
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Forbidden.'], 403);
+            }
+            return \Inertia\Inertia::render('Error', ['status' => 403])
+                ->toResponse($request)
+                ->setStatusCode(403);
+        });
     })->create();

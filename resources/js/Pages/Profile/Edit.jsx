@@ -12,13 +12,7 @@ export default function Edit({ auth, mustVerifyEmail, status }) {
             <div className="px-4 py-6 pb-20">
                 {/* Header */}
                 <div className="mb-6">
-                    <Link
-                        href="/feed"
-                        className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4 transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Feed
-                    </Link>
+
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                         Profile Settings
                     </h1>

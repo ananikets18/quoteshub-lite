@@ -1,107 +1,27 @@
 import { Link } from '@inertiajs/react';
-import { Heart, Github, Twitter } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 export default function Footer() {
-    const currentYear = new Date().getFullYear();
-
     return (
-        <footer className="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 mt-auto">
-            <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    {/* Brand */}
-                    <div className="space-y-4">
-                        <Link href="/" className="flex items-center gap-2">
-                            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#5D41E6] to-[#4b33c2]">
-                                QuotesHub
-                            </span>
-                        </Link>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Discover, save, and share the world's most inspiring quotes. Join our community of wisdom seekers today.
-                        </p>
-                    </div>
+        <footer className="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 mt-auto py-8">
+            <div className="max-w-lg mx-auto px-4 flex flex-col items-center space-y-6">
 
-                    {/* Company */}
-                    <div>
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
-                            Company
-                        </h3>
-                        <ul className="space-y-3">
-                            <li>
-                                <Link href="/about" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#5D41E6] dark:hover:text-[#5D41E6] transition-colors">
-                                    About Us
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/contact" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#5D41E6] dark:hover:text-[#5D41E6] transition-colors">
-                                    Contact
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/guidelines" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#5D41E6] dark:hover:text-[#5D41E6] transition-colors">
-                                    Community Guidelines
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
+                {/* Links */}
+                <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <Link href="/about" className="hover:text-[#5D41E6] transition-colors">About</Link>
+                    <Link href="/guidelines" className="hover:text-[#5D41E6] transition-colors">Guidelines</Link>
+                    <Link href="/privacy" className="hover:text-[#5D41E6] transition-colors">Privacy</Link>
+                    <Link href="/terms" className="hover:text-[#5D41E6] transition-colors">Terms</Link>
+                    <Link href="/contact" className="hover:text-[#5D41E6] transition-colors">Contact</Link>
+                </nav>
 
-                    {/* Legal */}
-                    <div>
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
-                            Legal
-                        </h3>
-                        <ul className="space-y-3">
-                            <li>
-                                <Link href="/privacy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#5D41E6] dark:hover:text-[#5D41E6] transition-colors">
-                                    Privacy Policy
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/terms" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#5D41E6] dark:hover:text-[#5D41E6] transition-colors">
-                                    Terms of Service
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/cookies" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#5D41E6] dark:hover:text-[#5D41E6] transition-colors">
-                                    Cookie Policy
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Social */}
-                    <div>
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
-                            Connect
-                        </h3>
-                        <div className="flex space-x-4">
-                            <a
-                                href="https://twitter.com/quoteshub"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-gray-400 hover:text-[#5D41E6] transition-colors"
-                            >
-                                <span className="sr-only">Twitter</span>
-                                <Twitter className="h-6 w-6" />
-                            </a>
-                            <a
-                                href="https://github.com/quoteshub"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-gray-400 hover:text-[#5D41E6] transition-colors"
-                            >
-                                <span className="sr-only">GitHub</span>
-                                <Github className="h-6 w-6" />
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mt-12 border-t border-gray-100 dark:border-gray-700 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center md:text-left">
-                        &copy; {currentYear} QuotesHub. All rights reserved.
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                        Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by QuotesHub Team
+                {/* Copyright & Brand */}
+                <div className="flex flex-col items-center gap-2 text-xs text-gray-400 dark:text-gray-500 text-center">
+                    <Link href="/" className="font-bold text-gray-600 dark:text-gray-300 hover:text-[#5D41E6] transition-colors">
+                        QuotesHub
+                    </Link>
+                    <p className="flex items-center gap-1">
+                        &copy; {new Date().getFullYear()} • Made with <Heart className="w-3 h-3 text-red-500 fill-red-500" />
                     </p>
                 </div>
             </div>

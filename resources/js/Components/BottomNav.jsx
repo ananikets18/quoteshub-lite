@@ -34,7 +34,7 @@ export default function BottomNav({ isVisible = true }) {
                             className={`bottom-nav-item ${active ? 'active' : ''}`}
                         >
                             <Icon
-                                className={`w-6 h-6 ${active ? 'text-purple-600 dark:text-purple-400' : ''
+                                className={`w-6 h-6 ${active ? 'text-[#5D41E6] dark:text-purple-400' : ''
                                     }`}
                                 strokeWidth={active ? 2.5 : 2}
                             />
