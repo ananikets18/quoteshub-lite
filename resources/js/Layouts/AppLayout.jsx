@@ -9,7 +9,7 @@ import useScrollDirection from '@/Hooks/useScrollDirection';
 import Footer from '@/Components/Footer';
 import Toast from '@/Components/Toast';
 
-export default function AppLayout({ children, title, showHeader = true, showNav = true, showFooter = true }) {
+export default function AppLayout({ children, title, showHeader = true, showNav = true, showFooter = true, showLogo = false }) {
     const { auth, flash } = usePage().props;
     const [showShortcutsModal, setShowShortcutsModal] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -66,6 +66,7 @@ export default function AppLayout({ children, title, showHeader = true, showNav 
                 {showHeader && (
                     <Header
                         title={title}
+                        showLogo={showLogo}
                         isVisible={isNavVisible}
                         unreadCount={unreadCount}
                         refreshUnreadCount={refreshUnreadCount}

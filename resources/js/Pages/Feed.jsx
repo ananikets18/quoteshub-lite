@@ -140,7 +140,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
     const isHeaderVisible = scrollDirection === 'up' || scrollY < 50;
 
     return (
-        <AppLayout title="Feed">
+        <AppLayout title="Feed" showLogo={true}>
             <SeoHead
                 title="Feed"
                 description="Your personalized feed of inspiring quotes. Discover, like, and share wisdom from around the world."

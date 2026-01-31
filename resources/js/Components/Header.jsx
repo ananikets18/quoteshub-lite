@@ -4,11 +4,13 @@ import { createPortal } from 'react-dom';
 import axios from 'axios';
 import { Flame, Bell, Settings } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
+import ApplicationLogo from './ApplicationLogo';
 
 export default function Header({
     title,
     showStreak = true,
     showNotifications = true,
+    showLogo = false,
     isVisible = true,
     unreadCount: unreadCountProp,
     refreshUnreadCount: refreshUnreadCountProp,
@@ -64,9 +66,16 @@ export default function Header({
             <div className="flex items-center justify-between px-4 py-3 max-w-lg mx-auto">
                 {/* Left: Title or Logo */}
                 <div>
-                    <h1 className="text-2xl font-bold text-gradient-primary">
-                        {title || 'QuotesHub'}
-                    </h1>
+                    {showLogo ? (
+                        <Link href="/" className="inline-flex items-center gap-2">
+                            <ApplicationLogo className="w-7 h-7 text-[#5D41E6]" />
+                            <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">QuotesHub</span>
+                        </Link>
+                    ) : (
+                        <h1 className="text-2xl font-bold text-gradient-primary">
+                            {title || 'QuotesHub'}
+                        </h1>
+                    )}
                 </div>
 
                 {/* Right: Streak & Actions */}
