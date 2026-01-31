@@ -1,11 +1,12 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "ananikets18/quoteshub",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "QuotesHub - A platform to discover and share inspiring quotes.",
     "keywords": [
-        "laravel",
-        "framework"
+        "quotes",
+        "inspiration",
+        "wisdom"
     ],
     "license": "MIT",
     "require": {
@@ -13,6 +14,7 @@
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.24",
         "laravel/tinker": "^2.10.1",
         "predis/predis": "^3.3",
         "pusher/pusher-php-server": "^7.2",

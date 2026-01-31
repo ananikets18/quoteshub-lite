@@ -41,6 +41,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'website',
         'location',
         'role',
+        'google_id',
         
         // Onboarding
         'onboarding_completed',
