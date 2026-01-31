@@ -140,9 +140,9 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
     const isHeaderVisible = scrollDirection === 'up' || scrollY < 50;
 
     return (
-        <AppLayout title="QuotesHub">
+        <AppLayout title="Feed">
             <SeoHead
-                title="Feed - QuotesHub"
+                title="Feed"
                 description="Your personalized feed of inspiring quotes. Discover, like, and share wisdom from around the world."
             />
             {/* Sticky Header Section - Hides on scroll down */}

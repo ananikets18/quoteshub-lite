@@ -34,23 +34,26 @@ export default function EditQuote({ quote, categories }) {
     };
 
     return (
-        <AppLayout title="Edit Quote" showHeader={false} showNav={false}>
+        <AppLayout title="Edit Quote" showHeader={false} showNav={false} showFooter={false}>
             <SeoHead
                 title="Edit Quote"
                 description="Modify your quote, update its author, source, or topics."
             />
             {/* Custom Full Screen Layout */}
-            <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
+            <div className="h-screen flex flex-col bg-[#f7f4ef] dark:bg-gray-900 overflow-hidden">
 
                 {/* 1. Top Bar */}
-                <header className="px-4 py-3 flex items-center justify-between bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shrink-0 z-20">
+                <header className="px-6 lg:px-10 py-4 flex items-center justify-between bg-white/90 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shrink-0 z-20 backdrop-blur">
                     <button
                         onClick={() => window.history.back()}
                         className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors"
                     >
                         <ArrowLeft className="w-6 h-6" />
                     </button>
-                    <h1 className="font-bold text-lg text-gray-900 dark:text-white">Edit Quote</h1>
+                    <div className="flex flex-col items-center gap-1">
+                        <h1 className="font-bold text-lg text-gray-900 dark:text-white">Edit Quote</h1>
+                        <span className="hidden md:inline text-xs text-gray-400">Desktop studio</span>
+                    </div>
                     <button
                         onClick={handleSubmit}
                         disabled={processing || !data.content}
@@ -68,13 +71,14 @@ export default function EditQuote({ quote, categories }) {
                 <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
 
                     {/* A. The Canvas (Preview) - Top on Mobile, Left on Desktop */}
-                    <div className="relative flex-1 bg-gray-100 dark:bg-black/50 flex items-center justify-center p-6 md:p-12 overflow-hidden transition-all duration-300 ease-in-out">
+                    <div className="relative flex-1 bg-[#efeae3] dark:bg-black/50 flex items-center justify-center p-6 md:p-12 lg:p-16 overflow-hidden transition-all duration-300 ease-in-out">
                         <div
-                            className="w-full max-w-sm md:max-w-md aspect-[4/5] md:aspect-square rounded-3xl shadow-2xl flex flex-col items-center justify-center text-center p-8 transition-all duration-500 ease-out border-l-4 bg-white dark:bg-gray-800 border-l-purple-600"
+                            className="w-full max-w-sm md:max-w-md xl:max-w-lg aspect-[4/5] md:aspect-[4/4.2] rounded-[32px] shadow-[0_30px_80px_rgba(76,66,53,0.25)] flex flex-col items-center justify-center text-center p-10 md:p-12 transition-all duration-500 ease-out border border-white/60 bg-white/95 dark:bg-gray-800"
                         >
                             <div className="overflow-y-auto max-h-full w-full no-scrollbar flex flex-col items-center justify-center space-y-4">
+                                <span className="text-xs uppercase tracking-[0.35em] text-gray-400">Preview</span>
                                 <p
-                                    className={`font-serif leading-relaxed break-words whitespace-pre-wrap transition-all duration-300 font-medium text-gray-900 dark:text-white ${data.content.length > 200 ? 'text-xl md:text-2xl' : 'text-2xl md:text-4xl'}`}
+                                    className={`font-serif leading-relaxed break-words whitespace-pre-wrap transition-all duration-300 font-medium text-gray-900 dark:text-white ${data.content.length > 200 ? 'text-xl md:text-2xl' : 'text-2xl md:text-4xl xl:text-5xl'}`}
                                 >
                                     {data.content || 'Start typing to edit your quote...'}
                                 </p>
@@ -114,13 +118,19 @@ export default function EditQuote({ quote, categories }) {
                         </div>
 
                         {/* Background Pattern (Optional Aesthetic) */}
-                        <div className="absolute inset-0 opacity-5 pointer-events-none"
-                            style={{ backgroundImage: 'radial-gradient(#8b5cf6 1px, transparent 1px)', backgroundSize: '24px 24px' }}
+                        <div className="absolute inset-0 opacity-40 pointer-events-none"
+                            style={{ backgroundImage: 'radial-gradient(#c7b9a4 1px, transparent 1px)', backgroundSize: '28px 28px' }}
                         />
                     </div>
 
                     {/* B. The Controls (Tools) - Bottom on Mobile, Right on Desktop */}
-                    <div className="bg-white dark:bg-gray-900 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-800 w-full md:w-[400px] flex flex-col shrink-0 h-[45vh] md:h-auto z-10 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+                    <div className="bg-white dark:bg-gray-900 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-800 w-full md:w-[420px] lg:w-[460px] flex flex-col shrink-0 h-[45vh] md:h-auto z-10 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+
+                        <div className="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+                            <p className="text-xs uppercase tracking-[0.3em] text-gray-400">Quote Studio</p>
+                            <h2 className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">Refine the details</h2>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Update the text and topics that travel with your quote.</p>
+                        </div>
 
                         {/* Tab Navigation */}
                         <div className="flex border-b border-gray-100 dark:border-gray-800">
@@ -154,7 +164,7 @@ export default function EditQuote({ quote, categories }) {
                                             value={data.content}
                                             onChange={(e) => setData('content', e.target.value)}
                                             placeholder="What's on your mind?"
-                                            className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-purple-500 min-h-[120px] text-lg resize-none placeholder-gray-400"
+                                            className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-0 focus:ring-2 focus:ring-purple-500 min-h-[140px] lg:min-h-[180px] text-lg resize-none placeholder-gray-400"
                                             autoFocus
                                         />
                                         <div className="flex justify-end">
