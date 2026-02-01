@@ -16,46 +16,62 @@ class SearchController extends Controller
      */
     public function index(Request $request): Response
     {
-        $query = Quote::query()
-            ->with(['user', 'categories', 'tags'])
-            ->withCount(['likes', 'saves']);
+        // Validate input
+        $validated = $request->validate([
+            'q' => 'nullable|string|max:500',
+            'category' => 'nullable|integer|exists:categories,id',
+            'tag' => 'nullable|string|max:100',
+            'start_date' => 'nullable|date|before_or_equal:today',
+            'end_date' => 'nullable|date|after_or_equal:start_date|before_or_equal:today',
+            'sort' => 'nullable|in:latest,popular,most_saved,oldest',
+        ]);
 
-        // Search by content, author, or username
-        if ($search = $request->input('q')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('content', 'LIKE', "%{$search}%")
-                  ->orWhere('author', 'LIKE', "%{$search}%")
-                  ->orWhereHas('user', function ($userQuery) use ($search) {
-                      $userQuery->where('name', 'LIKE', "%{$search}%")
-                               ->orWhere('username', 'LIKE', "%{$search}%");
-                  });
-            });
-        }
+        try {
+            $query = Quote::query()
+                ->approved()  // Only show approved quotes
+                ->with(['user', 'categories', 'tags'])
+                ->withCount(['likes', 'saves']);
 
-        // Filter by category
-        if ($categoryId = $request->input('category')) {
-            $query->whereHas('categories', function ($q) use ($categoryId) {
-                $q->where('categories.id', $categoryId);
-            });
-        }
+            // Search by content, author, or username
+            if ($search = $validated['q'] ?? null) {
+                // Sanitize search input
+                $search = trim($search);
+                
+                $query->where(function ($q) use ($search) {
+                    $q->where('content', 'LIKE', "%{$search}%")
+                      ->orWhere('author', 'LIKE', "%{$search}%")
+                      ->orWhereHas('user', function ($userQuery) use ($search) {
+                          $userQuery->where('name', 'LIKE', "%{$search}%")
+                                   ->orWhere('username', 'LIKE', "%{$search}%");
+                      });
+                });
+            }
 
-        // Filter by tag
-        if ($tag = $request->input('tag')) {
-            $query->whereHas('tags', function ($q) use ($tag) {
-                $q->where('tags.name', $tag);
-            });
-        }
+            // Filter by category
+            if ($categoryId = $validated['category'] ?? null) {
+                $query->whereHas('categories', function ($q) use ($categoryId) {
+                    $q->where('categories.id', $categoryId);
+                });
+            }
 
-        // Date range filter
-        if ($startDate = $request->input('start_date')) {
-            $query->whereDate('created_at', '>=', $startDate);
-        }
-        if ($endDate = $request->input('end_date')) {
-            $query->whereDate('created_at', '<=', $endDate);
-        }
+            // Filter by tag
+            if ($tag = $validated['tag'] ?? null) {
+                $tag = trim($tag);
+                $query->whereHas('tags', function ($q) use ($tag) {
+                    $q->where('tags.name', $tag);
+                });
+            }
 
-        // Sort by popularity or date
-        $sort = $request->input('sort', 'latest');
+            // Date range filter
+            if ($startDate = $validated['start_date'] ?? null) {
+                $query->whereDate('created_at', '>=', $startDate);
+            }
+            if ($endDate = $validated['end_date'] ?? null) {
+                $query->whereDate('created_at', '<=', $endDate);
+            }
+
+            // Sort by popularity or date
+            $sort = $validated['sort'] ?? 'latest';
         switch ($sort) {
             case 'popular':
                 $query->orderByDesc('likes_count');
@@ -88,17 +104,36 @@ class SearchController extends Controller
             });
         }
 
-        // Load filter options
-        $categories = Category::orderBy('name')->get();
-        $popularTags = Tag::withCount('quotes')
-            ->orderByDesc('quotes_count')
-            ->take(20)
-            ->get();
-        
-        // Get user's collections if authenticated
-        $collections = auth()->check() 
-            ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
-            : [];
+            // Load filter options
+            $categories = Category::orderBy('name')->get();
+            $popularTags = Tag::withCount('quotes')
+                ->orderByDesc('quotes_count')
+                ->take(20)
+                ->get();
+            
+            // Get user's collections if authenticated
+            $collections = auth()->check() 
+                ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
+                : [];
+        } catch (\Exception $e) {
+            \Log::error('Search error: ' . $e->getMessage());
+            
+            return Inertia::render('Search/Index', [
+                'quotes' => ['data' => [], 'links' => [], 'total' => 0],
+                'categories' => Category::orderBy('name')->get(),
+                'popularTags' => Tag::withCount('quotes')->orderByDesc('quotes_count')->take(20)->get(),
+                'collections' => [],
+                'filters' => [
+                    'q' => $validated['q'] ?? '',
+                    'category' => '',
+                    'tag' => '',
+                    'start_date' => '',
+                    'end_date' => '',
+                    'sort' => 'latest',
+                ],
+                'error' => 'An error occurred while searching. Please try again.',
+            ]);
+        }
 
         return Inertia::render('Search/Index', [
             'quotes' => $quotes,
@@ -121,11 +156,18 @@ class SearchController extends Controller
      */
     public function category(Request $request, string $slug): Response
     {
-        $category = Category::where('slug', $slug)->firstOrFail();
+        // Validate input
+        $validated = $request->validate([
+            'sort' => 'nullable|in:latest,popular,most_saved',
+        ]);
 
-        $query = $category->quotes()
-            ->with(['user', 'categories', 'tags'])
-            ->withCount(['likes', 'saves']);
+        try {
+            $category = Category::where('slug', $slug)->firstOrFail();
+
+            $query = $category->quotes()
+                ->approved()  // Only show approved quotes
+                ->with(['user', 'categories', 'tags'])
+                ->withCount(['likes', 'saves']);
 
         // Apply sorting
         $sort = $request->input('sort', 'latest');
@@ -158,10 +200,16 @@ class SearchController extends Controller
             });
         }
         
-        // Get user's collections if authenticated
-        $collections = auth()->check() 
-            ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
-            : [];
+            // Get user's collections if authenticated
+            $collections = auth()->check() 
+                ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
+                : [];
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404, 'Category not found');
+        } catch (\Exception $e) {
+            \Log::error('Category search error: ' . $e->getMessage());
+            abort(500, 'An error occurred while loading the category');
+        }
 
         return Inertia::render('Search/Category', [
             'category' => $category,
@@ -176,47 +224,63 @@ class SearchController extends Controller
      */
     public function tag(Request $request, string $name): Response
     {
-        $tag = Tag::where('name', $name)->firstOrFail();
+        // Validate input
+        $validated = $request->validate([
+            'sort' => 'nullable|in:latest,popular,most_saved',
+        ]);
 
-        $query = $tag->quotes()
-            ->with(['user', 'categories', 'tags'])
-            ->withCount(['likes', 'saves']);
+        // Sanitize tag name
+        $name = trim($name);
 
-        // Apply sorting
-        $sort = $request->input('sort', 'latest');
-        switch ($sort) {
-            case 'popular':
-                $query->orderByDesc('likes_count');
-                break;
-            case 'most_saved':
-                $query->orderByDesc('saves_count');
-                break;
-            case 'latest':
-            default:
-                $query->orderByDesc('created_at');
-                break;
+        try {
+            $tag = Tag::where('name', $name)->firstOrFail();
+
+            $query = $tag->quotes()
+                ->approved()  // Only show approved quotes
+                ->with(['user', 'categories', 'tags'])
+                ->withCount(['likes', 'saves']);
+
+            // Apply sorting
+            $sort = $validated['sort'] ?? 'latest';
+            switch ($sort) {
+                case 'popular':
+                    $query->orderByDesc('likes_count');
+                    break;
+                case 'most_saved':
+                    $query->orderByDesc('saves_count');
+                    break;
+                case 'latest':
+                default:
+                    $query->orderByDesc('created_at');
+                    break;
+            }
+
+            $quotes = $query->paginate(12)->withQueryString();
+
+            // Add user interaction flags if authenticated
+            if (auth()->check()) {
+                $quotes->getCollection()->transform(function ($quote) {
+                    $quote->is_liked = $quote->isLikedBy(auth()->user());
+                    $quote->is_saved = $quote->isSavedBy(auth()->user());
+                    // Add collection IDs this quote is in
+                    $quote->collection_ids = $quote->collections()
+                        ->where('user_id', auth()->id())
+                        ->pluck('collections.id')
+                        ->toArray();
+                    return $quote;
+                });
+            }
+            
+            // Get user's collections if authenticated
+            $collections = auth()->check() 
+                ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
+                : [];
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404, 'Tag not found');
+        } catch (\Exception $e) {
+            \Log::error('Tag search error: ' . $e->getMessage());
+            abort(500, 'An error occurred while loading the tag');
         }
-
-        $quotes = $query->paginate(12)->withQueryString();
-
-        // Add user interaction flags if authenticated
-        if (auth()->check()) {
-            $quotes->getCollection()->transform(function ($quote) {
-                $quote->is_liked = $quote->isLikedBy(auth()->user());
-                $quote->is_saved = $quote->isSavedBy(auth()->user());
-                // Add collection IDs this quote is in
-                $quote->collection_ids = $quote->collections()
-                    ->where('user_id', auth()->id())
-                    ->pluck('collections.id')
-                    ->toArray();
-                return $quote;
-            });
-        }
-        
-        // Get user's collections if authenticated
-        $collections = auth()->check() 
-            ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
-            : [];
 
         return Inertia::render('Search/Tag', [
             'tag' => $tag,
