@@ -180,7 +180,7 @@ class ActivityController extends Controller
         if (!$user) {
             // For non-authenticated users, show popular users
             $suggested = User::where('is_active', true)
-                ->where('id', '!=', optional($user)->id)
+                ->withCount(['quotes', 'followers'])
                 ->orderByDesc('followers_count')
                 ->limit(5)
                 ->get();
@@ -221,10 +221,20 @@ class ActivityController extends Controller
             // Combine suggestions
             $suggestedIds = $suggestedFromNetwork->concat($suggestedFromCategories)->unique()->take(5);
 
-            $suggested = User::whereIn('id', $suggestedIds)
-                ->where('is_active', true)
-                ->withCount(['quotes', 'followers'])
-                ->get();
+            // If no suggestions from network/categories, fallback to popular users
+            if ($suggestedIds->isEmpty()) {
+                $suggested = User::whereNotIn('id', $followingIds)
+                    ->where('is_active', true)
+                    ->withCount(['quotes', 'followers'])
+                    ->orderByDesc('followers_count')
+                    ->limit(5)
+                    ->get();
+            } else {
+                $suggested = User::whereIn('id', $suggestedIds)
+                    ->where('is_active', true)
+                    ->withCount(['quotes', 'followers'])
+                    ->get();
+            }
         }
 
         $suggested = $suggested->map(function ($suggestedUser) {

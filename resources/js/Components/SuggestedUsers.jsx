@@ -51,8 +51,12 @@ export default function SuggestedUsers({ auth, inline = false }) {
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random&size=80`;
     };
 
-    if (loading || suggested.length === 0) {
-        return null; // Don't show anything while loading or if no suggestions
+    if (loading) {
+        return null; // Don't show while loading to avoid layout shift
+    }
+
+    if (suggested.length === 0) {
+        return null; // Don't show if no suggestions
     }
 
     // Instagram-style inline horizontal scroll
