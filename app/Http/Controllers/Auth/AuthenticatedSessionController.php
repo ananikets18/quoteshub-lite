@@ -31,9 +31,11 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // Prevent session fixation
         $request->session()->regenerate();
 
-        return redirect()->intended(route('feed', absolute: false));
+        // ✅ PROD-SAFE redirect (no absolute:false)
+        return redirect()->intended('/feed');
     }
 
     /**
@@ -43,10 +45,13 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::guard('web')->logout();
 
+        // Invalidate session
         $request->session()->invalidate();
 
+        // Regenerate CSRF token
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('success', 'You have been logged out.');
+        // ✅ Explicit login redirect (prevents redirect loops)
+        return redirect('/login')->with('success', 'You have been logged out.');
     }
 }

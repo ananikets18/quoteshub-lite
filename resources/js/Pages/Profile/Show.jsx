@@ -29,14 +29,20 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
     const handleLogout = (e) => {
         e.preventDefault();
         
+        console.log('Logout clicked, CSRF token:', document.head.querySelector('meta[name="csrf-token"]')?.content);
+        
         router.post(route('logout'), {}, {
             onError: (errors) => {
+                console.log('Logout error:', errors);
                 // If it's a CSRF error (419), reload the page to get a fresh token
                 if (errors && (errors.message === 'CSRF token mismatch.' || errors.status === 419)) {
                     console.warn('CSRF token expired. Reloading page...');
                     window.location.reload();
                 }
             },
+            onSuccess: () => {
+                console.log('Logout successful');
+            }
         });
     };
 
