@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import { Heart, Bookmark, Share2, Eye, MoreVertical, Edit2, Trash2, Flag, EyeOff, CheckCircle, Folder } from 'lucide-react';
 import QuoteDetailModal from './QuoteDetailModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import ReportModal from './ReportModal';
 import AddToCollectionModal from './AddToCollectionModal';
+import ShareModal from './ShareModal';
 import Toast from './Toast';
 import AuthPromptModal from './AuthPromptModal';
 import axios from 'axios';
+
+// Professional color schemes matching QuoteDetailModal
+const colorSchemes = [
+    { bg: '#FFFFFF', accent: '#8B5CF6', text: '#1F2937', border: '#E5E7EB' },
+    { bg: '#FEFCE8', accent: '#EAB308', text: '#1F2937', border: '#FEF08A' },
+    { bg: '#F0FDF4', accent: '#10B981', text: '#1F2937', border: '#BBF7D0' },
+    { bg: '#FFF7ED', accent: '#F97316', text: '#1F2937', border: '#FED7AA' },
+    { bg: '#FDF2F8', accent: '#EC4899', text: '#1F2937', border: '#FBCFE8' },
+    { bg: '#EFF6FF', accent: '#3B82F6', text: '#1F2937', border: '#DBEAFE' },
+    { bg: '#F5F3FF', accent: '#A855F7', text: '#1F2937', border: '#E9D5FF' },
+    { bg: '#ECFDF5', accent: '#14B8A6', text: '#1F2937', border: '#99F6E4' },
+];
 
 export default function QuoteCard({ quote, compact = false, auth, collections = [], onUnsave = null, showSavedContext = false }) {
     const [isLiked, setIsLiked] = useState(quote.is_liked || false);
@@ -19,6 +32,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
     const [showCollectionModal, setShowCollectionModal] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isDeleted, setIsDeleted] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
@@ -34,6 +48,14 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
     const [authAction, setAuthAction] = useState('like');
 
     const isOwner = auth?.user?.id === quote.user_id;
+
+    // Sync state when quote prop changes (e.g., after page refresh)
+    useEffect(() => {
+        setIsLiked(quote.is_liked || false);
+        setIsSaved(quote.is_saved || false);
+        setLikesCount(quote.likes_count || 0);
+        setSavesCount(quote.saves_count || 0);
+    }, [quote.id, quote.is_liked, quote.is_saved, quote.likes_count, quote.saves_count]);
 
     // Don't render if deleted or hidden (not interested)
     if (isDeleted || isHidden) {
@@ -125,33 +147,20 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
             return;
         }
 
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Quote from QuotesHub',
-                    text: `"${quote.content}" - ${quote.author || 'Unknown'}`,
-                    url: window.location.origin + `/quotes/${quote.id}`,
-                });
+        // Open share modal for comprehensive sharing options
+        setShowShareModal(true);
 
-                router.post(`/quotes/${quote.id}/share`, {}, {
-                    preserveScroll: true,
-                    preserveState: true,
-                    only: [],
-                });
-                showNotification('Quote shared successfully!', 'success');
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    showNotification('Failed to share quote.', 'error');
-                }
-            }
-        } else {
-            showNotification('Sharing is not supported on this device.', 'warning');
-        }
+        // Track share count
+        router.post(`/quotes/${quote.id}/share`, {}, {
+            preserveScroll: true,
+            preserveState: true,
+            only: [],
+        });
     };
 
     const handleCardClick = () => {
         // Don't open quote detail if any other modal is open
-        if (showMenu || showDeleteModal || showReportModal || showCollectionModal || showAuthModal) {
+        if (showMenu || showDeleteModal || showReportModal || showCollectionModal || showShareModal || showAuthModal) {
             return;
         }
         setShowModal(true);
@@ -482,6 +491,13 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 onClose={() => setShowCollectionModal(false)}
                 quote={quote}
                 collections={collections}
+            />
+
+            <ShareModal
+                show={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                quote={quote}
+                colorScheme={colorSchemes[quote.id % colorSchemes.length]}
             />
 
             {/* Toast Notification */}

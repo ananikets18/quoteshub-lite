@@ -8,7 +8,8 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
 
     if (!show) return null;
 
-    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    // Generate the specific quote URL
+    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/quotes/${quote.id}` : '';
     const shareText = `"${quote.content}" - ${quote.author || 'Unknown'}`;
 
     const handleCopyLink = async () => {

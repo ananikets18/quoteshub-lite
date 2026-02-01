@@ -26,6 +26,16 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
     const [viewStartTime, setViewStartTime] = useState(null);
     const [showShareModal, setShowShareModal] = useState(false);
 
+    // Sync state when quote prop changes (e.g., after page refresh)
+    useEffect(() => {
+        if (quote) {
+            setIsLiked(quote.is_liked || false);
+            setIsSaved(quote.is_saved || false);
+            setLikesCount(quote.likes_count || 0);
+            setSavesCount(quote.saves_count || 0);
+        }
+    }, [quote?.id, quote?.is_liked, quote?.is_saved, quote?.likes_count, quote?.saves_count]);
+
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
