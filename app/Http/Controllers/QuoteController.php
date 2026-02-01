@@ -42,6 +42,13 @@ class QuoteController extends Controller
     {
         $user = auth()->user();
 
+        // Log incoming data for debugging
+        \Log::info('Quote creation attempt', [
+            'user_id' => $user->id,
+            'data' => $request->only(['content', 'author', 'source', 'category_ids']),
+            'categories_count' => \App\Models\Category::count()
+        ]);
+
         // Check rate limiting
         if ($this->moderationService->isRateLimited($user)) {
              $rateLimitInfo = $this->moderationService->getRemainingQuotes($user);
