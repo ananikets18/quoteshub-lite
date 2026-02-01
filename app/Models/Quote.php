@@ -18,9 +18,7 @@ class Quote extends Model
         'content',
         'author',
         'source',
-        'background_gradient',
         'status',
-        'is_featured',
         'likes_count',
         'saves_count',
         'shares_count',
@@ -28,7 +26,6 @@ class Quote extends Model
     ];
 
     protected $casts = [
-        'is_featured' => 'boolean',
         'likes_count' => 'integer',
         'saves_count' => 'integer',
         'shares_count' => 'integer',
@@ -78,6 +75,15 @@ class Quote extends Model
     }
 
     /**
+     * Get the collections that contain this quote
+     */
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(Collection::class, 'collection_quote')
+            ->withTimestamps();
+    }
+
+    /**
      * Check if the quote is liked by a user
      */
     public function isLikedBy(?User $user): bool
@@ -115,14 +121,6 @@ class Quote extends Model
     public function scopeApproved($query)
     {
         return $query->where('status', 'approved');
-    }
-
-    /**
-     * Scope for featured quotes
-     */
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
     }
 
     /**

@@ -1,30 +1,22 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
-import { useRef } from 'react';
+import { CheckCircle, AlertCircle, Shield } from 'lucide-react';
 
-export default function UpdatePasswordForm({ className = '' }) {
-    const passwordInput = useRef();
-    const currentPasswordInput = useRef();
-
+export default function UpdatePasswordForm() {
     const {
         data,
         setData,
-        errors,
         put,
-        reset,
+        errors,
         processing,
         recentlySuccessful,
+        reset,
     } = useForm({
         current_password: '',
         password: '',
         password_confirmation: '',
     });
 
-    const updatePassword = (e) => {
+    const submit = (e) => {
         e.preventDefault();
 
         put(route('password.update'), {
@@ -33,110 +25,114 @@ export default function UpdatePasswordForm({ className = '' }) {
             onError: (errors) => {
                 if (errors.password) {
                     reset('password', 'password_confirmation');
-                    passwordInput.current.focus();
                 }
-
                 if (errors.current_password) {
                     reset('current_password');
-                    currentPasswordInput.current.focus();
                 }
             },
         });
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Update Password
-                </h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay
-                    secure.
-                </p>
-            </header>
-
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel
-                        htmlFor="current_password"
-                        value="Current Password"
-                    />
-
-                    <TextInput
-                        id="current_password"
-                        ref={currentPasswordInput}
-                        value={data.current_password}
-                        onChange={(e) =>
-                            setData('current_password', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                    />
-
-                    <InputError
-                        message={errors.current_password}
-                        className="mt-2"
-                    />
+        <form onSubmit={submit} className="space-y-4">
+            {/* Security Tip */}
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div className="flex items-start gap-3">
+                    <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                        Use a strong password with at least 8 characters, including letters,
+                        numbers, and symbols.
+                    </p>
                 </div>
+            </div>
 
-                <div>
-                    <InputLabel htmlFor="password" value="New Password" />
+            {/* Current Password */}
+            <div>
+                <label className="block text-sm font-medium mb-2">
+                    Current Password *
+                </label>
+                <input
+                    type="password"
+                    value={data.current_password}
+                    placeholder="Enter your current password"
+                    onChange={(e) =>
+                        setData('current_password', e.target.value)
+                    }
+                    autoComplete="current-password"
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-purple-500"
+                />
+                {errors.current_password && (
+                    <p className="mt-1 text-sm text-red-600 flex gap-1 items-center">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.current_password}
+                    </p>
+                )}
+            </div>
 
-                    <TextInput
-                        id="password"
-                        ref={passwordInput}
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
+            {/* New Password */}
+            <div>
+                <label className="block text-sm font-medium mb-2">
+                    New Password *
+                </label>
+                <input
+                    type="password"
+                    value={data.password}
+                    placeholder="Create a strong password"
+                    onChange={(e) => setData('password', e.target.value)}
+                    autoComplete="new-password"
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-purple-500"
+                />
+                {errors.password && (
+                    <p className="mt-1 text-sm text-red-600 flex gap-1 items-center">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.password}
+                    </p>
+                )}
+            </div>
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
+            {/* Confirm Password */}
+            <div>
+                <label className="block text-sm font-medium mb-2">
+                    Confirm New Password *
+                </label>
+                <input
+                    type="password"
+                    value={data.password_confirmation}
+                    placeholder="Re-enter your new password"
+                    onChange={(e) =>
+                        setData('password_confirmation', e.target.value)
+                    }
+                    autoComplete="new-password"
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-purple-500"
+                />
+                {errors.password_confirmation && (
+                    <p className="mt-1 text-sm text-red-600 flex gap-1 items-center">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.password_confirmation}
+                    </p>
+                )}
+            </div>
 
-                <div>
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
+            {/* Submit */}
+            <div className="flex items-center gap-4 pt-4">
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="px-6 py-2.5 rounded-lg text-white font-semibold bg-gradient-to-r from-purple-600 to-pink-600 disabled:opacity-50"
+                >
+                    {processing ? 'Updating...' : 'Update Password'}
+                </button>
 
-                    <TextInput
-                        id="password_confirmation"
-                        value={data.password_confirmation}
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600">
-                            Saved.
-                        </p>
-                    </Transition>
-                </div>
-            </form>
-        </section>
+                {recentlySuccessful && (
+                    <span className="text-sm text-green-600 flex items-center gap-1">
+                        <CheckCircle className="w-4 h-4" />
+                        Password updated!
+                    </span>
+                )}
+            </div>
+        </form>
     );
 }

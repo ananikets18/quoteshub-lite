@@ -30,6 +30,7 @@ return new class extends Migration
             $table->index('username');
             $table->index('role');
             $table->index('is_verified');
+            $table->index('is_active');
         });
     }
 

@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Console\Scheduling\Schedule;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,14 +12,62 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withSchedule(function (Schedule $schedule): void {
+        // Run bot activities every 15 minutes (if enabled)
+        $schedule->command('bot:activity')
+            ->everyFifteenMinutes()
+            ->when(fn() => config('bot.enabled'));
+        
+        // Daily cleanup of old bot content
+        $schedule->command('bot:activity --cleanup')
+            ->daily()
+            ->at('03:00');
+        
+        // Existing scheduled commands
+        $schedule->command('engagement:calculate')
+            ->hourly();
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            \App\Http\Middleware\PreventBackHistory::class,
+            \App\Http\Middleware\EnsureUserIsActive::class,
+            \App\Http\Middleware\EnsureOnboardingCompleted::class,
         ]);
 
-        //
+        // Enable session-based authentication for API routes
+        // This allows API calls from the Inertia frontend to authenticate using sessions
+        $middleware->api(prepend: [
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
+
+        // Register middleware aliases
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'moderator' => \App\Http\Middleware\EnsureUserIsModerator::class,
+            'active' => \App\Http\Middleware\EnsureUserIsActive::class,
+            'prevent.back' => \App\Http\Middleware\PreventBackHistory::class,
+            'onboarding' => \App\Http\Middleware\EnsureOnboardingCompleted::class,
+            'noindex' => \App\Http\Middleware\RobotsNoIndex::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Record not found.'], 404);
+            }
+            return \Inertia\Inertia::render('Error', ['status' => 404])
+                ->toResponse($request)
+                ->setStatusCode(404);
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Forbidden.'], 403);
+            }
+            return \Inertia\Inertia::render('Error', ['status' => 403])
+                ->toResponse($request)
+                ->setStatusCode(403);
+        });
     })->create();

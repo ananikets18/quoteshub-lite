@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Models\Like;
 use App\Models\Save;
+use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -300,7 +301,19 @@ class QuoteController extends Controller
     public function share($id)
     {
         $quote = Quote::findOrFail($id);
+        $user = auth()->user();
+        
+        // Increment share count
         $quote->increment('shares_count');
+        
+        // Track user category preferences
+        if ($user && $quote->category_id) {
+            app(RecommendationService::class)->trackCategoryInteraction(
+                $user,
+                $quote->category_id,
+                'share'
+            );
+        }
 
         return response()->json([
             'message' => 'Share tracked',

@@ -1,47 +1,163 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
-import { Heart, Bookmark, Share2, Eye, MoreVertical } from 'lucide-react';
+import { Heart, Bookmark, Share2, Eye, MoreVertical, Edit2, Trash2, Flag, EyeOff, CheckCircle, Folder } from 'lucide-react';
 import QuoteDetailModal from './QuoteDetailModal';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import ReportModal from './ReportModal';
+import AddToCollectionModal from './AddToCollectionModal';
+import ShareModal from './ShareModal';
+import Toast from './Toast';
+import AuthPromptModal from './AuthPromptModal';
+import axios from 'axios';
 
-// Professional color schemes with subtle accents
+// Professional color schemes matching QuoteDetailModal
 const colorSchemes = [
-    { bg: '#FFFFFF', accent: '#8B5CF6', text: '#1F2937', border: '#E5E7EB' }, // Purple accent
-    { bg: '#FEFCE8', accent: '#EAB308', text: '#1F2937', border: '#FEF08A' }, // Yellow accent
-    { bg: '#F0FDF4', accent: '#10B981', text: '#1F2937', border: '#BBF7D0' }, // Green accent
-    { bg: '#FFF7ED', accent: '#F97316', text: '#1F2937', border: '#FED7AA' }, // Orange accent
-    { bg: '#FDF2F8', accent: '#EC4899', text: '#1F2937', border: '#FBCFE8' }, // Pink accent
-    { bg: '#EFF6FF', accent: '#3B82F6', text: '#1F2937', border: '#DBEAFE' }, // Blue accent
-    { bg: '#F5F3FF', accent: '#A855F7', text: '#1F2937', border: '#E9D5FF' }, // Violet accent
-    { bg: '#ECFDF5', accent: '#14B8A6', text: '#1F2937', border: '#99F6E4' }, // Teal accent
+    { bg: '#FFFFFF', accent: '#8B5CF6', text: '#1F2937', border: '#E5E7EB' },
+    { bg: '#FEFCE8', accent: '#EAB308', text: '#1F2937', border: '#FEF08A' },
+    { bg: '#F0FDF4', accent: '#10B981', text: '#1F2937', border: '#BBF7D0' },
+    { bg: '#FFF7ED', accent: '#F97316', text: '#1F2937', border: '#FED7AA' },
+    { bg: '#FDF2F8', accent: '#EC4899', text: '#1F2937', border: '#FBCFE8' },
+    { bg: '#EFF6FF', accent: '#3B82F6', text: '#1F2937', border: '#DBEAFE' },
+    { bg: '#F5F3FF', accent: '#A855F7', text: '#1F2937', border: '#E9D5FF' },
+    { bg: '#ECFDF5', accent: '#14B8A6', text: '#1F2937', border: '#99F6E4' },
 ];
 
-export default function QuoteCard({ quote, compact = false }) {
+export default function QuoteCard({ quote, compact = false, auth, collections = [], onUnsave = null, showSavedContext = false }) {
     const [isLiked, setIsLiked] = useState(quote.is_liked || false);
     const [isSaved, setIsSaved] = useState(quote.is_saved || false);
     const [likesCount, setLikesCount] = useState(quote.likes_count || 0);
     const [savesCount, setSavesCount] = useState(quote.saves_count || 0);
     const [showModal, setShowModal] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [showCollectionModal, setShowCollectionModal] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isDeleted, setIsDeleted] = useState(false);
+    const [isHidden, setIsHidden] = useState(false);
+    const [isFadingOut, setIsFadingOut] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
-    const handleLike = async (e) => {
+    // Toast notifications
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('info');
+
+    // Auth prompt modal
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [authAction, setAuthAction] = useState('like');
+
+    const isOwner = auth?.user?.id === quote.user_id;
+
+    // Sync state when quote prop changes (e.g., after page refresh)
+    useEffect(() => {
+        setIsLiked(quote.is_liked || false);
+        setIsSaved(quote.is_saved || false);
+        setLikesCount(quote.likes_count || 0);
+        setSavesCount(quote.saves_count || 0);
+    }, [quote.id, quote.is_liked, quote.is_saved, quote.likes_count, quote.saves_count]);
+
+    // Don't render if deleted or hidden (not interested)
+    if (isDeleted || isHidden) {
+        return null;
+    }
+
+    const showNotification = (message, type = 'info') => {
+        setToastMessage(message);
+        setToastType(type);
+        setShowToast(true);
+    };
+
+    // Format timestamp to relative time
+    const formatTimestamp = (timestamp) => {
+        if (!timestamp) return null;
+        
+        const now = new Date();
+        const postDate = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - postDate) / 1000);
+        
+        if (diffInSeconds < 60) return 'just now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
+        if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d`;
+        if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)}w`;
+        
+        // For older posts, show actual date
+        return postDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    // Check if quote is long (over 280 characters)
+    const isLongQuote = quote.content && quote.content.length > 280;
+    const displayContent = (!isExpanded && isLongQuote) 
+        ? quote.content.substring(0, 280) + '...' 
+        : quote.content;
+
+    const handleLike = (e) => {
         e.stopPropagation();
 
-        router.post(`/api/quotes/${quote.id}/like`, {}, {
+        // Check authentication
+        if (!auth?.user) {
+            setAuthAction('like');
+            setShowAuthModal(true);
+            return;
+        }
+
+        // Optimistic update - instant UI feedback
+        const newIsLiked = !isLiked;
+        setIsLiked(newIsLiked);
+        setLikesCount(newIsLiked ? likesCount + 1 : likesCount - 1);
+
+        // Background sync with server
+        router.post(`/quotes/${quote.id}/like`, {}, {
+            preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                setIsLiked(!isLiked);
-                setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+            only: [],
+            onError: () => {
+                // Revert on error
+                setIsLiked(!newIsLiked);
+                setLikesCount(newIsLiked ? likesCount : likesCount + 1);
+                showNotification('Failed to update like. Please try again.', 'error');
             },
         });
     };
 
-    const handleSave = async (e) => {
+    const handleSave = (e) => {
         e.stopPropagation();
 
-        router.post(`/api/quotes/${quote.id}/save`, {}, {
+        // Check authentication
+        if (!auth?.user) {
+            setAuthAction('save');
+            setShowAuthModal(true);
+            return;
+        }
+
+        // Optimistic update - instant UI feedback
+        const newIsSaved = !isSaved;
+        const wasUnsaved = isSaved && !newIsSaved;
+
+        setIsSaved(newIsSaved);
+        setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
+
+        // If unsaving and callback provided (e.g., from Saved page), trigger fade out
+        if (wasUnsaved && onUnsave) {
+            setIsFadingOut(true);
+            setTimeout(() => {
+                onUnsave(quote.id);
+            }, 300); // Match the transition duration
+        }
+
+        // Background sync with server
+        router.post(`/quotes/${quote.id}/save`, {}, {
+            preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                setIsSaved(!isSaved);
-                setSavesCount(isSaved ? savesCount - 1 : savesCount + 1);
+            only: [],
+            onError: () => {
+                // Revert on error
+                setIsSaved(!newIsSaved);
+                setSavesCount(newIsSaved ? savesCount : savesCount + 1);
+                setIsFadingOut(false);
+                showNotification('Failed to save quote. Please try again.', 'error');
             },
         });
     };
@@ -49,175 +165,414 @@ export default function QuoteCard({ quote, compact = false }) {
     const handleShare = async (e) => {
         e.stopPropagation();
 
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Quote from QuotesHub',
-                    text: `"${quote.content}" - ${quote.author || 'Unknown'}`,
-                    url: window.location.origin + `/quotes/${quote.id}`,
-                });
-
-                router.post(`/api/quotes/${quote.id}/share`, {}, {
-                    preserveScroll: true,
-                });
-            } catch (err) {
-                console.log('Share cancelled');
-            }
+        // Check authentication
+        if (!auth?.user) {
+            setAuthAction('share');
+            setShowAuthModal(true);
+            return;
         }
+
+        // Open share modal for comprehensive sharing options
+        setShowShareModal(true);
+    };
+
+    const trackShare = () => {
+        // Track share count when user actually completes a share
+        router.post(`/quotes/${quote.id}/share`, {}, {
+            preserveScroll: true,
+            preserveState: true,
+            only: [],
+        });
     };
 
     const handleCardClick = () => {
+        // Don't open quote detail if any other modal is open
+        if (showMenu || showDeleteModal || showReportModal || showCollectionModal || showShareModal || showAuthModal) {
+            return;
+        }
         setShowModal(true);
     };
 
-    const colorScheme = colorSchemes[quote.id % colorSchemes.length];
+    const handleUserClick = (e) => {
+        e.stopPropagation(); // Prevent opening quote modal
+        if (quote.user?.username) {
+            router.visit(`/${quote.user.username}`);
+        }
+    };
+
+    const handleEdit = (e) => {
+        e.stopPropagation();
+        router.visit(`/quotes/${quote.id}/edit`);
+    };
+
+    const handleDelete = (e) => {
+        e.stopPropagation();
+        setShowMenu(false);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        setIsDeleting(true);
+        router.delete(`/quotes/${quote.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setIsDeleted(true);
+                setShowDeleteModal(false);
+                showNotification('Quote deleted successfully', 'success');
+            },
+            onError: () => {
+                setIsDeleting(false);
+                setShowDeleteModal(false);
+                showNotification('Failed to delete quote. Please try again.', 'error');
+            },
+        });
+    };
+
+    const handleReport = (data) => {
+        router.post(`/quotes/${quote.id}/report`, data, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showNotification('Report submitted successfully. We\'ll review it soon.', 'success');
+                setShowReportModal(false);
+            },
+            onError: () => {
+                showNotification('Failed to submit report. Please try again.', 'error');
+            },
+        });
+    };
+
+    const handleNotInterested = async (e) => {
+        e.stopPropagation();
+        setShowMenu(false);
+
+        try {
+            // Get CSRF token
+            const csrfToken = document.head.querySelector('meta[name="csrf-token"]')?.content;
+
+            const response = await axios.post('/api/preferences/not-interested', {
+                item_type: 'quote',
+                item_id: quote.id,
+                reason: 'dont_like',
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                withCredentials: true,
+            });
+
+            if (response.data.success) {
+                // Show success message
+                showNotification('Quote hidden. We\'ll show you less like this.', 'success');
+
+                // Start fade out animation
+                setIsFadingOut(true);
+
+                // Remove from DOM after animation
+                setTimeout(() => {
+                    setIsHidden(true);
+                }, 500);
+            }
+        } catch (error) {
+            console.error('Failed to mark as not interested:', error);
+            showNotification('Failed to update preference. Please try again.', 'error');
+        }
+    };
 
     return (
         <div
-            className="quote-card-professional cursor-pointer mb-4"
+            className={`cursor-pointer transition-all duration-300 ${isFadingOut ? 'opacity-0 scale-95' : 'opacity-100'
+                }`}
             onClick={handleCardClick}
-            style={{
-                backgroundColor: colorScheme.bg,
-                borderColor: colorScheme.border,
-                color: colorScheme.text
-            }}
         >
-            {/* Accent border on left */}
-            <div
-                className="absolute left-0 top-0 bottom-0 w-1"
-                style={{ backgroundColor: colorScheme.accent }}
-            />
+            {/* Open Card Design - Free and Spaced */}
+            <div className="bg-white dark:bg-gray-800 px-4 sm:px-5 py-4 sm:py-5 hover:bg-gray-50/50 dark:hover:bg-gray-750 transition-colors duration-200 border-b border-gray-200 dark:border-gray-700">
 
-            {/* Content */}
-            <div className="relative z-10 p-6">
-                {/* User Info */}
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                        <div 
-                            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                            style={{ backgroundColor: colorScheme.accent }}
+                {/* Header: User Info */}
+                <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                        {/* Avatar - Clickable */}
+                        <button
+                            onClick={handleUserClick}
+                            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#5D41E6] to-[#7C3AED] flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md hover:shadow-lg hover:ring-4 hover:ring-[#5D41E6]/20 transition-all duration-200 transform hover:scale-105"
+                            aria-label={`Visit ${quote.user?.name || 'user'}'s profile`}
                         >
                             {quote.user?.name?.charAt(0).toUpperCase() || 'U'}
-                        </div>
-                        <div>
-                            <p className="font-semibold text-sm" style={{ color: colorScheme.text }}>
-                                {quote.user?.name || 'Anonymous'}
-                            </p>
-                            <p className="text-xs opacity-60" style={{ color: colorScheme.text }}>
-                                @{quote.user?.username || 'user'}
-                            </p>
-                        </div>
-                    </div>
+                        </button>
 
-                    <button className="p-2 rounded-full hover:bg-black/5 transition-colors">
-                        <MoreVertical className="w-5 h-5" style={{ color: colorScheme.text }} />
-                    </button>
-                </div>
-
-                {/* Quote Text */}
-                <div className={`${compact ? 'mb-3' : 'mb-6'}`}>
-                    <p 
-                        className={`${compact ? 'text-lg' : 'text-2xl'} font-serif leading-relaxed mb-3 font-medium`}
-                        style={{ color: colorScheme.text }}
-                    >
-                        "{quote.content}"
-                    </p>
-                    {quote.author && (
-                        <p 
-                            className={`${compact ? 'text-sm' : 'text-base'} font-semibold flex items-center gap-2`}
-                            style={{ color: colorScheme.accent }}
+                        {/* User Details - Clickable */}
+                        <button
+                            onClick={handleUserClick}
+                            className="flex flex-col text-left group"
                         >
-                            <span className="w-8 h-0.5" style={{ backgroundColor: colorScheme.accent }}></span>
-                            {quote.author}
+                            <div className="flex items-center gap-2">
+                                <span className="font-bold text-sm sm:text-base text-gray-900 dark:text-white leading-tight group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors duration-200">
+                                    {quote.user?.name || 'Anonymous'}
+                                </span>
+                                {quote.created_at && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                        {formatTimestamp(quote.created_at)}
+                                    </span>
+                                )}
+                            </div>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors duration-200">
+                                @{quote.user?.username || 'user'}
+                            </span>
+                        </button>
+                    </div>
+
+                    {/* Menu Button */}
+                    <div className="relative">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowMenu(!showMenu);
+                            }}
+                            className="p-1 sm:p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                        >
+                            <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400" />
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {showMenu && (
+                            <div
+                                className="absolute right-0 top-full mt-1 w-44 sm:w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 overflow-hidden"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {isOwner ? (
+                                    <>
+                                        <button
+                                            onClick={handleEdit}
+                                            className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-200 transition-colors"
+                                        >
+                                            <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            <span className="text-xs sm:text-sm font-medium">Edit</span>
+                                        </button>
+                                        <button
+                                            onClick={handleDelete}
+                                            className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left flex items-center gap-2 sm:gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            <span className="text-xs sm:text-sm font-medium">Delete</span>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        {auth?.user && (
+                                            <button
+                                                onClick={handleNotInterested}
+                                                className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left flex items-center gap-2 sm:gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-200 transition-colors"
+                                            >
+                                                <EyeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                                <span className="text-xs sm:text-sm font-medium">Not Interested</span>
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => {
+                                                setShowMenu(false);
+                                                setShowReportModal(true);
+                                            }}
+                                            className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-left flex items-center gap-2 sm:gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
+                                        >
+                                            <Flag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            <span className="text-xs sm:text-sm font-medium">Report</span>
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Quote Content */}
+                <div className="mt-3">
+                    {/* Quote Text - Open and Breathable */}
+                    <div className="mb-3">
+                        <p className="text-base sm:text-lg md:text-xl leading-relaxed text-gray-900 dark:text-white whitespace-pre-line">
+                            {displayContent}
                         </p>
+                        
+                        {/* Read More/Less Button for Long Quotes */}
+                        {isLongQuote && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsExpanded(!isExpanded);
+                                }}
+                                className="mt-2 text-sm font-bold text-[#5D41E6] dark:text-purple-400 hover:text-[#4a31c9] dark:hover:text-purple-300 transition-colors inline-flex items-center gap-1"
+                            >
+                                {isExpanded ? 'Show less' : 'Read more'}
+                                <svg className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Author & Source - Minimal Design */}
+                    {(quote.author || quote.source) && (
+                        <div className="mb-3 pl-3 sm:pl-4 border-l-[3px] border-[#5D41E6] dark:border-purple-500">
+                            {quote.author && (
+                                <p className="text-sm sm:text-base font-semibold text-[#5D41E6] dark:text-purple-400 leading-tight">
+                                    — {quote.author}
+                                </p>
+                            )}
+                            {quote.source && (
+                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500 mt-1">
+                                    {quote.source}
+                                </p>
+                            )}
+                        </div>
                     )}
-                    {quote.source && (
-                        <p className="text-xs mt-1 opacity-60" style={{ color: colorScheme.text }}>
-                            {quote.source}
-                        </p>
+
+                    {/* Categories - Clean Pills */}
+                    {quote.categories && quote.categories.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                            {quote.categories.slice(0, 3).map((category) => (
+                                <span
+                                    key={category.id}
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-900/20 text-[#5D41E6] dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <span className="text-sm">{category.icon}</span>
+                                    <span>{category.name}</span>
+                                </span>
+                            ))}
+                        </div>
                     )}
                 </div>
 
-                {/* Categories */}
-                {quote.categories && quote.categories.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        {quote.categories.slice(0, 3).map((category) => (
-                            <span
-                                key={category.id}
-                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium"
-                                style={{ 
-                                    backgroundColor: `${colorScheme.accent}15`,
-                                    color: colorScheme.accent 
-                                }}
-                            >
-                                <span>{category.icon}</span>
-                                <span>{category.name}</span>
-                            </span>
-                        ))}
-                    </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: colorScheme.border }}>
-                    <div className="flex items-center gap-6">
+                {/* Actions Bar - Clean and Open */}
+                <div className="mt-4 pt-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-700/50">
+                    {/* Left Actions */}
+                    <div className="flex items-center gap-6 sm:gap-8">
                         {/* Like */}
                         <button
                             onClick={handleLike}
-                            className="flex items-center gap-2 group"
+                            className="flex items-center gap-1.5 group transition-transform active:scale-95"
                         >
                             <Heart
-                                className={`w-5 h-5 transition-all ${
-                                    isLiked
-                                        ? 'fill-red-500 text-red-500'
-                                        : 'hover:text-red-500 group-hover:scale-110'
-                                }`}
-                                style={{ color: isLiked ? '#EF4444' : colorScheme.text + '99' }}
+                                className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-200 ${isLiked
+                                    ? 'fill-red-500 text-red-500'
+                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-red-500 group-hover:scale-105'
+                                    }`}
                             />
-                            <span className="text-sm font-medium" style={{ color: colorScheme.text }}>{likesCount}</span>
+                            {likesCount > 0 && (
+                                <span className={`text-sm sm:text-base font-medium tabular-nums ${isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500'}`}>
+                                    {likesCount}
+                                </span>
+                            )}
                         </button>
 
-                        {/* Save */}
+                        {/* Save/Bookmark */}
                         <button
                             onClick={handleSave}
-                            className="flex items-center gap-2 group"
+                            className="flex items-center gap-1.5 group transition-transform active:scale-95"
                         >
                             <Bookmark
-                                className={`w-5 h-5 transition-all ${
-                                    isSaved
-                                        ? 'fill-current'
-                                        : 'group-hover:scale-110'
-                                }`}
-                                style={{ color: isSaved ? colorScheme.accent : colorScheme.text + '99' }}
+                                className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-200 ${isSaved
+                                    ? 'fill-[#5D41E6] text-[#5D41E6]'
+                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6] group-hover:scale-105'
+                                    }`}
                             />
-                            <span className="text-sm font-medium" style={{ color: colorScheme.text }}>{savesCount}</span>
+                            {savesCount > 0 && (
+                                <span className={`text-sm sm:text-base font-medium tabular-nums ${isSaved ? 'text-[#5D41E6]' : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'}`}>
+                                    {savesCount}
+                                </span>
+                            )}
                         </button>
 
                         {/* Share */}
                         <button
                             onClick={handleShare}
-                            className="flex items-center gap-2 group"
+                            className="flex items-center gap-1.5 group transition-transform active:scale-95"
                         >
-                            <Share2 
-                                className="w-5 h-5 group-hover:scale-110 transition-all" 
-                                style={{ color: colorScheme.text + '99' }}
-                            />
-                            <span className="text-sm font-medium" style={{ color: colorScheme.text }}>{quote.shares_count || 0}</span>
+                            <Share2 className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 group-hover:scale-105 transition-all duration-200" />
+                            {quote.shares_count > 0 && (
+                                <span className="text-sm sm:text-base font-medium tabular-nums text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200">
+                                    {quote.shares_count}
+                                </span>
+                            )}
                         </button>
+
+                        {/* Collection (if available) */}
+                        {auth?.user && collections && collections.length > 0 && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowCollectionModal(true);
+                                }}
+                                className="flex items-center gap-1.5 group transition-transform active:scale-90"
+                                title="Add to Collection"
+                            >
+                                <Folder
+                                    className={`w-5 h-5 sm:w-6 sm:h-6 transition-all ${quote.collection_ids && quote.collection_ids.length > 0
+                                        ? 'fill-[#5D41E6] text-[#5D41E6]'
+                                        : 'text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6]'
+                                        }`}
+                                />
+                            </button>
+                        )}
                     </div>
 
-                    {/* Views */}
-                    <div className="flex items-center gap-2 opacity-60">
-                        <Eye className="w-5 h-5" style={{ color: colorScheme.text }} />
-                        <span className="text-sm font-medium" style={{ color: colorScheme.text }}>{quote.views_count || 0}</span>
-                    </div>
+                    {/* Right: Views */}
+                    {quote.views_count > 0 && (
+                        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                            <Eye className="w-4 h-4 sm:w-5 sm:h-5 opacity-70" />
+                            <span className="text-xs sm:text-sm font-medium tabular-nums">{quote.views_count}</span>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Quote Detail Modal */}
+            {/* Modals */}
             <QuoteDetailModal
                 quote={quote}
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
+            />
+
+            <DeleteConfirmationModal
+                show={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={confirmDelete}
+                processing={isDeleting}
+            />
+
+            <ReportModal
+                show={showReportModal}
+                onClose={() => setShowReportModal(false)}
+                quoteId={quote.id}
+                onSubmit={handleReport}
+            />
+
+            <AddToCollectionModal
+                show={showCollectionModal}
+                onClose={() => setShowCollectionModal(false)}
+                quote={quote}
+                collections={collections}
+            />
+
+            <ShareModal
+                show={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                quote={quote}
+                colorScheme={colorSchemes[quote.id % colorSchemes.length]}
+                onShare={trackShare}
+            />
+
+            {/* Toast Notification */}
+            <Toast
+                show={showToast}
+                onClose={() => setShowToast(false)}
+                message={toastMessage}
+                type={toastType}
+            />
+
+            {/* Auth Prompt Modal */}
+            <AuthPromptModal
+                show={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                action={authAction}
             />
         </div>
     );

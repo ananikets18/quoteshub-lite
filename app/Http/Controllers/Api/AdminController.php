@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -63,21 +64,6 @@ class AdminController extends Controller
         return response()->json([
             'message' => 'Quote rejected successfully',
             'quote' => $quote,
-        ]);
-    }
-
-    /**
-     * Toggle featured status
-     */
-    public function toggleFeatured($id)
-    {
-        $quote = Quote::findOrFail($id);
-        $quote->update(['is_featured' => !$quote->is_featured]);
-
-        return response()->json([
-            'message' => 'Featured status updated',
-            'quote' => $quote,
-            'is_featured' => $quote->is_featured,
         ]);
     }
 

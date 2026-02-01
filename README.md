@@ -1,259 +1,87 @@
-# 📝 QuotesHub
+# QuotesHub
 
-A modern quote-sharing platform built with Laravel and React, where users can create, share, and discover inspiring quotes.
+A platform to discover and share inspiring quotes. Join a community of thinkers and dreamers—save quotes, create collections, follow others, and get your daily dose of wisdom.
 
-## 🚀 Features
+## Features
 
-- **User Authentication** - Secure registration and login system
-- **Quote Management** - Create, edit, and delete your quotes
-- **Social Features** - Like and save favorite quotes
-- **Feed System** - Discover quotes from the community
-- **Creator Studio** - Dedicated space for content creators
-- **Responsive Design** - Beautiful UI that works on all devices
-- **RESTful API** - Well-documented API endpoints
+- **Discover** – Browse quotes by topic, author, or feed
+- **Share & save** – Post quotes, like, save, and organize into collections
+- **Connect** – Follow users, see activity, and get personalized recommendations
+- **Achievements** – Streaks, badges, and gamification
+- **Notifications** – In-app and optional email alerts
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-### Backend
-- **Laravel 11.x** - PHP framework
-- **PostgreSQL** - Database
-- **Laravel Sanctum** - API authentication
+- **Backend:** Laravel 12, PHP 8.2+
+- **Frontend:** React 18, Inertia.js, Tailwind CSS, Vite
+- **Auth:** Laravel Breeze, Sanctum (API), optional Google OAuth
+- **Real-time:** Pusher (optional)
 
-### Frontend
-- **React 18** - UI library
-- **Inertia.js** - Modern monolith approach
-- **TailwindCSS** - Utility-first CSS framework
-- **Vite** - Fast build tool
+## Requirements
 
-## 📋 Prerequisites
+- PHP 8.2+
+- Composer
+- Node.js 18+
+- Database (SQLite for local, PostgreSQL/MySQL for production)
+- Optional: Redis (e.g. Upstash) for minimal caching
 
-Before you begin, ensure you have the following installed:
-
-- **PHP** >= 8.2
-- **Composer** >= 2.0
-- **Node.js** >= 18.x
-- **npm** or **yarn**
-- **PostgreSQL** >= 14.x
-- **Git**
-
-## 🔧 Installation & Setup
-
-### 1. Clone the Repository
+## Setup
 
 ```bash
-git clone https://github.com/ananikets18/Quoteshub.git
-cd Quoteshub
-```
-
-### 2. Install PHP Dependencies
-
-```bash
+# Install dependencies
 composer install
-```
-
-### 3. Install Node Dependencies
-
-```bash
 npm install
-```
 
-### 4. Environment Configuration
-
-Copy the example environment file and configure it:
-
-```bash
+# Environment
 cp .env.example .env
-```
-
-Update the following variables in `.env`:
-
-```env
-APP_NAME=QuotesHub
-APP_ENV=local
-APP_KEY=
-APP_DEBUG=true
-APP_URL=http://localhost:8000
-
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=quoteshub
-DB_USERNAME=your_db_username
-DB_PASSWORD=your_db_password
-
-SESSION_DRIVER=database
-```
-
-### 5. Generate Application Key
-
-```bash
 php artisan key:generate
-```
 
-### 6. Database Setup
+# Configure .env (DB, mail, optional Redis/Pusher)
+# Then migrate
+php artisan migrate
 
-Create a PostgreSQL database:
-
-```sql
-CREATE DATABASE quoteshub;
-```
-
-Run migrations and seeders:
-
-```bash
-php artisan migrate --seed
-```
-
-### 7. Build Frontend Assets
-
-For development:
-```bash
-npm run dev
-```
-
-For production:
-```bash
+# Build assets
 npm run build
 ```
 
-### 8. Start the Development Server
+## Running locally
 
-In a separate terminal, start the Laravel server:
+```bash
+# Single command: server + queue + Vite
+composer run dev
+```
+
+Or separately:
 
 ```bash
 php artisan serve
+php artisan queue:listen
+npm run dev
 ```
 
-Your application should now be running at `http://localhost:8000`
+## Environment
 
-## 🌿 Git Branching Strategy
+- `APP_NAME=QuotesHub` – Used in titles and meta
+- `VITE_APP_NAME=QuotesHub` – Used in browser tab titles (optional; defaults to QuotesHub)
+- See `.env.example` for database, mail, Redis, and Pusher options.
 
-This project follows a structured branching workflow:
+## Documentation
 
-- **`main`** - Production-ready code (protected)
-- **`test`** - Staging/QA environment
-- **`dev`** - Active development branch
-- **`feature/*`** - Feature branches (created from `dev`)
-- **`bugfix/*`** - Bug fix branches (created from `dev`)
-- **`hotfix/*`** - Critical fixes (created from `main`)
+Comprehensive documentation is available in the [`/docs`](./docs/) folder:
 
-### Workflow
+- **[Deployment Guide](./docs/DEPLOYMENT_CHECKLIST.md)** - Complete production deployment checklist
+- **[Feature Documentation](./docs/README.md)** - All system features and implementation details
+- **[Security Guide](./docs/SECURITY_TEST_CHECKLIST.md)** - Security testing and validation
+- **[Admin Guide](./docs/CONTENT_MODERATION_SYSTEM.md)** - Admin panel and moderation tools
 
-1. Create feature branch from `dev`:
-   ```bash
-   git checkout dev
-   git pull origin dev
-   git checkout -b feature/your-feature-name
-   ```
+## Admin Access
 
-2. Make changes and commit:
-   ```bash
-   git add .
-   git commit -m "feat: your feature description"
-   ```
+Two admin accounts are pre-configured:
+- **Aniket Shinde**: `ananiket.pshinde18@gmail.com` / `Aniket@123`
+- **Adnois Wins**: `adnois.wins@gmail.com` / `Adonis@123`
 
-3. Push and create Pull Request to `dev`:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+Access the admin panel at `/admin` after logging in.
 
-4. After review, merge to `dev` → `test` → `main`
+## License
 
-## 📚 API Documentation
-
-### Authentication Endpoints
-
-- `POST /api/register` - Register new user
-- `POST /api/login` - Login user
-- `POST /api/logout` - Logout user
-
-### Quote Endpoints
-
-- `GET /api/quotes` - Get all quotes
-- `POST /api/quotes` - Create new quote
-- `GET /api/quotes/{id}` - Get specific quote
-- `PUT /api/quotes/{id}` - Update quote
-- `DELETE /api/quotes/{id}` - Delete quote
-
-### Interaction Endpoints
-
-- `POST /api/quotes/{id}/like` - Like/unlike a quote
-- `POST /api/quotes/{id}/save` - Save/unsave a quote
-- `GET /api/saved-quotes` - Get user's saved quotes
-
-## 🧪 Testing
-
-Run the test suite:
-
-```bash
-php artisan test
-```
-
-Run specific test file:
-
-```bash
-php artisan test --filter=QuoteTest
-```
-
-## 📦 Deployment
-
-### Production Build
-
-1. Set environment to production:
-   ```env
-   APP_ENV=production
-   APP_DEBUG=false
-   ```
-
-2. Optimize Laravel:
-   ```bash
-   php artisan config:cache
-   php artisan route:cache
-   php artisan view:cache
-   ```
-
-3. Build frontend assets:
-   ```bash
-   npm run build
-   ```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'feat: Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Commit Convention
-
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `docs:` - Documentation changes
-- `style:` - Code style changes (formatting, etc.)
-- `refactor:` - Code refactoring
-- `test:` - Adding or updating tests
-- `chore:` - Maintenance tasks
-
-## 📝 License
-
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-## 👨‍💻 Author
-
-**Aniket Sharma**
-- GitHub: [@ananikets18](https://github.com/ananikets18)
-
-## 🙏 Acknowledgments
-
-- Built with [Laravel](https://laravel.com)
-- UI powered by [React](https://react.dev) and [TailwindCSS](https://tailwindcss.com)
-- Monolith magic by [Inertia.js](https://inertiajs.com)
-
----
-
-**Happy Coding! 🚀**
+MIT.

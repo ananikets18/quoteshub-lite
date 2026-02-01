@@ -2,7 +2,8 @@ import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
+import { useForm } from '@inertiajs/react';
 
 export default function ForgotPassword({ status }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -17,7 +18,7 @@ export default function ForgotPassword({ status }) {
 
     return (
         <GuestLayout>
-            <Head title="Forgot Password" />
+            <SeoHead title="Forgot Password" description="Request a password reset link for your QuotesHub account." />
 
             <div className="mb-4 text-sm text-gray-600">
                 Forgot your password? No problem. Just let us know your email
@@ -37,6 +38,7 @@ export default function ForgotPassword({ status }) {
                     type="email"
                     name="email"
                     value={data.email}
+                    placeholder="you@example.com"
                     className="mt-1 block w-full"
                     isFocused={true}
                     onChange={(e) => setData('email', e.target.value)}

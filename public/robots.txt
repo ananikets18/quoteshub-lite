@@ -1,2 +1,21 @@
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /notifications
+Disallow: /settings
+Disallow: /saved
+Disallow: /profile/
+Disallow: /collections
+Disallow: /following-feed
+Disallow: /quotes/create
+Disallow: /quotes/*/edit
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /confirm-password
+Disallow: /email/verification-notification
+Disallow: /password
+Disallow: /logout
+Disallow: /api/

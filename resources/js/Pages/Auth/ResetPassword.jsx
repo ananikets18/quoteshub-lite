@@ -3,7 +3,8 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import SeoHead from '@/Components/SeoHead';
+import { useForm } from '@inertiajs/react';
 
 export default function ResetPassword({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -23,7 +24,7 @@ export default function ResetPassword({ token, email }) {
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <SeoHead title="Reset Password" description="Set a new password for your QuotesHub account." />
 
             <form onSubmit={submit}>
                 <div>
@@ -34,6 +35,7 @@ export default function ResetPassword({ token, email }) {
                         type="email"
                         name="email"
                         value={data.email}
+                        placeholder="you@example.com"
                         className="mt-1 block w-full"
                         autoComplete="username"
                         onChange={(e) => setData('email', e.target.value)}
@@ -50,6 +52,7 @@ export default function ResetPassword({ token, email }) {
                         type="password"
                         name="password"
                         value={data.password}
+                        placeholder="Create a strong password"
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                         isFocused={true}
@@ -70,6 +73,7 @@ export default function ResetPassword({ token, email }) {
                         id="password_confirmation"
                         name="password_confirmation"
                         value={data.password_confirmation}
+                        placeholder="Re-enter your password"
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                         onChange={(e) =>

@@ -1,8 +1,9 @@
 *.log
 .DS_Store
 .env
-.env.backup
-.env.production
+.env.*
+!.env.example
+!.env.bot.example
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -22,3 +23,31 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+npm-debug.log
+yarn-error.log
+
+# Laravel cache and compiled files
+/bootstrap/cache/*
+!bootstrap/cache/.gitkeep
+/storage/framework/cache/data/*
+!storage/framework/cache/data/.gitkeep
+/storage/framework/sessions/*
+!storage/framework/sessions/.gitkeep
+/storage/framework/views/*
+!storage/framework/views/.gitkeep
+/storage/logs/*
+!storage/logs/.gitkeep
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+.project
+.settings
+.buildpath
+
+# Development/testing scripts
+bot_status.php
+clear_bot_quotes.php
+test_bot_deploy.sh
+/storage/app/bot_import_progress.json

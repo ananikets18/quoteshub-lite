@@ -18,7 +18,7 @@ class CategorySeeder extends Seeder
                 'slug' => 'motivation',
                 'description' => 'Quotes to inspire and motivate you',
                 'icon' => '🔥',
-                'color' => '#f59e0b',
+                'color' => 'orange',
                 'order' => 1,
             ],
             [
@@ -26,7 +26,7 @@ class CategorySeeder extends Seeder
                 'slug' => 'love',
                 'description' => 'Beautiful quotes about love and relationships',
                 'icon' => '❤️',
-                'color' => '#ec4899',
+                'color' => 'pink',
                 'order' => 2,
             ],
             [
@@ -34,7 +34,7 @@ class CategorySeeder extends Seeder
                 'slug' => 'success',
                 'description' => 'Quotes about achieving success',
                 'icon' => '🏆',
-                'color' => '#10b981',
+                'color' => 'green',
                 'order' => 3,
             ],
             [
@@ -42,7 +42,7 @@ class CategorySeeder extends Seeder
                 'slug' => 'life',
                 'description' => 'Wisdom about life and living',
                 'icon' => '🌟',
-                'color' => '#6366f1',
+                'color' => 'indigo',
                 'order' => 4,
             ],
             [
@@ -50,7 +50,7 @@ class CategorySeeder extends Seeder
                 'slug' => 'happiness',
                 'description' => 'Quotes to bring joy and happiness',
                 'icon' => '😊',
-                'color' => '#fbbf24',
+                'color' => 'yellow',
                 'order' => 5,
             ],
             [
@@ -58,7 +58,7 @@ class CategorySeeder extends Seeder
                 'slug' => 'wisdom',
                 'description' => 'Timeless wisdom and knowledge',
                 'icon' => '🦉',
-                'color' => '#8b5cf6',
+                'color' => 'purple',
                 'order' => 6,
             ],
             [
@@ -66,7 +66,7 @@ class CategorySeeder extends Seeder
                 'slug' => 'friendship',
                 'description' => 'Quotes celebrating friendship',
                 'icon' => '🤝',
-                'color' => '#06b6d4',
+                'color' => 'blue',
                 'order' => 7,
             ],
             [
@@ -74,7 +74,7 @@ class CategorySeeder extends Seeder
                 'slug' => 'courage',
                 'description' => 'Quotes about bravery and courage',
                 'icon' => '💪',
-                'color' => '#ef4444',
+                'color' => 'red',
                 'order' => 8,
             ],
             [
@@ -82,7 +82,7 @@ class CategorySeeder extends Seeder
                 'slug' => 'dreams',
                 'description' => 'Quotes about following your dreams',
                 'icon' => '✨',
-                'color' => '#a855f7',
+                'color' => 'purple',
                 'order' => 9,
             ],
             [
@@ -90,13 +90,16 @@ class CategorySeeder extends Seeder
                 'slug' => 'leadership',
                 'description' => 'Quotes for leaders and visionaries',
                 'icon' => '👑',
-                'color' => '#f97316',
+                'color' => 'orange',
                 'order' => 10,
             ],
         ];
 
         foreach ($categories as $category) {
-            Category::create($category);
+            Category::updateOrCreate(
+                ['slug' => $category['slug']],
+                $category
+            );
         }
     }
 }

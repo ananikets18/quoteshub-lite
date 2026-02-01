@@ -1,113 +1,198 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { useForm, usePage, Link } from '@inertiajs/react';
+import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
 
-export default function UpdateProfileInformation({
-    mustVerifyEmail,
-    status,
-    className = '',
-}) {
+export default function UpdateProfileInformationForm({ mustVerifyEmail, status }) {
     const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
-            email: user.email,
-        });
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+        name: user.name || '',
+        username: user.username || '',
+        email: user.email || '',
+        bio: user.bio || '',
+        website: user.website || '',
+        location: user.location || '',
+    });
 
     const submit = (e) => {
         e.preventDefault();
-
         patch(route('profile.update'));
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Profile Information
-                </h2>
+        <form onSubmit={submit} className="space-y-4">
+            {/* Name */}
+            <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Name *
+                </label>
+                <input
+                    id="name"
+                    type="text"
+                    value={data.name}
+                    onChange={(e) => setData('name', e.target.value)}
+                    required
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.name && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.name}
+                    </p>
+                )}
+            </div>
 
-                <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
-                </p>
-            </header>
+            {/* Username */}
+            <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Username
+                </label>
+                <input
+                    id="username"
+                    type="text"
+                    value={data.username}
+                    onChange={(e) => setData('username', e.target.value)}
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.username && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.username}
+                    </p>
+                )}
+            </div>
 
-            <form onSubmit={submit} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
+            {/* Email */}
+            <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email *
+                </label>
+                <input
+                    id="email"
+                    type="email"
+                    value={data.email}
+                    onChange={(e) => setData('email', e.target.value)}
+                    required
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.email && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.email}
+                    </p>
+                )}
+            </div>
 
-                    <TextInput
-                        id="name"
-                        className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        isFocused
-                        autoComplete="name"
-                    />
-
-                    <InputError className="mt-2" message={errors.name} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                        autoComplete="username"
-                    />
-
-                    <InputError className="mt-2" message={errors.email} />
-                </div>
-
-                {mustVerifyEmail && user.email_verified_at === null && (
-                    <div>
-                        <p className="mt-2 text-sm text-gray-800">
-                            Your email address is unverified.
+            {/* Email Verification Notice */}
+            {mustVerifyEmail && user.email_verified_at === null && (
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <div className="flex items-start gap-3">
+                        <Mail className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                            <p className="text-sm text-amber-800 dark:text-amber-200 mb-2">
+                                Your email address is unverified.
+                            </p>
                             <Link
                                 href={route('verification.send')}
                                 method="post"
                                 as="button"
-                                className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                className="text-sm text-amber-700 dark:text-amber-300 underline hover:text-amber-900 dark:hover:text-amber-100 transition-colors"
                             >
                                 Click here to re-send the verification email.
                             </Link>
-                        </p>
-
-                        {status === 'verification-link-sent' && (
-                            <div className="mt-2 text-sm font-medium text-green-600">
-                                A new verification link has been sent to your
-                                email address.
-                            </div>
-                        )}
+                            {status === 'verification-link-sent' && (
+                                <p className="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                                    <CheckCircle className="w-4 h-4" />
+                                    A new verification link has been sent!
+                                </p>
+                            )}
+                        </div>
                     </div>
-                )}
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600">
-                            Saved.
-                        </p>
-                    </Transition>
                 </div>
-            </form>
-        </section>
+            )}
+
+            {/* Bio */}
+            <div>
+                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Bio
+                </label>
+                <textarea
+                    id="bio"
+                    value={data.bio}
+                    onChange={(e) => setData('bio', e.target.value)}
+                    rows="3"
+                    maxLength="160"
+                    placeholder="Tell us about yourself..."
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors resize-none"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-right">
+                    {data.bio.length}/160
+                </p>
+                {errors.bio && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.bio}
+                    </p>
+                )}
+            </div>
+
+            {/* Website */}
+            <div>
+                <label htmlFor="website" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Website
+                </label>
+                <input
+                    id="website"
+                    type="url"
+                    value={data.website}
+                    onChange={(e) => setData('website', e.target.value)}
+                    placeholder="https://example.com"
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.website && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.website}
+                    </p>
+                )}
+            </div>
+
+            {/* Location */}
+            <div>
+                <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Location
+                </label>
+                <input
+                    id="location"
+                    type="text"
+                    value={data.location}
+                    onChange={(e) => setData('location', e.target.value)}
+                    placeholder="City, Country"
+                    className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
+                />
+                {errors.location && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.location}
+                    </p>
+                )}
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex items-center gap-4 pt-4">
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                    {processing ? 'Saving...' : 'Save Changes'}
+                </button>
+                {recentlySuccessful && (
+                    <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1 animate-in fade-in duration-200">
+                        <CheckCircle className="w-4 h-4" />
+                        Saved successfully!
+                    </span>
+                )}
+            </div>
+        </form>
     );
 }
