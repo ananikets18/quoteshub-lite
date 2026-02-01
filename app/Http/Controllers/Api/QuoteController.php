@@ -212,10 +212,11 @@ class QuoteController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        $ownerId = $quote->user_id;
         $quote->delete();
 
-        // Decrement user's quote count
-        Auth::user()->decrement('quotes_count');
+        // Decrement the quote owner's count (not the deleter's if moderator)
+        User::where('id', $ownerId)->decrement('quotes_count');
 
         return response()->json([
             'message' => 'Quote deleted successfully',

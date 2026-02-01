@@ -25,8 +25,7 @@ class FollowController extends Controller
 
         if (!$currentUser->following()->where('following_id', $userToFollow->id)->exists()) {
             $currentUser->following()->attach($userToFollow->id);
-            $currentUser->increment('following_count');
-            $userToFollow->increment('followers_count');
+            // Note: Counters are automatically updated by Follow model observers
             
             // Trigger notification
             app(NotificationService::class)->notifyNewFollower($currentUser, $userToFollow);
@@ -45,8 +44,7 @@ class FollowController extends Controller
 
         if ($currentUser->following()->where('following_id', $userToUnfollow->id)->exists()) {
             $currentUser->following()->detach($userToUnfollow->id);
-            $currentUser->decrement('following_count');
-            $userToUnfollow->decrement('followers_count');
+            // Note: Counters are automatically updated by Follow model observers
         }
 
         return back();
@@ -129,6 +127,7 @@ class FollowController extends Controller
         }
 
         $quotes = \App\Models\Quote::whereIn('user_id', $followingIds)
+            ->approved()  // Only show approved quotes
             ->with(['user', 'categories', 'tags'])
             ->withCount(['likes', 'saves'])
             ->latest()

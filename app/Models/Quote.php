@@ -140,4 +140,25 @@ class Quote extends Model
             ->orderBy('likes_count', 'desc')
             ->orderBy('views_count', 'desc');
     }
+
+    /**
+     * Boot the model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Decrement tag usage counts when quote is deleted
+        static::deleting(function ($quote) {
+            // Decrement usage count for all tags
+            $quote->tags()->each(function ($tag) {
+                $tag->decrement('usage_count');
+            });
+
+            // Decrement user's quote count
+            if ($quote->user) {
+                $quote->user->decrement('quotes_count');
+            }
+        });
+    }
 }

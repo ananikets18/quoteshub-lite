@@ -84,18 +84,22 @@ class QuoteController extends Controller
             $warnings[] = 'Note: Your quote contains URLs. It may be reviewed by moderators.';
         }
 
-        $quote = Quote::create([
-            'user_id' => $user->id,
-            'content' => $validated['content'],
-            'author' => $validated['author'],
-            'source' => $validated['source'] ?? null,
-            'status' => 'approved', // MVP: Auto-approve all quotes. Moderation via report system.
-        ]);
+        $quote = \DB::transaction(function () use ($validated, $user) {
+            $quote = Quote::create([
+                'user_id' => $user->id,
+                'content' => $validated['content'],
+                'author' => $validated['author'],
+                'source' => $validated['source'] ?? null,
+                'status' => 'approved', // MVP: Auto-approve all quotes. Moderation via report system.
+            ]);
 
-        // Attach categories
-        if (!empty($validated['category_ids'])) {
-            $quote->categories()->attach($validated['category_ids']);
-        }
+            // Attach categories
+            if (!empty($validated['category_ids'])) {
+                $quote->categories()->attach($validated['category_ids']);
+            }
+            
+            return $quote;
+        });
 
         $successMessage = 'Quote created successfully!';
         if (!empty($warnings)) {
@@ -129,10 +133,7 @@ class QuoteController extends Controller
      */
     public function edit(Quote $quote)
     {
-        // Ensure the user owns the quote
-        if ($quote->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorize('update', $quote);
 
         $categories = Category::active()->ordered()->get();
 
@@ -147,10 +148,7 @@ class QuoteController extends Controller
      */
     public function update(Request $request, Quote $quote)
     {
-        // Ensure the user owns the quote
-        if ($quote->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorize('update', $quote);
 
         $validated = $request->validate([
             'content' => 'required|string|min:10|max:500',
@@ -187,19 +185,21 @@ class QuoteController extends Controller
             $warnings[] = 'Note: Your quote contains URLs. It may be reviewed by moderators.';
         }
 
-        $quote->update([
-            'content' => $validated['content'],
-            'author' => $validated['author'],
-            'source' => $validated['source'] ?? null,
-            'background_gradient' => $validated['background_gradient'],
-        ]);
+        \DB::transaction(function () use ($quote, $validated) {
+            $quote->update([
+                'content' => $validated['content'],
+                'author' => $validated['author'],
+                'source' => $validated['source'] ?? null,
+                'background_gradient' => $validated['background_gradient'],
+            ]);
 
-        // Sync categories
-        if (isset($validated['category_ids'])) {
-            $quote->categories()->sync($validated['category_ids']);
-        } else {
-            $quote->categories()->detach();
-        }
+            // Sync categories
+            if (isset($validated['category_ids'])) {
+                $quote->categories()->sync($validated['category_ids']);
+            } else {
+                $quote->categories()->detach();
+            }
+        });
 
         $successMessage = 'Quote updated successfully!';
         if (!empty($warnings)) {
@@ -214,10 +214,7 @@ class QuoteController extends Controller
      */
     public function destroy(Quote $quote)
     {
-        // Ensure the user owns the quote
-        if ($quote->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorize('delete', $quote);
 
         $quote->delete();
 

@@ -60,14 +60,23 @@ class CollectionController extends Controller
 
         // Add user interaction flags if authenticated
         if ($request->user()) {
-            $quotes->getCollection()->transform(function ($quote) use ($request) {
+            $userId = $request->user()->id;
+            
+            // Get all collection IDs for this user's quotes in one query
+            $quoteIds = $quotes->pluck('id');
+            $quoteCollections = \DB::table('collection_quote')
+                ->join('collections', 'collection_quote.collection_id', '=', 'collections.id')
+                ->where('collections.user_id', $userId)
+                ->whereIn('collection_quote.quote_id', $quoteIds)
+                ->select('collection_quote.quote_id', 'collections.id as collection_id')
+                ->get()
+                ->groupBy('quote_id');
+            
+            $quotes->getCollection()->transform(function ($quote) use ($request, $quoteCollections, $userId) {
                 $quote->is_liked = $quote->isLikedBy($request->user());
                 $quote->is_saved = $quote->isSavedBy($request->user());
-                // Add collection IDs this quote is in
-                $quote->collection_ids = $quote->collections()
-                    ->where('user_id', $request->user()->id)
-                    ->pluck('collections.id')
-                    ->toArray();
+                // Add collection IDs from the pre-loaded data
+                $quote->collection_ids = $quoteCollections->get($quote->id, collect())->pluck('collection_id')->toArray();
                 return $quote;
             });
         }
@@ -152,10 +161,12 @@ class CollectionController extends Controller
 
         $this->authorize('update', $collection);
 
-        if (!$collection->quotes()->where('quote_id', $quote->id)->exists()) {
-            $collection->quotes()->attach($quote->id);
-            $collection->increment('quotes_count');
-        }
+        \DB::transaction(function () use ($collection, $quote) {
+            if (!$collection->quotes()->where('quote_id', $quote->id)->exists()) {
+                $collection->quotes()->attach($quote->id);
+                $collection->increment('quotes_count');
+            }
+        });
 
         return back()->with('success', 'Quote added to collection!');
     }
@@ -171,10 +182,12 @@ class CollectionController extends Controller
 
         $this->authorize('update', $collection);
 
-        if ($collection->quotes()->where('quote_id', $quote->id)->exists()) {
-            $collection->quotes()->detach($quote->id);
-            $collection->decrement('quotes_count');
-        }
+        \DB::transaction(function () use ($collection, $quote) {
+            if ($collection->quotes()->where('quote_id', $quote->id)->exists()) {
+                $collection->quotes()->detach($quote->id);
+                $collection->decrement('quotes_count');
+            }
+        });
 
         return back()->with('success', 'Quote removed from collection!');
     }
@@ -195,17 +208,19 @@ class CollectionController extends Controller
         $this->authorize('update', $fromCollection);
         $this->authorize('update', $toCollection);
 
-        // Remove from source collection
-        if ($fromCollection->quotes()->where('quote_id', $quote->id)->exists()) {
-            $fromCollection->quotes()->detach($quote->id);
-            $fromCollection->decrement('quotes_count');
-        }
+        \DB::transaction(function () use ($fromCollection, $toCollection, $quote) {
+            // Remove from source collection
+            if ($fromCollection->quotes()->where('quote_id', $quote->id)->exists()) {
+                $fromCollection->quotes()->detach($quote->id);
+                $fromCollection->decrement('quotes_count');
+            }
 
-        // Add to destination collection
-        if (!$toCollection->quotes()->where('quote_id', $quote->id)->exists()) {
-            $toCollection->quotes()->attach($quote->id);
-            $toCollection->increment('quotes_count');
-        }
+            // Add to destination collection
+            if (!$toCollection->quotes()->where('quote_id', $quote->id)->exists()) {
+                $toCollection->quotes()->attach($quote->id);
+                $toCollection->increment('quotes_count');
+            }
+        });
 
         return back()->with('success', 'Quote moved successfully!');
     }
