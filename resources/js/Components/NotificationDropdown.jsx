@@ -180,7 +180,7 @@ export default function NotificationDropdown({ show, onClose, buttonRef }) {
                         {notifications.some(n => !n.is_read) && (
                             <button
                                 onClick={markAllAsRead}
-                                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                className="text-sm text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300"
                             >
                                 Mark all read
                             </button>

@@ -121,7 +121,7 @@ export default function UpdatePasswordForm() {
                 <button
                     type="submit"
                     disabled={processing}
-                    className="px-6 py-2.5 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-600 to-cyan-600 disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-lg text-white font-semibold bg-gradient-to-r from-purple-600 to-pink-600 disabled:opacity-50"
                 >
                     {processing ? 'Updating...' : 'Update Password'}
                 </button>

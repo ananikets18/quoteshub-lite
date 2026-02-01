@@ -123,7 +123,7 @@ export default function UsersManagement({ auth, users, filters }) {
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-4xl font-bold text-gray-900 dark:text-white flex items-center">
-                                    <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl mr-4">
+                                    <div className="p-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl mr-4">
                                         <Users className="w-8 h-8 text-white" />
                                     </div>
                                     User Management

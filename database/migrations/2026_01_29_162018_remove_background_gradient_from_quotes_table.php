@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('quotes', function (Blueprint $table) {
-            $table->dropColumn('background_gradient');
+            if (Schema::hasColumn('quotes', 'background_gradient')) {
+                $table->dropColumn('background_gradient');
+            }
         });
     }
 
