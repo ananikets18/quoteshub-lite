@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Link, useForm } from '@inertiajs/react';
+import { Link, useForm, router } from '@inertiajs/react';
 import SeoHead from '@/Components/SeoHead';
 import { Mail, ArrowRight, Loader2, LogOut, CheckCircle2, AlertCircle } from 'lucide-react';
 
@@ -11,6 +11,20 @@ export default function VerifyEmail({ status }) {
     const submit = (e) => {
         e.preventDefault();
         post(route('verification.send'));
+    };
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        
+        router.post(route('logout'), {}, {
+            onError: (errors) => {
+                // If it's a CSRF error (419), reload the page to get a fresh token
+                if (errors && (errors.message === 'CSRF token mismatch.' || errors.status === 419)) {
+                    console.warn('CSRF token expired. Reloading page...');
+                    window.location.reload();
+                }
+            },
+        });
     };
 
     return (
@@ -75,15 +89,13 @@ export default function VerifyEmail({ status }) {
                         </button>
 
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-                            <Link
-                                href={route('logout')}
-                                method="post"
-                                as="button"
+                            <button
+                                onClick={handleLogout}
                                 className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors group"
                             >
                                 <LogOut className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                                 <span>Log Out</span>
-                            </Link>
+                            </button>
 
                             <Link
                                 href="/"

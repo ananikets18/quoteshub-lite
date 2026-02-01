@@ -1,7 +1,7 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
@@ -28,6 +28,22 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+});
+
+// Handle 419 CSRF token mismatch errors globally
+router.on('error', (event) => {
+    // Check if it's a 419 CSRF token mismatch error
+    if (event.detail.errors && event.detail.errors.message === 'CSRF token mismatch.') {
+        // Reload the page to get a fresh CSRF token
+        window.location.reload();
+    }
+    
+    // Also handle by status code
+    if (event.detail.response && event.detail.response.status === 419) {
+        console.warn('CSRF token expired. Reloading page to get fresh token...');
+        // Reload the page to get a fresh CSRF token
+        window.location.reload();
+    }
 });
 
 // Update CSRF token in axios headers before each request

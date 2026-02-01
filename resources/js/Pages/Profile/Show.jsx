@@ -26,6 +26,20 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
         });
     };
 
+    const handleLogout = (e) => {
+        e.preventDefault();
+        
+        router.post(route('logout'), {}, {
+            onError: (errors) => {
+                // If it's a CSRF error (419), reload the page to get a fresh token
+                if (errors && (errors.message === 'CSRF token mismatch.' || errors.status === 419)) {
+                    console.warn('CSRF token expired. Reloading page...');
+                    window.location.reload();
+                }
+            },
+        });
+    };
+
     const avatarUrl = profile.avatar
         ? `/storage/${profile.avatar}`
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=random`;
@@ -87,15 +101,13 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                                         <Edit className="w-4 h-4 mr-2" />
                                         Edit Profile
                                     </Link>
-                                    <Link
-                                        href={route('logout')}
-                                        method="post"
-                                        as="button"
+                                    <button
+                                        onClick={handleLogout}
                                         className="flex-1 sm:flex-none inline-flex items-center justify-center px-4 sm:px-5 py-2.5 bg-white dark:bg-gray-800 border-2 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-semibold rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-700 transition-all shadow-sm hover:shadow-md"
                                     >
                                         <LogOut className="w-4 h-4 mr-2" />
                                         Logout
-                                    </Link>
+                                    </button>
                                 </div>
                             ) : (
                                 <button

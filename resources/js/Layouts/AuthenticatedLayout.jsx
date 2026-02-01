@@ -3,7 +3,7 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import NotificationListener from '@/Components/NotificationListener';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 
@@ -16,6 +16,20 @@ export default function AuthenticatedLayout({ header, children }) {
     // Check if user is admin and currently on admin routes
     const isAdmin = user.is_admin;
     const isAdminRoute = route().current().startsWith('admin.');
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        
+        router.post(route('logout'), {}, {
+            onError: (errors) => {
+                // If it's a CSRF error (419), reload the page to get a fresh token
+                if (errors && (errors.message === 'CSRF token mismatch.' || errors.status === 419)) {
+                    console.warn('CSRF token expired. Reloading page...');
+                    window.location.reload();
+                }
+            },
+        });
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -102,13 +116,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                         >
                                             Profile
                                         </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
-                                            as="button"
+                                        <button
+                                            onClick={handleLogout}
+                                            className="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700 transition duration-150 ease-in-out"
                                         >
                                             Log Out
-                                        </Dropdown.Link>
+                                        </button>
                                     </Dropdown.Content>
                                 </Dropdown>
                             </div>
@@ -214,13 +227,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             <ResponsiveNavLink href={route('profile.edit')}>
                                 Profile
                             </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
+                            <button
+                                onClick={handleLogout}
+                                className="block w-full pl-3 pr-4 py-2 border-l-4 border-transparent text-left text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus:outline-none focus:text-gray-800 dark:focus:text-gray-200 focus:bg-gray-50 dark:focus:bg-gray-700 focus:border-gray-300 dark:focus:border-gray-600 transition duration-150 ease-in-out"
                             >
                                 Log Out
-                            </ResponsiveNavLink>
+                            </button>
                         </div>
                     </div>
                 </div>
