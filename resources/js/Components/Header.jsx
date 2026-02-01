@@ -68,7 +68,7 @@ export default function Header({
                 <div>
                     {showLogo ? (
                         <Link href="/" className="inline-flex items-center gap-2">
-                            <ApplicationLogo className="w-7 h-7 text-[#5D41E6]" />
+                            <ApplicationLogo className="w-7 h-7 text-purple-600 dark:text-purple-400" />
                             <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">QuotesHub</span>
                         </Link>
                     ) : (

@@ -59,7 +59,7 @@ export default function Register({ flash, errors: inertiaErrors }) {
                 <div className="relative z-10 w-full flex flex-col items-center justify-center p-16 text-white text-center">
                     <Link href="/" className="mb-16 flex items-center gap-4 group transition-all hover:scale-105">
                         <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
-                            <ApplicationLogo className="w-12 h-12 text-white" />
+                            <ApplicationLogo variant="gradient" className="w-12 h-12 text-white" />
                         </div>
                         <span className="text-3xl font-black tracking-tighter uppercase"> QuotesHub </span>
                     </Link>
@@ -106,7 +106,7 @@ export default function Register({ flash, errors: inertiaErrors }) {
                     {/* Header */}
                     <div className="mb-10 text-center lg:text-left">
                         <div className="lg:hidden flex justify-center mb-6">
-                            <ApplicationLogo className="w-16 h-16 text-[#5D41E6]" />
+                            <ApplicationLogo variant="gradient" className="w-16 h-16 text-[#5D41E6]" />
                         </div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create Account</h1>
                         <p className="text-gray-500 dark:text-gray-400">
