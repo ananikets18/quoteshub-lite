@@ -132,9 +132,9 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard', [
         'stats' => $stats,
     ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
-Route::middleware(['auth', 'verified', 'noindex'])->group(function () {
+Route::middleware(['auth', 'noindex'])->group(function () {
     // Notifications
     Route::get('/notifications', function () {
         return Inertia::render('Notifications');
