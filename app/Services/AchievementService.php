@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\UserAchievement;
 use App\Models\Quote;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AchievementService
 {
@@ -332,6 +334,12 @@ class AchievementService
     protected function checkPopularityAchievements(User $user, Quote $quote): array
     {
         $awarded = [];
+        
+        // Ensure likes_count is loaded
+        if (!isset($quote->likes_count)) {
+            $quote->loadCount('likes');
+        }
+        
         $likes = $quote->likes_count;
         $milestones = [
             10 => self::POPULAR_QUOTE_10,
@@ -413,39 +421,47 @@ class AchievementService
      */
     protected function awardAchievement(User $user, string $achievementType): array
     {
-        // Check if already awarded
-        $existing = UserAchievement::where('user_id', $user->id)
-            ->where('achievement_type', $achievementType)
-            ->first();
-
-        if ($existing) {
-            return []; // Already has this achievement
-        }
-
         $definition = self::getDefinitions()[$achievementType] ?? null;
         if (!$definition) {
             return [];
         }
 
-        // Create achievement
-        $achievement = UserAchievement::create([
-            'user_id' => $user->id,
-            'achievement_type' => $achievementType,
-            'progress' => $definition['target'],
-            'target' => $definition['target'],
-            'is_completed' => true,
-            'completed_at' => now(),
-        ]);
+        try {
+            // Use firstOrCreate to handle race conditions with unique constraint
+            $achievement = UserAchievement::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'achievement_type' => $achievementType,
+                ],
+                [
+                    'progress' => $definition['target'],
+                    'target' => $definition['target'],
+                    'is_completed' => true,
+                    'completed_at' => now(),
+                ]
+            );
 
-        // Send notification
-        $notificationService = app(NotificationService::class);
-        $notificationService->notifyAchievementUnlocked(
-            $user,
-            $definition['name'],
-            $definition['description']
-        );
+            // If it was just created, send notification
+            if ($achievement->wasRecentlyCreated) {
+                // Send notification
+                $notificationService = app(NotificationService::class);
+                $notificationService->notifyAchievementUnlocked(
+                    $user,
+                    $definition['name'],
+                    $definition['description']
+                );
 
-        return [$achievement];
+                return [$achievement];
+            }
+
+            return []; // Already has this achievement
+        } catch (\Exception $e) {
+            Log::error('Failed to award achievement: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'achievement_type' => $achievementType,
+            ]);
+            return [];
+        }
     }
 
     /**

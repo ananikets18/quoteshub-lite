@@ -22,8 +22,12 @@ class QuoteObserver
         // Check quote creation achievements
         $user = $quote->user;
         if ($user) {
-            $quoteCount = $user->quotes()->count();
-            $this->achievementService->checkAchievements($user, 'quote_created', $quoteCount);
+            try {
+                $quoteCount = $user->quotes()->count();
+                $this->achievementService->checkAchievements($user, 'quote_created', $quoteCount);
+            } catch (\Exception $e) {
+                \Log::error('Failed to check quote creation achievements: ' . $e->getMessage());
+            }
         }
     }
 
@@ -36,7 +40,11 @@ class QuoteObserver
         if ($quote->isDirty('is_featured') && $quote->is_featured) {
             $user = $quote->user;
             if ($user) {
-                $this->achievementService->checkAchievements($user, 'quote_featured');
+                try {
+                    $this->achievementService->checkAchievements($user, 'quote_featured');
+                } catch (\Exception $e) {
+                    \Log::error('Failed to check quote featured achievements: ' . $e->getMessage());
+                }
             }
         }
     }

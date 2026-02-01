@@ -237,13 +237,38 @@ class UserController extends Controller
      */
     public function updateStreak()
     {
-        $user = Auth::user();
-        $user->updateDailyStreak();
+        try {
+            $user = Auth::user();
+            
+            // Check if already updated today
+            $today = now()->toDateString();
+            $lastActive = $user->last_active_at?->toDateString();
+            
+            if ($lastActive === $today) {
+                return response()->json([
+                    'message' => 'Streak already updated today',
+                    'daily_streak' => $user->daily_streak,
+                    'last_active_at' => $user->last_active_at,
+                ], 200);
+            }
+            
+            $user->updateDailyStreak();
 
-        return response()->json([
-            'message' => 'Streak updated',
-            'daily_streak' => $user->daily_streak,
-        ]);
+            return response()->json([
+                'message' => 'Streak updated successfully',
+                'daily_streak' => $user->daily_streak,
+                'last_active_at' => $user->last_active_at,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Streak update failed: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+            ]);
+            
+            return response()->json([
+                'message' => 'Failed to update streak',
+                'error' => 'An error occurred while updating your streak',
+            ], 500);
+        }
     }
 
     /**

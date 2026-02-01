@@ -22,12 +22,16 @@ class FollowObserver
         // Check follower achievements for the followed user
         $followedUser = \App\Models\User::find($follow->following_id);
         if ($followedUser) {
-            $followerCount = $followedUser->followers()->count();
-            $this->achievementService->checkAchievements(
-                $followedUser,
-                'follower_gained',
-                $followerCount
-            );
+            try {
+                $followerCount = $followedUser->followers()->count();
+                $this->achievementService->checkAchievements(
+                    $followedUser,
+                    'follower_gained',
+                    $followerCount
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to check follower achievements: ' . $e->getMessage());
+            }
         }
     }
 }

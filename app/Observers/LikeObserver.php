@@ -22,11 +22,15 @@ class LikeObserver
         // Check popularity achievements for the quote owner
         $quote = $like->quote;
         if ($quote && $quote->user) {
-            $this->achievementService->checkAchievements(
-                $quote->user,
-                'quote_liked',
-                $quote->id
-            );
+            try {
+                $this->achievementService->checkAchievements(
+                    $quote->user,
+                    'quote_liked',
+                    $quote->id
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to check quote popularity achievements: ' . $e->getMessage());
+            }
         }
     }
 }

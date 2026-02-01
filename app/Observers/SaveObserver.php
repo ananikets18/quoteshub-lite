@@ -22,12 +22,16 @@ class SaveObserver
         // Check collection achievements for the user who saved
         $user = $save->user;
         if ($user) {
-            $saveCount = $user->saves()->count();
-            $this->achievementService->checkAchievements(
-                $user,
-                'quote_saved',
-                $saveCount
-            );
+            try {
+                $saveCount = $user->saves()->count();
+                $this->achievementService->checkAchievements(
+                    $user,
+                    'quote_saved',
+                    $saveCount
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to check save achievements: ' . $e->getMessage());
+            }
         }
     }
 }

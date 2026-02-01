@@ -301,26 +301,44 @@ class User extends Authenticatable implements MustVerifyEmail
         $today = now()->toDateString();
         $lastActive = $this->last_active_at?->toDateString();
 
+        // Already updated today, skip
         if ($lastActive === $today) {
-            return; // Already active today
+            return;
         }
 
         $yesterday = now()->subDay()->toDateString();
 
-        if ($lastActive === $yesterday) {
-            // Continue streak
-            $this->increment('daily_streak');
-        } else {
-            // Reset streak
-            $this->daily_streak = 1;
-        }
+        DB::transaction(function () use ($today, $lastActive, $yesterday) {
+            // Lock the row to prevent race conditions
+            $user = User::where('id', $this->id)->lockForUpdate()->first();
 
-        $this->last_active_at = now();
-        $this->save();
+            // Double-check after acquiring lock
+            if ($user->last_active_at?->toDateString() === $today) {
+                return;
+            }
 
-        // Check streak achievements
-        $achievementService = app(\App\Services\AchievementService::class);
-        $achievementService->checkAchievements($this, 'streak_updated', $this->daily_streak);
+            if ($lastActive === $yesterday) {
+                // Continue streak
+                $user->increment('daily_streak');
+            } else {
+                // Reset streak
+                $user->daily_streak = 1;
+            }
+
+            $user->last_active_at = now();
+            $user->save();
+
+            // Refresh current instance
+            $this->refresh();
+
+            // Check streak achievements
+            try {
+                $achievementService = app(\App\Services\AchievementService::class);
+                $achievementService->checkAchievements($this, 'streak_updated', $this->daily_streak);
+            } catch (\Exception $e) {
+                Log::error('Failed to check streak achievements: ' . $e->getMessage());
+            }
+        });
     }
 
     /**
