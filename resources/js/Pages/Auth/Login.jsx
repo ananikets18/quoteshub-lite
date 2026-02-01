@@ -215,34 +215,6 @@ export default function Login({ status, canResetPassword, flash, errors: inertia
                                 </>
                             )}
                         </PrimaryButton>
-
-                        <div className="relative my-8">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-4 py-1 bg-white dark:bg-gray-950 text-gray-500 font-medium">Or continue with</span>
-                            </div>
-                        </div>
-
-                        {/* Social Buttons */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <a
-                                href={route('auth.google')}
-                                className="flex items-center justify-center gap-3 px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-300"
-                            >
-                                <Chrome className="w-5 h-5 text-red-500" />
-                                <span>Google</span>
-                            </a>
-                            <button
-                                type="button"
-                                className="flex items-center justify-center gap-3 px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-gray-700 dark:text-gray-300 opacity-50 cursor-not-allowed"
-                                title="GitHub login coming soon"
-                            >
-                                <Github className="w-5 h-5" />
-                                <span>GitHub</span>
-                            </button>
-                        </div>
                     </form>
 
                     <p className="mt-10 text-center text-xs text-gray-400 dark:text-gray-500">
