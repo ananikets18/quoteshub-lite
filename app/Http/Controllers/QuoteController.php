@@ -140,14 +140,30 @@ class QuoteController extends Controller
      */
     public function edit(Quote $quote)
     {
-        $this->authorize('update', $quote);
+        try {
+            \Log::info('Quote edit attempt', [
+                'quote_id' => $quote->id,
+                'user_id' => auth()->id(),
+                'quote_user_id' => $quote->user_id,
+            ]);
 
-        $categories = Category::active()->ordered()->get();
+            $this->authorize('update', $quote);
 
-        return Inertia::render('EditQuote', [
-            'quote' => $quote->load('categories'),
-            'categories' => $categories,
-        ]);
+            $categories = Category::active()->ordered()->get();
+
+            return Inertia::render('EditQuote', [
+                'quote' => $quote->load('categories'),
+                'categories' => $categories,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Quote edit failed', [
+                'quote_id' => $quote->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            abort(500, 'Failed to load edit form: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -161,7 +177,7 @@ class QuoteController extends Controller
             'content' => 'required|string|min:10|max:500',
             'author' => 'required|string|max:100',
             'source' => 'nullable|string|max:200',
-            'background_gradient' => 'required|string',
+            'background_gradient' => 'nullable|string',
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'exists:categories,id',
         ]);
@@ -197,7 +213,7 @@ class QuoteController extends Controller
                 'content' => $validated['content'],
                 'author' => $validated['author'],
                 'source' => $validated['source'] ?? null,
-                'background_gradient' => $validated['background_gradient'],
+                'background_gradient' => $validated['background_gradient'] ?? $quote->background_gradient,
             ]);
 
             // Sync categories
@@ -221,11 +237,31 @@ class QuoteController extends Controller
      */
     public function destroy(Quote $quote)
     {
-        $this->authorize('delete', $quote);
+        try {
+            \Log::info('Quote deletion attempt', [
+                'quote_id' => $quote->id,
+                'user_id' => auth()->id(),
+                'quote_user_id' => $quote->user_id,
+            ]);
 
-        $quote->delete();
+            $this->authorize('delete', $quote);
 
-        return redirect()->route('home')->with('success', 'Quote deleted successfully!');
+            $quote->delete();
+
+            \Log::info('Quote deleted successfully', ['quote_id' => $quote->id]);
+
+            return redirect()->route('home')->with('success', 'Quote deleted successfully!');
+        } catch (\Exception $e) {
+            \Log::error('Quote deletion failed', [
+                'quote_id' => $quote->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->withErrors([
+                'error' => 'Failed to delete quote: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**

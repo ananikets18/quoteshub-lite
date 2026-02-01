@@ -150,14 +150,26 @@ class Quote extends Model
 
         // Decrement tag usage counts when quote is deleted
         static::deleting(function ($quote) {
-            // Decrement usage count for all tags
-            $quote->tags()->each(function ($tag) {
-                $tag->decrement('usage_count');
-            });
+            try {
+                // Decrement usage count for all tags
+                if ($quote->tags()->exists()) {
+                    $quote->tags()->each(function ($tag) {
+                        if ($tag && \Schema::hasColumn('tags', 'usage_count')) {
+                            $tag->decrement('usage_count');
+                        }
+                    });
+                }
 
-            // Decrement user's quote count
-            if ($quote->user) {
-                $quote->user->decrement('quotes_count');
+                // Decrement user's quote count
+                if ($quote->user && \Schema::hasColumn('users', 'quotes_count')) {
+                    $quote->user->decrement('quotes_count');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error in Quote deleting event', [
+                    'quote_id' => $quote->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't throw - allow deletion to proceed
             }
         });
     }
