@@ -97,10 +97,6 @@ export default function NotificationListener({ user }) {
                 title = '🏆 Achievement Unlocked!';
                 body = data.achievement_name;
                 break;
-            case 'quote_featured':
-                title = '⭐ Quote Featured!';
-                body = 'Your quote has been featured';
-                break;
             default:
                 body = 'You have a new notification';
         }

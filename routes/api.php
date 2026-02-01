@@ -98,7 +98,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/quotes/pending', [AdminController::class, 'pendingQuotes']);
         Route::post('/quotes/{id}/approve', [AdminController::class, 'approveQuote']);
         Route::post('/quotes/{id}/reject', [AdminController::class, 'rejectQuote']);
-        Route::post('/quotes/{id}/toggle-featured', [AdminController::class, 'toggleFeatured']);
         Route::get('/users', [AdminController::class, 'users']);
         Route::put('/users/{id}/role', [AdminController::class, 'updateUserRole']);
         Route::post('/users/{id}/toggle-status', [AdminController::class, 'toggleUserStatus']);

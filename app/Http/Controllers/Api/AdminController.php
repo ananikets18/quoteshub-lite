@@ -68,27 +68,6 @@ class AdminController extends Controller
     }
 
     /**
-     * Toggle featured status
-     */
-    public function toggleFeatured($id)
-    {
-        $quote = Quote::findOrFail($id);
-        $wasFeatured = $quote->is_featured;
-        $quote->update(['is_featured' => !$quote->is_featured]);
-
-        // Send notification if quote was just featured
-        if (!$wasFeatured && $quote->is_featured) {
-            app(NotificationService::class)->notifyQuoteFeatured($quote->user, $quote);
-        }
-
-        return response()->json([
-            'message' => 'Featured status updated',
-            'quote' => $quote,
-            'is_featured' => $quote->is_featured,
-        ]);
-    }
-
-    /**
      * Get all users (admin only)
      */
     public function users(Request $request)

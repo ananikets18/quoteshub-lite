@@ -14,7 +14,7 @@ import { router } from '@inertiajs/react';
  * - S: Go to saved/collections
  * - ?: Show keyboard shortcuts help
  * - Esc: Close modals/dialogs
- * - 1-4: Switch feed filters (For You, Latest, Trending, Featured)
+ * - 1-4: Switch feed filters (For You, Latest, Trending)
  */
 export function useGlobalShortcuts({
     onOpenShortcutsHelp,
@@ -103,16 +103,15 @@ export function useGlobalShortcuts({
                     }
                     break;
 
-                // Feed filter shortcuts (1-4)
+                // Feed filter shortcuts (1-3)
                 case '1':
                 case '2':
                 case '3':
-                case '4':
                     if (!isMod && window.location.pathname === '/' || window.location.pathname === '/feed') {
                         e.preventDefault();
                         const filters = isAuthenticated
-                            ? ['foryou', 'latest', 'trending', 'featured']
-                            : ['latest', 'trending', 'featured'];
+                            ? ['foryou', 'latest', 'trending']
+                            : ['latest', 'trending'];
                         const filterIndex = parseInt(e.key) - 1;
                         if (filters[filterIndex]) {
                             router.visit(`/feed?sort=${filters[filterIndex]}`, {

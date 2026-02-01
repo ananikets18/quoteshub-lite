@@ -89,7 +89,6 @@ class QuoteController extends Controller
             'author' => $validated['author'],
             'source' => $validated['source'] ?? null,
             'status' => 'approved', // MVP: Auto-approve all quotes. Moderation via report system.
-            'is_featured' => false,
         ]);
 
         // Attach categories

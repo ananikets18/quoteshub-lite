@@ -176,7 +176,6 @@ Route::middleware(['auth', 'verified', 'noindex'])->group(function () {
                 'achievement_unlocked' => true,
                 'admin_warning' => true,
                 'quote_removed' => true,
-                'quote_featured' => true,
                 'in_app_notifications' => true,
                 'email_notifications' => false,
                 'push_notifications' => false,

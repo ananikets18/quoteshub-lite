@@ -165,22 +165,6 @@ class NotificationService
     }
 
     /**
-     * Create a quote featured notification
-     */
-    public function notifyQuoteFeatured(User $user, Quote $quote): void
-    {
-        Notification::create([
-            'user_id' => $user->id,
-            'actor_id' => null,
-            'type' => Notification::TYPE_QUOTE_FEATURED,
-            'data' => [
-                'quote_id' => $quote->id,
-                'quote_content' => substr($quote->content, 0, 100),
-            ],
-        ]);
-    }
-
-    /**
      * Delete all notifications for a specific quote (when quote is deleted)
      */
     public function deleteQuoteNotifications(Quote $quote): void
@@ -238,7 +222,6 @@ class NotificationService
             Notification::TYPE_ACHIEVEMENT_UNLOCKED => 'achievement_unlocked',
             Notification::TYPE_ADMIN_WARNING => 'admin_warning',
             Notification::TYPE_QUOTE_REMOVED => 'quote_removed',
-            Notification::TYPE_QUOTE_FEATURED => 'quote_featured',
         ];
 
         $preferenceKey = $typeMap[$data['type']] ?? null;

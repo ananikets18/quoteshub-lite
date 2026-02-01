@@ -34,7 +34,6 @@ class Notification extends Model
     const TYPE_ACHIEVEMENT_UNLOCKED = 'achievement_unlocked';
     const TYPE_ADMIN_WARNING = 'admin_warning';
     const TYPE_QUOTE_REMOVED = 'quote_removed';
-    const TYPE_QUOTE_FEATURED = 'quote_featured';
 
     /**
      * Get the user who receives the notification

@@ -21,7 +21,6 @@ export default function KeyboardShortcutsModal({ show, onClose, isAuthenticated 
                 { keys: ['1'], description: 'For You feed', authRequired: true },
                 { keys: ['2'], description: 'Latest feed' },
                 { keys: ['3'], description: 'Trending feed' },
-                { keys: ['4'], description: 'Featured feed' },
             ],
         },
         {

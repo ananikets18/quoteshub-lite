@@ -15,7 +15,6 @@ export default function NotificationPreferences({ auth, preferences }) {
         achievement_unlocked: preferences?.achievement_unlocked ?? true,
         admin_warning: preferences?.admin_warning ?? true,
         quote_removed: preferences?.quote_removed ?? true,
-        quote_featured: preferences?.quote_featured ?? true,
 
         // Delivery preferences
         in_app_notifications: preferences?.in_app_notifications ?? true,
@@ -82,12 +81,6 @@ export default function NotificationPreferences({ auth, preferences }) {
             label: 'Achievements',
             description: 'When you unlock a new achievement',
             icon: '🏆',
-        },
-        {
-            key: 'quote_featured',
-            label: 'Featured Quotes',
-            description: 'When your quote is featured',
-            icon: '⭐',
         },
         {
             key: 'admin_warning',

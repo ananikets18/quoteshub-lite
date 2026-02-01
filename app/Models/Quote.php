@@ -19,7 +19,6 @@ class Quote extends Model
         'author',
         'source',
         'status',
-        'is_featured',
         'likes_count',
         'saves_count',
         'shares_count',
@@ -27,7 +26,6 @@ class Quote extends Model
     ];
 
     protected $casts = [
-        'is_featured' => 'boolean',
         'likes_count' => 'integer',
         'saves_count' => 'integer',
         'shares_count' => 'integer',
@@ -123,14 +121,6 @@ class Quote extends Model
     public function scopeApproved($query)
     {
         return $query->where('status', 'approved');
-    }
-
-    /**
-     * Scope for featured quotes
-     */
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
     }
 
     /**

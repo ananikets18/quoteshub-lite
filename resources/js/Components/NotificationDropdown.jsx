@@ -150,7 +150,6 @@ export default function NotificationDropdown({ show, onClose, buttonRef }) {
             'achievement_unlocked': 'text-yellow-500',
             'admin_warning': 'text-orange-500',
             'quote_removed': 'text-red-600',
-            'quote_featured': 'text-yellow-400',
         };
         return colorMap[type] || 'text-gray-500';
     };

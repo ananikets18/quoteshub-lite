@@ -26,22 +26,11 @@ class QuoteFactory extends Factory
             'author' => fake()->name(),
             'source' => fake()->optional()->sentence(3),
             'status' => 'approved',
-            'is_featured' => fake()->boolean(20), // 20% chance of being featured
             'likes_count' => fake()->numberBetween(0, 500),
             'saves_count' => fake()->numberBetween(0, 200),
             'shares_count' => fake()->numberBetween(0, 100),
             'views_count' => fake()->numberBetween(0, 1000),
         ];
-    }
-
-    /**
-     * Indicate that the quote is featured.
-     */
-    public function featured(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'is_featured' => true,
-        ]);
     }
 
     /**
