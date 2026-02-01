@@ -9,9 +9,12 @@ use App\Services\ContentModerationService;
 use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class QuoteController extends Controller
 {
+    use AuthorizesRequests;
+    
     protected $moderationService;
 
     public function __construct(ContentModerationService $moderationService)
