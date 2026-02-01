@@ -11,59 +11,59 @@ export default function Dashboard({ auth, stats }) {
                 description="View your personal quote statistics, engagement metrics, and recent activity on QuotesHub."
             />
 
-            <div className="px-4 py-6 pb-20">
+            <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-20 max-w-6xl mx-auto">
                 {/* This Week Highlights */}
                 {stats?.this_week && (stats.this_week.quotes > 0 || stats.this_week.likes > 0 || stats.this_week.followers > 0) && (
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-purple-100 dark:border-gray-700 p-5 mb-6">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                            <h2 className="text-lg font-bold text-gray-900 dark:text-white">This Week's Progress</h2>
+                    <div className="bg-gradient-to-br from-[#5D41E6] to-[#7C3AED] rounded-2xl shadow-xl p-5 sm:p-6 mb-6 sm:mb-8 text-white">
+                        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
+                            <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                            <h2 className="text-lg sm:text-xl font-bold text-white">This Week's Progress</h2>
                         </div>
-                        <div className="grid grid-cols-3 gap-3 divide-x divide-gray-100 dark:divide-gray-700">
+                        <div className="grid grid-cols-3 gap-3 sm:gap-4 divide-x divide-white/20">
                             <div className="text-center px-2">
-                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.this_week.quotes}</div>
-                                <div className="text-xs text-gray-500 font-medium uppercase mt-1">Quotes</div>
+                                <div className="text-2xl sm:text-3xl font-bold text-white">{stats.this_week.quotes}</div>
+                                <div className="text-xs sm:text-sm text-white/80 font-semibold uppercase mt-1">Quotes</div>
                             </div>
                             <div className="text-center px-2">
-                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.this_week.likes}</div>
-                                <div className="text-xs text-gray-500 font-medium uppercase mt-1">Likes</div>
+                                <div className="text-2xl sm:text-3xl font-bold text-white">{stats.this_week.likes}</div>
+                                <div className="text-xs sm:text-sm text-white/80 font-semibold uppercase mt-1">Likes</div>
                             </div>
                             <div className="text-center px-2">
-                                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.this_week.followers}</div>
-                                <div className="text-xs text-gray-500 font-medium uppercase mt-1">Followers</div>
+                                <div className="text-2xl sm:text-3xl font-bold text-white">{stats.this_week.followers}</div>
+                                <div className="text-xs sm:text-sm text-white/80 font-semibold uppercase mt-1">Followers</div>
                             </div>
                         </div>
                     </div>
                 )}
 
                 {/* Stats Grid */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-6">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
-                        <div className="text-center group cursor-default">
-                            <div className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] transition-colors">{stats?.quotes_count || 0}</div>
-                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-2">Quotes</div>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 sm:p-8 mb-6 sm:mb-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
+                        <div className="text-center group cursor-default px-3 py-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors">{stats?.quotes_count || 0}</div>
+                            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider mt-2">Quotes</div>
                         </div>
-                        <div className="text-center group cursor-default">
-                            <div className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] transition-colors">{stats?.total_likes || 0}</div>
-                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-2">Total Likes</div>
+                        <div className="text-center group cursor-default px-3 py-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors">{stats?.total_likes || 0}</div>
+                            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider mt-2">Total Likes</div>
                         </div>
-                        <div className="text-center group cursor-default">
-                            <div className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] transition-colors">{stats?.followers_count || 0}</div>
-                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-2">Followers</div>
+                        <div className="text-center group cursor-default px-3 py-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+                            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors">{stats?.followers_count || 0}</div>
+                            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider mt-2">Followers</div>
                         </div>
-                        <Link href="/achievements" className="text-center group cursor-pointer">
-                            <div className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] transition-colors flex items-center justify-center gap-1">
+                        <Link href="/achievements" className="text-center group cursor-pointer px-3 py-4 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all">
+                            <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors flex items-center justify-center gap-1">
                                 {stats?.daily_streak || 0}
-                                <Zap className="w-5 h-5 text-orange-500" />
+                                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
                             </div>
-                            <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mt-2">Day Streak</div>
+                            <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider mt-2">Day Streak</div>
                         </Link>
                     </div>
                 </div>
 
                 {/* Simple Progress Graph */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 sm:p-8 mb-6 sm:mb-8">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
                         <BarChart3 className="w-5 h-5" />
                         Engagement Overview
                     </h2>

@@ -71,35 +71,35 @@ export default function Header({
                 isVisible ? "translate-y-0" : "-translate-y-full"
             }`}
         >
-            <div className="flex items-center justify-between px-4 py-3 max-w-lg mx-auto">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 max-w-3xl mx-auto w-full">
                 {/* Left: Title or Logo */}
-                <div>
+                <div className="flex-1 min-w-0 mr-4">
                     {showLogo ? (
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-1"
+                            className="inline-flex items-center gap-2"
                         >
-                            <ApplicationLogo className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                            <span className="text-xl pt-1   font-black tracking-tight text-gray-900 dark:text-white">
+                            <ApplicationLogo className="w-6 h-6 sm:w-7 sm:h-7 text-[#5D41E6] dark:text-purple-400" />
+                            <span className="text-lg sm:text-xl font-black tracking-tight text-gray-900 dark:text-white">
                                 QuotesHub
                             </span>
                         </Link>
                     ) : (
-                        <h1 className="text-2xl font-bold text-gradient-primary">
+                        <h1 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white truncate">
                             {title || "QuotesHub"}
                         </h1>
                     )}
                 </div>
 
                 {/* Right: Streak & Actions */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                     {showStreak && auth?.user && (
                         <Link
                             href="/achievements"
                             className="streak-badge hover:scale-105 transition-transform active:scale-95 cursor-pointer"
                         >
-                            <Flame className="w-4 h-4" />
-                            <span>{auth.user.daily_streak || 0}</span>
+                            <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span className="text-sm sm:text-base">{auth.user.daily_streak || 0}</span>
                         </Link>
                     )}
 
@@ -109,6 +109,7 @@ export default function Header({
                                 ref={bellButtonRef}
                                 onClick={handleBellClick}
                                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
+                                aria-label="Notifications"
                             >
                                 <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                                 {unreadCount > 0 && (
@@ -139,7 +140,7 @@ export default function Header({
                     </Link>
 
                     {auth?.user && (
-                        <Link href={`/${auth.user.username}`} className="ml-1">
+                        <Link href={`/${auth.user.username}`} className="flex-shrink-0">
                             <img
                                 src={
                                     auth.user.avatar
@@ -147,7 +148,7 @@ export default function Header({
                                         : `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user.name)}&background=random`
                                 }
                                 alt={auth.user.name}
-                                className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 object-cover"
+                                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 border-gray-200 dark:border-gray-700 object-cover hover:ring-2 hover:ring-[#5D41E6] transition-all"
                             />
                         </Link>
                     )}

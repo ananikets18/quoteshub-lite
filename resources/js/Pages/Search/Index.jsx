@@ -67,12 +67,15 @@ export default function Index({
                 description={`Search results for '${localFilters.q || 'quotes'}' on QuotesHub. Filter by category, tag, and more.`}
             />
 
-            <div className="px-4 py-6 pb-20 space-y-6">
-                <SearchBar initialValue={localFilters.q} />
+            <div className="px-4 sm:px-6 py-6 sm:py-8 pb-20 max-w-6xl mx-auto space-y-6 sm:space-y-8">
+                <div className="max-w-2xl mx-auto">
+                    <SearchBar initialValue={localFilters.q} />
+                </div>
 
-                <div className="flex justify-end">
-                    <Link href="/topics" className="text-sm font-medium text-#5D41E6 dark:text-purple-400 hover:underline flex items-center gap-1">
-                        Browse Topics <span aria-hidden="true">&rarr;</span>
+                <div className="flex justify-end max-w-2xl mx-auto">
+                    <Link href="/topics" className="text-sm font-semibold text-[#5D41E6] dark:text-purple-400 hover:text-[#4b33c2] dark:hover:text-purple-300 flex items-center gap-1.5 transition-colors group">
+                        <span>Browse Topics</span>
+                        <span aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
                     </Link>
                 </div>
 
@@ -80,12 +83,12 @@ export default function Index({
                 {quotes.total > 0 && (
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className="lg:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm"
+                        className="lg:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all font-semibold"
                     >
                         <Filter className="w-5 h-5" />
-                        {showFilters ? 'Hide Filters' : 'Show Filters'}
+                        <span>{showFilters ? 'Hide Filters' : 'Show Filters'}</span>
                         {hasActiveFilters && (
-                            <span className="ml-2 px-2 py-0.5 bg-purple-100 text-[#5D41E6] text-xs rounded-full">
+                            <span className="ml-2 px-2.5 py-1 bg-purple-50 dark:bg-purple-900/30 text-[#5D41E6] dark:text-purple-400 text-xs font-bold rounded-full">
                                 Active
                             </span>
                         )}
@@ -97,17 +100,19 @@ export default function Index({
                     {quotes.total > 0 && (
                         <div
                             className={`${showFilters ? 'block' : 'hidden'
-                                } lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6`}
+                                } lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 h-fit sticky top-24`}
                         >
-                            <div className="flex justify-between mb-4">
-                                <h2 className="font-semibold flex items-center gap-2">
-                                    <Filter className="w-5 h-5" />
-                                    Filters
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-lg font-bold flex items-center gap-2.5">
+                                    <div className="p-1.5 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                                        <Filter className="w-5 h-5 text-[#5D41E6] dark:text-purple-400" />
+                                    </div>
+                                    <span>Filters</span>
                                 </h2>
                                 {hasActiveFilters && (
                                     <button
                                         onClick={clearFilters}
-                                        className="text-sm text-[#5D41E6]"
+                                        className="text-sm font-semibold text-[#5D41E6] dark:text-purple-400 hover:text-[#4b33c2] dark:hover:text-purple-300 transition-colors"
                                     >
                                         Clear all
                                     </button>
@@ -257,14 +262,21 @@ export default function Index({
                                 )}
                             </>
                         ) : (
-                            <div className="bg-white dark:bg-gray-800 p-12 rounded-2xl text-center">
-                                <h3 className="font-semibold mb-2">
-                                    No results found
-                                </h3>
-                                <button
-                                    onClick={clearFilters}
-                                    className="mt-4 px-6 py-3 bg-[#5D41E6] text-white rounded-xl"
-                                >
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-12 sm:p-16 text-center">
+                                <div className="max-w-sm mx-auto">
+                                    <div className="w-20 h-20 mx-auto mb-6 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                                        <Filter className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                        No results found
+                                    </h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                                        Try adjusting your filters or search terms
+                                    </p>
+                                    <button
+                                        onClick={clearFilters}
+                                        className="px-6 py-3 bg-gradient-to-r from-[#5D41E6] to-[#7C3AED] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+                                    >
                                     Clear Filters
                                 </button>
                             </div>

@@ -150,9 +150,9 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                 }`}>
 
                 {/* Filter Tabs - Enhanced Design */}
-                <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-                    <div className="max-w-3xl mx-auto px-4 py-3">
-                        <div className="flex items-center gap-2">
+                <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-lg">
+                    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             {filters.map((filter) => {
                                 const Icon = filter.icon;
                                 const isActive = activeFilter === filter.id;
@@ -161,9 +161,9 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                                     <button
                                         key={filter.id}
                                         onClick={() => changeFilter(filter.id)}
-                                        className={`flex-1 group relative px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
-                                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/30'
-                                            : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                        className={`flex-1 group relative px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl font-semibold text-sm transition-all duration-200 ${isActive
+                                            ? 'bg-gradient-to-r from-[#5D41E6] to-[#7C3AED] text-white shadow-lg hover:shadow-xl'
+                                            : 'bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md'
                                             }`}
                                     >
                                         <div className="flex items-center justify-center gap-2">
@@ -184,14 +184,14 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
 
                 {/* Categories Horizontal Scroll - Enhanced */}
                 {categories && categories.length > 0 && (
-                    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                        <div className="max-w-3xl mx-auto px-4 py-3">
+                    <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+                        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
                             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
                                 {categories?.map((category) => (
                                     <button
                                         key={category.id}
                                         onClick={() => handleCategoryClick(category.slug)}
-                                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm border ${getCategoryColor(category.color)}`}
+                                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md border ${getCategoryColor(category.color)}`}
                                     >
                                         <span className="text-sm">{category.icon}</span>
                                         <span>{category.name}</span>
@@ -208,7 +208,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
             <div className="max-w-3xl mx-auto">
                 {/* Welcome Banner for New Users */}
                 {auth.user && activeFilter === 'foryou' && quotes.length === 0 && !initialLoading && (
-                    <div className="mx-4 mt-4 mb-6 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-6 text-white shadow-xl">
+                    <div className="mx-4 sm:mx-6 mt-6 mb-8 bg-gradient-to-r from-[#5D41E6] to-[#7C3AED] rounded-2xl p-6 sm:p-8 text-white shadow-xl hover:shadow-2xl transition-shadow">
                         <div className="flex items-start gap-4">
                             <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
                                 <Sparkles className="w-6 h-6" />
@@ -224,14 +224,14 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                 )}
 
                 {initialLoading ? (
-                    <div className="space-y-0 mt-4">
+                    <div className="space-y-0 mt-6">
                         {[...Array(5)].map((_, i) => (
                             <QuoteCardSkeleton key={`skeleton-${i}`} />
                         ))}
                     </div>
                 ) : quotes.length === 0 ? (
-                    <div className="mx-4 mt-8 mb-12">
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+                    <div className="mx-4 sm:mx-6 mt-8 mb-12">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-12 sm:p-16 text-center">
                             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 flex items-center justify-center">
                                 {activeFilter === 'foryou' ? (
                                     <Sparkles className="w-10 h-10 text-purple-600 dark:text-purple-400" />
@@ -252,7 +252,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                             {!auth.user && (
                                 <button
                                     onClick={() => router.visit('/register')}
-                                    className="mt-6 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                                    className="mt-6 px-6 py-3 bg-gradient-to-r from-[#5D41E6] to-[#7C3AED] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
                                 >
                                     Get Started
                                 </button>
@@ -262,7 +262,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                 ) : (
                     <>
                         {/* Quotes List */}
-                        <div className="mt-4">
+                        <div className="mt-6">
                             {quotes.map((quote, index) => (
                                 <div key={`quote-${quote.id}`}>
                                     <QuoteCard quote={quote} auth={auth} collections={collections} />

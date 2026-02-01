@@ -85,16 +85,16 @@ export default function Settings({ auth, preferences = {}, privacy = {}, mustVer
                 description="Manage your profile information, password, notification preferences, and privacy settings."
             />
 
-            <div className="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8 pb-32">
-                <div className="mb-8 px-4 sm:px-0">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Manage your profile, account, and application preferences.</p>
+            <div className="max-w-7xl mx-auto py-8 sm:py-10 px-4 sm:px-6 lg:px-8 pb-32">
+                <div className="mb-8 sm:mb-10 px-0">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+                    <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your profile, account, and application preferences.</p>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-8 px-4 sm:px-0">
+                <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
                     {/* Sidebar Tabs */}
                     <div className="w-full lg:w-64 flex-shrink-0">
-                        <nav className="space-y-1">
+                        <nav className="space-y-1 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-2">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
@@ -102,12 +102,12 @@ export default function Settings({ auth, preferences = {}, privacy = {}, mustVer
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${isActive
-                                            ? 'bg-[#5D41E6] text-white shadow-md'
-                                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                        className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl transition-all ${isActive
+                                            ? 'bg-gradient-to-r from-[#5D41E6] to-[#7C3AED] text-white shadow-lg'
+                                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
                                             }`}
                                     >
-                                        <Icon className={`mr-3 h-5 w-5 ${isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
+                                        <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
                                         {tab.label}
                                     </button>
                                 );
@@ -125,24 +125,24 @@ export default function Settings({ auth, preferences = {}, privacy = {}, mustVer
 
                         {activeTab === 'account' && (
                             <div className="space-y-6">
-                                <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-2xl">
+                                <div className="p-6 sm:p-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 rounded-2xl">
                                     <UpdateProfileInformationForm
                                         mustVerifyEmail={mustVerifyEmail}
                                         status={status}
                                         className="max-w-xl"
                                     />
                                 </div>
-                                <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-2xl">
+                                <div className="p-6 sm:p-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 rounded-2xl">
                                     <UpdatePasswordForm className="max-w-xl" />
                                 </div>
-                                <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-2xl">
+                                <div className="p-6 sm:p-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 rounded-2xl">
                                     <DeleteUserForm className="max-w-xl" />
                                 </div>
                             </div>
                         )}
 
                         {activeTab === 'preferences' && (
-                            <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-2xl space-y-6">
+                            <div className="p-6 sm:p-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 rounded-2xl space-y-6">
                                 <div className="border-b border-gray-100 dark:border-gray-700 pb-4">
                                     <h3 className="text-lg font-medium text-gray-900 dark:text-white">Notification Preferences</h3>
                                     <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Choose how and when you want to be notified.</p>
@@ -173,7 +173,7 @@ export default function Settings({ auth, preferences = {}, privacy = {}, mustVer
                         )}
 
                         {activeTab === 'privacy' && (
-                            <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-2xl space-y-6">
+                            <div className="p-6 sm:p-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 rounded-2xl space-y-6">
                                 <div className="border-b border-gray-100 dark:border-gray-700 pb-4">
                                     <h3 className="text-lg font-medium text-gray-900 dark:text-white">Privacy Settings</h3>
                                     <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Control who can see your profile and activity.</p>
@@ -202,7 +202,7 @@ export default function Settings({ auth, preferences = {}, privacy = {}, mustVer
                         )}
 
                         {activeTab === 'appearance' && (
-                            <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-2xl space-y-6">
+                            <div className="p-6 sm:p-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 rounded-2xl space-y-6">
                                 <div className="border-b border-gray-100 dark:border-gray-700 pb-4">
                                     <h3 className="text-lg font-medium text-gray-900 dark:text-white">Appearance</h3>
                                     <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Customize the look and feel.</p>

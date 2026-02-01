@@ -33,7 +33,7 @@ class ProfileController extends Controller
         
         // Check if current user is following this profile
         $isFollowing = $request->user() 
-            ? $request->user()->following()->where('followed_id', $user->id)->exists()
+            ? $request->user()->following()->where('following_id', $user->id)->exists()
             : false;
         
         // Load user's quotes (paginated)

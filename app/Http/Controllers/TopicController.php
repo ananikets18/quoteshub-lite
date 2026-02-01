@@ -15,10 +15,9 @@ class TopicController extends Controller
     public function index()
     {
         // Get all categories with quote counts
-        // We'll filter for active ones if the column supports it
+        // Using the cached quotes_count column from the categories table
         $categories = Category::query()
-            ->withCount('quotes')
-            ->orderByDesc('quotes_count')
+            ->orderByDesc('categories.quotes_count')
             ->get()
             ->map(function ($category) {
                 // Ensure we have a valid color or generate one based on ID/Name if null

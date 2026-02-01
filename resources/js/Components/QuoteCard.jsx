@@ -37,6 +37,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
     const [isDeleted, setIsDeleted] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
     const [isFadingOut, setIsFadingOut] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     // Toast notifications
     const [showToast, setShowToast] = useState(false);
@@ -67,6 +68,30 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
         setToastType(type);
         setShowToast(true);
     };
+
+    // Format timestamp to relative time
+    const formatTimestamp = (timestamp) => {
+        if (!timestamp) return null;
+        
+        const now = new Date();
+        const postDate = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - postDate) / 1000);
+        
+        if (diffInSeconds < 60) return 'just now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
+        if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d`;
+        if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)}w`;
+        
+        // For older posts, show actual date
+        return postDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    // Check if quote is long (over 280 characters)
+    const isLongQuote = quote.content && quote.content.length > 280;
+    const displayContent = (!isExpanded && isLongQuote) 
+        ? quote.content.substring(0, 280) + '...' 
+        : quote.content;
 
     const handleLike = (e) => {
         e.stopPropagation();
@@ -166,6 +191,13 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
         setShowModal(true);
     };
 
+    const handleUserClick = (e) => {
+        e.stopPropagation(); // Prevent opening quote modal
+        if (quote.user?.username) {
+            router.visit(`/${quote.user.username}`);
+        }
+    };
+
     const handleEdit = (e) => {
         e.stopPropagation();
         router.visit(`/quotes/${quote.id}/edit`);
@@ -250,26 +282,43 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 }`}
             onClick={handleCardClick}
         >
-            {/* Clean Card Container - Instagram/Twitter Style */}
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700/50">
+            {/* Enhanced Card Container - Modern Social Feed Style */}
+            <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-800/80 transition-colors duration-200">
 
                 {/* Header: User Info */}
                 <div className="flex items-center justify-between px-3 sm:px-4 pt-2 sm:pt-3 pb-1.5 sm:pb-2">
                     <div className="flex items-center gap-2 sm:gap-3">
-                        {/* Avatar */}
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#5D41E6] flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-sm">
+                        {/* Avatar - Clickable */}
+                        <button
+                            onClick={handleUserClick}
+                            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#5D41E6] flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-sm hover:shadow-md hover:ring-2 hover:ring-[#5D41E6]/30 transition-all duration-200 transform hover:scale-105"
+                            aria-label={`Visit ${quote.user?.name || 'user'}'s profile`}
+                        >
                             {quote.user?.name?.charAt(0).toUpperCase() || 'U'}
-                        </div>
+                        </button>
 
-                        {/* User Details */}
-                        <div className="flex flex-col">
-                            <span className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight">
-                                {quote.user?.name || 'Anonymous'}
-                            </span>
-                            <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                        {/* User Details - Clickable */}
+                        <button
+                            onClick={handleUserClick}
+                            className="flex flex-col text-left group"
+                        >
+                            <div className="flex items-center gap-1.5">
+                                <span className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors duration-200">
+                                    {quote.user?.name || 'Anonymous'}
+                                </span>
+                                {quote.created_at && (
+                                    <>
+                                        <span className="text-gray-400 dark:text-gray-600">·</span>
+                                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                            {formatTimestamp(quote.created_at)}
+                                        </span>
+                                    </>
+                                )}
+                            </div>
+                            <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors duration-200">
                                 @{quote.user?.username || 'user'}
                             </span>
-                        </div>
+                        </button>
                     </div>
 
                     {/* Menu Button */}
@@ -338,9 +387,24 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 {/* Quote Content */}
                 <div className="px-3 sm:px-4 py-2 sm:py-3">
                     {/* Quote Text - Primary Focus */}
-                    <p className="text-[15px] sm:text-base md:text-lg leading-relaxed text-gray-900 dark:text-white mb-2 sm:mb-3 font-medium">
-                        "{quote.content}"
-                    </p>
+                    <div className="mb-2 sm:mb-3">
+                        <p className="text-[15px] sm:text-base md:text-lg leading-relaxed text-gray-900 dark:text-white font-medium whitespace-pre-line">
+                            "{displayContent}"
+                        </p>
+                        
+                        {/* Read More/Less Button for Long Quotes */}
+                        {isLongQuote && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsExpanded(!isExpanded);
+                                }}
+                                className="mt-1 text-xs sm:text-sm font-semibold text-[#5D41E6] dark:text-purple-400 hover:text-[#4a31c9] dark:hover:text-purple-300 transition-colors"
+                            >
+                                {isExpanded ? 'Show less' : 'Read more'}
+                            </button>
+                        )}
+                    </div>
 
                     {/* Author & Source - Secondary Info */}
                     {(quote.author || quote.source) && (
@@ -358,13 +422,14 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                         </div>
                     )}
 
-                    {/* Categories - Minimal Pills */}
+                    {/* Categories - Enhanced Pills */}
                     {quote.categories && quote.categories.length > 0 && (
                         <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-2 sm:mt-3">
                             {quote.categories.slice(0, 3).map((category) => (
                                 <span
                                     key={category.id}
-                                    className="inline-flex items-center gap-0.5 sm:gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300"
+                                    className="inline-flex items-center gap-0.5 sm:gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700/50 dark:to-gray-700/30 text-gray-700 dark:text-gray-300 hover:shadow-sm transition-shadow duration-200"
+                                    onClick={(e) => e.stopPropagation()}
                                 >
                                     <span className="text-[9px] sm:text-[10px]">{category.icon}</span>
                                     <span>{category.name}</span>
@@ -374,25 +439,25 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                     )}
                 </div>
 
-                {/* Actions Bar - Instagram Style */}
-                <div className="px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between">
+                {/* Actions Bar - Enhanced Instagram Style */}
+                <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-t border-gray-50 dark:border-gray-700/30">
                     {/* Left Actions */}
                     <div className="flex items-center gap-3 sm:gap-4">
                         {/* Like */}
                         <button
                             onClick={handleLike}
-                            className="flex items-center gap-1 sm:gap-1.5 group -ml-1"
+                            className="flex items-center gap-1 sm:gap-1.5 group -ml-1 transition-transform active:scale-95"
                         >
-                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-red-50 dark:group-hover:bg-red-900/20 transition-colors">
+                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-red-50 dark:group-hover:bg-red-900/20 transition-all duration-200">
                                 <Heart
-                                    className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all ${isLiked
+                                    className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all duration-200 ${isLiked
                                         ? 'fill-red-500 text-red-500 scale-105'
-                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500'
+                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500 group-hover:scale-110'
                                         }`}
                                 />
                             </div>
                             {likesCount > 0 && (
-                                <span className={`text-xs sm:text-sm font-medium ${isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>
+                                <span className={`text-xs sm:text-sm font-semibold tabular-nums ${isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500'}`}>
                                     {likesCount}
                                 </span>
                             )}
@@ -401,18 +466,18 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                         {/* Save/Bookmark */}
                         <button
                             onClick={handleSave}
-                            className="flex items-center gap-1 sm:gap-1.5 group"
+                            className="flex items-center gap-1 sm:gap-1.5 group transition-transform active:scale-95"
                         >
-                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors">
+                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-all duration-200">
                                 <Bookmark
-                                    className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all ${isSaved
+                                    className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all duration-200 ${isSaved
                                         ? 'fill-[#5D41E6] text-[#5D41E6] scale-105'
-                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'
+                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6] group-hover:scale-110'
                                         }`}
                                 />
                             </div>
                             {savesCount > 0 && (
-                                <span className={`text-xs sm:text-sm font-medium ${isSaved ? 'text-[#5D41E6]' : 'text-gray-600 dark:text-gray-400'}`}>
+                                <span className={`text-xs sm:text-sm font-semibold tabular-nums ${isSaved ? 'text-[#5D41E6]' : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'}`}>
                                     {savesCount}
                                 </span>
                             )}
@@ -421,13 +486,13 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                         {/* Share */}
                         <button
                             onClick={handleShare}
-                            className="flex items-center gap-1 sm:gap-1.5 group"
+                            className="flex items-center gap-1 sm:gap-1.5 group transition-transform active:scale-95"
                         >
-                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50 transition-colors">
-                                <Share2 className="w-5 h-5 sm:w-[22px] sm:h-[22px] text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors" />
+                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50 transition-all duration-200">
+                                <Share2 className="w-5 h-5 sm:w-[22px] sm:h-[22px] text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 group-hover:scale-110 transition-all duration-200" />
                             </div>
                             {quote.shares_count > 0 && (
-                                <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
+                                <span className="text-xs sm:text-sm font-semibold tabular-nums text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200">
                                     {quote.shares_count}
                                 </span>
                             )}
@@ -457,9 +522,9 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
 
                     {/* Right: Views */}
                     {quote.views_count > 0 && (
-                        <div className="flex items-center gap-1 sm:gap-1.5 text-gray-500 dark:text-gray-400">
-                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            <span className="text-[10px] sm:text-xs font-medium">{quote.views_count}</span>
+                        <div className="flex items-center gap-1 sm:gap-1.5 text-gray-500 dark:text-gray-400 group">
+                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors" />
+                            <span className="text-[10px] sm:text-xs font-semibold tabular-nums group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">{quote.views_count}</span>
                         </div>
                     )}
                 </div>
