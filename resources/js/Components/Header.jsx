@@ -77,7 +77,7 @@ export default function Header({
                     {showLogo ? (
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+                            className="inline-flex items-center gap-1 hover:opacity-80 transition-opacity"
                         >
                             <ApplicationLogo className="w-7 h-7 sm:w-8 sm:h-8 text-[#5D41E6] dark:text-purple-400 flex-shrink-0" />
                             <span className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white leading-none">
