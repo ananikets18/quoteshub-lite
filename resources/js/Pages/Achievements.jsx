@@ -49,7 +49,7 @@ export default function Achievements({ auth, achievements, progress, totalPoints
                         <div className="absolute bottom-10 right-10 w-48 h-48 bg-indigo-500 rounded-full mix-blend-overlay filter blur-3xl animate-pulse delay-1000" />
                     </div>
 
-                    <div className="relative relative z-10 px-6 pt-8 pb-12 text-center">
+                    <div className="relative z-10 px-6 pt-8 pb-12 text-center">
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-6">
                             <Crown className="w-4 h-4 text-yellow-400" />
                             <span className="text-sm font-medium text-yellow-100 tracking-wide uppercase">Your Legacy</span>
