@@ -5,7 +5,7 @@ import UpdateProfileInformationForm from './Partials/UpdateProfileInformationFor
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import { User, Lock, ArrowLeft } from 'lucide-react';
 
-export default function Edit({ auth, mustVerifyEmail, status }) {
+export default function Edit({ auth, status }) {
     return (
         <AppLayout title="Profile Settings">
             <SeoHead title="Profile Settings" description="Manage your QuotesHub profile, avatar, and password." />
@@ -41,7 +41,6 @@ export default function Edit({ auth, mustVerifyEmail, status }) {
                     </div>
                     <div className="p-6">
                         <UpdateProfileInformationForm
-                            mustVerifyEmail={mustVerifyEmail}
                             status={status}
                         />
                     </div>

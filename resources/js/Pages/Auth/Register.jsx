@@ -6,7 +6,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { User, AtSign, Mail, Lock, ArrowLeft, ArrowRight, Github, Chrome, Sparkles } from 'lucide-react';
+import { User, AtSign, Mail, Lock, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function Register({ flash, errors: inertiaErrors }) {
     const { data, setData, post, processing, errors, reset } = useForm({

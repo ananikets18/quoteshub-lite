@@ -7,7 +7,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Mail, Lock, ArrowLeft, ArrowRight, Github, Chrome } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, ArrowRight } from 'lucide-react';
 
 export default function Login({ status, canResetPassword, flash, errors: inertiaErrors }) {
     const { data, setData, post, processing, errors, reset } = useForm({

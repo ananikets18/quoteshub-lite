@@ -8,7 +8,7 @@ import UpdateProfileInformationForm from './Profile/Partials/UpdateProfileInform
 import UpdatePasswordForm from './Profile/Partials/UpdatePasswordForm';
 import DeleteUserForm from './Profile/Partials/DeleteUserForm';
 
-export default function Settings({ auth, preferences = {}, privacy = {}, mustVerifyEmail, status }) {
+export default function Settings({ auth, preferences = {}, privacy = {}, status }) {
     const [activeTab, setActiveTab] = useState('account');
     const [darkMode, setDarkMode] = useState(
         document.documentElement.classList.contains('dark')
@@ -127,7 +127,6 @@ export default function Settings({ auth, preferences = {}, privacy = {}, mustVer
                             <div className="space-y-6">
                                 <div className="p-6 sm:p-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 rounded-2xl">
                                     <UpdateProfileInformationForm
-                                        mustVerifyEmail={mustVerifyEmail}
                                         status={status}
                                         className="max-w-xl"
                                     />

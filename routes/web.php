@@ -191,7 +191,6 @@ Route::middleware(['auth', 'noindex'])->group(function () {
                 'show_email' => $user->show_email ?? false,
                 'show_activity_status' => $user->show_activity_status ?? true,
             ],
-            'mustVerifyEmail' => $user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail,
             'status' => session('status'),
         ]);
     })->name('settings');
