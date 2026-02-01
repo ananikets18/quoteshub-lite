@@ -410,14 +410,14 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
 
                     {/* Author & Source - Minimal Design */}
                     {(quote.author || quote.source) && (
-                        <div className="mb-3 pl-4 border-l-4 border-[#5D41E6]">
+                        <div className="mb-3 pl-3 sm:pl-4 border-l-[3px] border-[#5D41E6] dark:border-purple-500">
                             {quote.author && (
-                                <p className="text-sm sm:text-base font-bold text-[#5D41E6] dark:text-purple-400">
+                                <p className="text-sm sm:text-base font-semibold text-[#5D41E6] dark:text-purple-400 leading-tight">
                                     — {quote.author}
                                 </p>
                             )}
                             {quote.source && (
-                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500 mt-1">
                                     {quote.source}
                                 </p>
                             )}
@@ -442,22 +442,22 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 </div>
 
                 {/* Actions Bar - Clean and Open */}
-                <div className="mt-3 pt-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-700/50">
+                <div className="mt-4 pt-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-700/50">
                     {/* Left Actions */}
-                    <div className="flex items-center gap-5 sm:gap-6">
+                    <div className="flex items-center gap-6 sm:gap-8">
                         {/* Like */}
                         <button
                             onClick={handleLike}
-                            className="flex items-center gap-1.5 group transition-transform active:scale-90"
+                            className="flex items-center gap-1.5 group transition-transform active:scale-95"
                         >
                             <Heart
                                 className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-200 ${isLiked
                                     ? 'fill-red-500 text-red-500'
-                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-red-500 group-hover:scale-110'
+                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-red-500 group-hover:scale-105'
                                     }`}
                             />
                             {likesCount > 0 && (
-                                <span className={`text-sm font-semibold tabular-nums ${isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500'}`}>
+                                <span className={`text-sm sm:text-base font-medium tabular-nums ${isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500'}`}>
                                     {likesCount}
                                 </span>
                             )}
@@ -466,16 +466,16 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                         {/* Save/Bookmark */}
                         <button
                             onClick={handleSave}
-                            className="flex items-center gap-1.5 group transition-transform active:scale-90"
+                            className="flex items-center gap-1.5 group transition-transform active:scale-95"
                         >
                             <Bookmark
                                 className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-200 ${isSaved
                                     ? 'fill-[#5D41E6] text-[#5D41E6]'
-                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6] group-hover:scale-110'
+                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6] group-hover:scale-105'
                                     }`}
                             />
                             {savesCount > 0 && (
-                                <span className={`text-sm font-semibold tabular-nums ${isSaved ? 'text-[#5D41E6]' : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'}`}>
+                                <span className={`text-sm sm:text-base font-medium tabular-nums ${isSaved ? 'text-[#5D41E6]' : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'}`}>
                                     {savesCount}
                                 </span>
                             )}
@@ -484,11 +484,11 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                         {/* Share */}
                         <button
                             onClick={handleShare}
-                            className="flex items-center gap-1.5 group transition-transform active:scale-90"
+                            className="flex items-center gap-1.5 group transition-transform active:scale-95"
                         >
-                            <Share2 className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 group-hover:scale-110 transition-all duration-200" />
+                            <Share2 className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 group-hover:scale-105 transition-all duration-200" />
                             {quote.shares_count > 0 && (
-                                <span className="text-sm font-semibold tabular-nums text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200">
+                                <span className="text-sm sm:text-base font-medium tabular-nums text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200">
                                     {quote.shares_count}
                                 </span>
                             )}
@@ -516,9 +516,9 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
 
                     {/* Right: Views */}
                     {quote.views_count > 0 && (
-                        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 group">
-                            <Eye className="w-4 h-4 sm:w-5 sm:h-5 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors" />
-                            <span className="text-xs sm:text-sm font-semibold tabular-nums group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">{quote.views_count}</span>
+                        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                            <Eye className="w-4 h-4 sm:w-5 sm:h-5 opacity-70" />
+                            <span className="text-xs sm:text-sm font-medium tabular-nums">{quote.views_count}</span>
                         </div>
                     )}
                 </div>

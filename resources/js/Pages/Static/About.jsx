@@ -29,6 +29,11 @@ export default function About() {
                     <p className="mb-4 text-gray-600 dark:text-gray-300">
                         QuotesHub is more than just a collection of texts; it's a vibrant community of thinkers, dreamers, and doers. Create collections, share your favorite quotes, and connect with others who share your passion for words.
                     </p>
+
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">Get in Touch</h2>
+                    <p className="mb-4 text-gray-600 dark:text-gray-300">
+                        Have questions or feedback? We'd love to hear from you at <a href="mailto:thequoteshubteam@gmail.com" className="text-[#5D41E6] hover:underline">thequoteshubteam@gmail.com</a>.
+                    </p>
                 </div>
             </div>
         </AppLayout>

@@ -29,6 +29,11 @@ export default function Cookies() {
                         <li>Preferences: To remember your theme and language settings.</li>
                         <li>Analytics: To understand how our service is used.</li>
                     </ul>
+
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Contact Us</h2>
+                    <p className="mb-4 text-gray-600 dark:text-gray-300">
+                        If you have questions about our use of cookies, please contact us at <a href="mailto:thequoteshubteam@gmail.com" className="text-[#5D41E6] hover:underline">thequoteshubteam@gmail.com</a>.
+                    </p>
                 </div>
             </div>
         </AppLayout>

@@ -39,7 +39,7 @@ export default function Privacy() {
 
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Contact Us</h2>
                     <p className="mb-4 text-gray-600 dark:text-gray-300">
-                        If you have any questions about this Privacy Policy, please contact us at privacy@quoteshub.com.
+                        If you have any questions about this Privacy Policy, please contact us at <a href="mailto:thequoteshubteam@gmail.com" className="text-[#5D41E6] hover:underline">thequoteshubteam@gmail.com</a>.
                     </p>
                 </div>
             </div>

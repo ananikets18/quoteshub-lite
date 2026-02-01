@@ -42,6 +42,11 @@ export default function Terms() {
                     <p className="mb-4 text-gray-600 dark:text-gray-300">
                         We reserve the right to terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.
                     </p>
+
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">5. Contact Us</h2>
+                    <p className="mb-4 text-gray-600 dark:text-gray-300">
+                        If you have any questions about these Terms of Service, please contact us at <a href="mailto:thequoteshubteam@gmail.com" className="text-[#5D41E6] hover:underline">thequoteshubteam@gmail.com</a>.
+                    </p>
                 </div>
             </div>
         </AppLayout>

@@ -39,6 +39,11 @@ export default function Guidelines() {
                     <p className="mb-4 text-gray-600 dark:text-gray-300">
                         If you see content that violates these guidelines, please use the report function on the quote or user profile to alert our moderation team.
                     </p>
+
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-3">Questions?</h2>
+                    <p className="mb-4 text-gray-600 dark:text-gray-300">
+                        If you have any questions about these guidelines, please reach out to us at <a href="mailto:thequoteshubteam@gmail.com" className="text-[#5D41E6] hover:underline">thequoteshubteam@gmail.com</a>.
+                    </p>
                 </div>
             </div>
         </AppLayout>

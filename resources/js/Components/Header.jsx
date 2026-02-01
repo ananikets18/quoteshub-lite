@@ -73,19 +73,19 @@ export default function Header({
         >
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 max-w-3xl mx-auto w-full">
                 {/* Left: Title or Logo */}
-                <div className="flex-1 min-w-0 mr-4">
+                <div className="flex-1 min-w-0 mr-3">
                     {showLogo ? (
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-2"
+                            className="inline-flex items-center gap-2.5 hover:opacity-80 transition-opacity"
                         >
-                            <ApplicationLogo className="w-6 h-6 sm:w-7 sm:h-7 text-[#5D41E6] dark:text-purple-400" />
-                            <span className="text-lg sm:text-xl font-black tracking-tight text-gray-900 dark:text-white">
+                            <ApplicationLogo className="w-7 h-7 sm:w-8 sm:h-8 text-[#5D41E6] dark:text-purple-400 flex-shrink-0" />
+                            <span className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white leading-none">
                                 QuotesHub
                             </span>
                         </Link>
                     ) : (
-                        <h1 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white truncate">
+                        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
                             {title || "QuotesHub"}
                         </h1>
                     )}

@@ -20,12 +20,12 @@ export default function Contact() {
 
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 text-left">
                         {/* Email */}
-                        <a href="mailto:support@quoteshub.com" className="block p-6 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-[#5D41E6] dark:hover:border-[#5D41E6] hover:shadow-md transition-all group">
+                        <a href="mailto:thequoteshubteam@gmail.com" className="block p-6 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-[#5D41E6] dark:hover:border-[#5D41E6] hover:shadow-md transition-all group">
                             <div className="w-12 h-12 bg-purple-50 dark:bg-purple-900/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <Mail className="w-6 h-6 text-[#5D41E6] dark:text-purple-400" />
                             </div>
                             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Email Support</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">support@quoteshub.com</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">thequoteshubteam@gmail.com</p>
                         </a>
 
                         {/* Twitter */}
