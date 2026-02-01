@@ -7,8 +7,11 @@ import { createRoot } from 'react-dom/client';
 
 const appName = import.meta.env.VITE_APP_NAME || 'QuotesHub';
 
-// Get CSRF token from meta tag
-const token = document.head.querySelector('meta[name="csrf-token"]');
+// Get CSRF token from meta tag and keep it updated
+function getCsrfToken() {
+    const token = document.head.querySelector('meta[name="csrf-token"]');
+    return token ? token.content : null;
+}
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -27,7 +30,13 @@ createInertiaApp({
     },
 });
 
-// Ensure CSRF token is included in all Inertia requests
-if (token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+// Update CSRF token in axios headers before each request
+if (window.axios) {
+    window.axios.interceptors.request.use((config) => {
+        const token = getCsrfToken();
+        if (token) {
+            config.headers['X-CSRF-TOKEN'] = token;
+        }
+        return config;
+    });
 }
