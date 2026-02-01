@@ -230,28 +230,42 @@ export default function CreateQuote({ categories }) {
                             {activeTab === 'tags' && (
                                 <div className="space-y-4 animate-fade-in">
                                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Topics</label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {categories?.map((category) => {
-                                            const isSelected = data.category_ids.includes(category.id);
-                                            return (
-                                                <button
-                                                    key={category.id}
-                                                    type="button"
-                                                    onClick={() => toggleCategory(category.id)}
-                                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 border ${isSelected
-                                                        ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300'
-                                                        : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100'
-                                                        }`}
-                                                >
-                                                    <span>{category.icon}</span>
-                                                    <span>{category.name}</span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                    <p className="text-xs text-gray-400 text-center pt-4">
-                                        Select up to 3 topics to help people find your quote.
-                                    </p>
+                                    {categories && categories.length > 0 ? (
+                                        <>
+                                            <div className="flex flex-wrap gap-2">
+                                                {categories.map((category) => {
+                                                    const isSelected = data.category_ids.includes(category.id);
+                                                    return (
+                                                        <button
+                                                            key={category.id}
+                                                            type="button"
+                                                            onClick={() => toggleCategory(category.id)}
+                                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 border ${isSelected
+                                                                ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300'
+                                                                : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100'
+                                                                }`}
+                                                        >
+                                                            <span>{category.icon}</span>
+                                                            <span>{category.name}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            <p className="text-xs text-gray-400 text-center pt-4">
+                                                Select up to 3 topics to help people find your quote.
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-6 text-center">
+                                            <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium mb-2">
+                                                No topics available yet
+                                            </p>
+                                            <p className="text-xs text-yellow-600 dark:text-yellow-400">
+                                                You can still create quotes! Topics are optional and help with discovery.
+                                            </p>
+                                        </div>
+                                    )}
+                                    <InputError message={errors.category_ids} className="mt-2" />
                                 </div>
                             )}
                         </div>
