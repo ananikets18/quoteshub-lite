@@ -32,6 +32,12 @@ class SocialController extends Controller
                 if (!$user->google_id) {
                     $user->update([
                         'google_id' => $googleUser->id,
+                        'email_verified_at' => $user->email_verified_at ?? now(), // Verify email if not already verified
+                    ]);
+                } elseif (!$user->email_verified_at) {
+                    // If user logs in via Google, mark their email as verified
+                    $user->update([
+                        'email_verified_at' => now(),
                     ]);
                 }
                 
