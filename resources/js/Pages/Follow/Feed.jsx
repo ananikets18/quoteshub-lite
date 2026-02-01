@@ -22,7 +22,7 @@ export default function Feed({ auth, quotes, followingCount, collections = [] })
 
                 {quotes.data.length > 0 ? (
                     <>
-                        <div className="space-y-4">
+                        <div className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {quotes.data.map((quote) => (
                                 <QuoteCard 
                                     key={quote.id} 

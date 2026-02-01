@@ -145,7 +145,10 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
 
     const handleShare = () => {
         setShowShareModal(true);
-        // Track share intent
+    };
+
+    const trackShare = () => {
+        // Track share when user actually completes a share
         router.post(`/quotes/${quote.id}/share`, {}, {
             preserveState: true,
             preserveScroll: true,
@@ -560,6 +563,7 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
                 onClose={() => setShowShareModal(false)}
                 quote={quote}
                 colorScheme={colorScheme}
+                onShare={trackShare}
             />
         </div>,
         document.body

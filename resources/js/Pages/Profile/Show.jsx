@@ -190,7 +190,7 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                 <div className="mt-6 sm:mt-8 mb-8">
                     {quotes.data.length > 0 ? (
                         <>
-                            <div className="space-y-0 bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+                            <div className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 {quotes.data.map((quote) => (
                                     <QuoteCard
                                         key={quote.id}

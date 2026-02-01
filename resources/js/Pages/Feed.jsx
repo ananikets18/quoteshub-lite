@@ -224,7 +224,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                 )}
 
                 {initialLoading ? (
-                    <div className="space-y-0 mt-6">
+                    <div className="mt-6 bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         {[...Array(5)].map((_, i) => (
                             <QuoteCardSkeleton key={`skeleton-${i}`} />
                         ))}
@@ -262,7 +262,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                 ) : (
                     <>
                         {/* Quotes List */}
-                        <div className="mt-6">
+                        <div className="mt-6 bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {quotes.map((quote, index) => (
                                 <div key={`quote-${quote.id}`}>
                                     <QuoteCard quote={quote} auth={auth} collections={collections} />

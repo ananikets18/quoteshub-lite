@@ -174,8 +174,10 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
 
         // Open share modal for comprehensive sharing options
         setShowShareModal(true);
+    };
 
-        // Track share count
+    const trackShare = () => {
+        // Track share count when user actually completes a share
         router.post(`/quotes/${quote.id}/share`, {}, {
             preserveScroll: true,
             preserveState: true,
@@ -282,16 +284,16 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 }`}
             onClick={handleCardClick}
         >
-            {/* Enhanced Card Container - Modern Social Feed Style */}
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50/50 dark:hover:bg-gray-800/80 transition-colors duration-200">
+            {/* Open Card Design - Free and Spaced */}
+            <div className="bg-white dark:bg-gray-800 px-4 sm:px-5 py-4 sm:py-5 hover:bg-gray-50/50 dark:hover:bg-gray-750 transition-colors duration-200 border-b border-gray-200 dark:border-gray-700">
 
                 {/* Header: User Info */}
-                <div className="flex items-center justify-between px-3 sm:px-4 pt-2 sm:pt-3 pb-1.5 sm:pb-2">
-                    <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
                         {/* Avatar - Clickable */}
                         <button
                             onClick={handleUserClick}
-                            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#5D41E6] flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-sm hover:shadow-md hover:ring-2 hover:ring-[#5D41E6]/30 transition-all duration-200 transform hover:scale-105"
+                            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#5D41E6] to-[#7C3AED] flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md hover:shadow-lg hover:ring-4 hover:ring-[#5D41E6]/20 transition-all duration-200 transform hover:scale-105"
                             aria-label={`Visit ${quote.user?.name || 'user'}'s profile`}
                         >
                             {quote.user?.name?.charAt(0).toUpperCase() || 'U'}
@@ -302,20 +304,17 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                             onClick={handleUserClick}
                             className="flex flex-col text-left group"
                         >
-                            <div className="flex items-center gap-1.5">
-                                <span className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white leading-tight group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors duration-200">
+                            <div className="flex items-center gap-2">
+                                <span className="font-bold text-sm sm:text-base text-gray-900 dark:text-white leading-tight group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors duration-200">
                                     {quote.user?.name || 'Anonymous'}
                                 </span>
                                 {quote.created_at && (
-                                    <>
-                                        <span className="text-gray-400 dark:text-gray-600">·</span>
-                                        <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                            {formatTimestamp(quote.created_at)}
-                                        </span>
-                                    </>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                        {formatTimestamp(quote.created_at)}
+                                    </span>
                                 )}
                             </div>
-                            <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors duration-200">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors duration-200">
                                 @{quote.user?.username || 'user'}
                             </span>
                         </button>
@@ -385,11 +384,11 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 </div>
 
                 {/* Quote Content */}
-                <div className="px-3 sm:px-4 py-2 sm:py-3">
-                    {/* Quote Text - Primary Focus */}
-                    <div className="mb-2 sm:mb-3">
-                        <p className="text-[15px] sm:text-base md:text-lg leading-relaxed text-gray-900 dark:text-white font-medium whitespace-pre-line">
-                            "{displayContent}"
+                <div className="mt-3">
+                    {/* Quote Text - Open and Breathable */}
+                    <div className="mb-3">
+                        <p className="text-base sm:text-lg md:text-xl leading-relaxed text-gray-900 dark:text-white whitespace-pre-line">
+                            {displayContent}
                         </p>
                         
                         {/* Read More/Less Button for Long Quotes */}
@@ -399,39 +398,42 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                                     e.stopPropagation();
                                     setIsExpanded(!isExpanded);
                                 }}
-                                className="mt-1 text-xs sm:text-sm font-semibold text-[#5D41E6] dark:text-purple-400 hover:text-[#4a31c9] dark:hover:text-purple-300 transition-colors"
+                                className="mt-2 text-sm font-bold text-[#5D41E6] dark:text-purple-400 hover:text-[#4a31c9] dark:hover:text-purple-300 transition-colors inline-flex items-center gap-1"
                             >
                                 {isExpanded ? 'Show less' : 'Read more'}
+                                <svg className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
                             </button>
                         )}
                     </div>
 
-                    {/* Author & Source - Secondary Info */}
+                    {/* Author & Source - Minimal Design */}
                     {(quote.author || quote.source) && (
-                        <div className="mt-2 sm:mt-2.5 space-y-0.5">
+                        <div className="mb-3 pl-4 border-l-4 border-[#5D41E6]">
                             {quote.author && (
-                                <p className="text-xs sm:text-sm font-semibold text-[#5D41E6] dark:text-purple-400">
+                                <p className="text-sm sm:text-base font-bold text-[#5D41E6] dark:text-purple-400">
                                     — {quote.author}
                                 </p>
                             )}
                             {quote.source && (
-                                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-0.5">
                                     {quote.source}
                                 </p>
                             )}
                         </div>
                     )}
 
-                    {/* Categories - Enhanced Pills */}
+                    {/* Categories - Clean Pills */}
                     {quote.categories && quote.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-2 sm:mt-3">
+                        <div className="flex flex-wrap gap-2">
                             {quote.categories.slice(0, 3).map((category) => (
                                 <span
                                     key={category.id}
-                                    className="inline-flex items-center gap-0.5 sm:gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700/50 dark:to-gray-700/30 text-gray-700 dark:text-gray-300 hover:shadow-sm transition-shadow duration-200"
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-900/20 text-[#5D41E6] dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    <span className="text-[9px] sm:text-[10px]">{category.icon}</span>
+                                    <span className="text-sm">{category.icon}</span>
                                     <span>{category.name}</span>
                                 </span>
                             ))}
@@ -439,25 +441,23 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                     )}
                 </div>
 
-                {/* Actions Bar - Enhanced Instagram Style */}
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between border-t border-gray-50 dark:border-gray-700/30">
+                {/* Actions Bar - Clean and Open */}
+                <div className="mt-3 pt-3 flex items-center justify-between border-t border-gray-100 dark:border-gray-700/50">
                     {/* Left Actions */}
-                    <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex items-center gap-5 sm:gap-6">
                         {/* Like */}
                         <button
                             onClick={handleLike}
-                            className="flex items-center gap-1 sm:gap-1.5 group -ml-1 transition-transform active:scale-95"
+                            className="flex items-center gap-1.5 group transition-transform active:scale-90"
                         >
-                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-red-50 dark:group-hover:bg-red-900/20 transition-all duration-200">
-                                <Heart
-                                    className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all duration-200 ${isLiked
-                                        ? 'fill-red-500 text-red-500 scale-105'
-                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500 group-hover:scale-110'
-                                        }`}
-                                />
-                            </div>
+                            <Heart
+                                className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-200 ${isLiked
+                                    ? 'fill-red-500 text-red-500'
+                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-red-500 group-hover:scale-110'
+                                    }`}
+                            />
                             {likesCount > 0 && (
-                                <span className={`text-xs sm:text-sm font-semibold tabular-nums ${isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500'}`}>
+                                <span className={`text-sm font-semibold tabular-nums ${isLiked ? 'text-red-500' : 'text-gray-600 dark:text-gray-400 group-hover:text-red-500'}`}>
                                     {likesCount}
                                 </span>
                             )}
@@ -466,18 +466,16 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                         {/* Save/Bookmark */}
                         <button
                             onClick={handleSave}
-                            className="flex items-center gap-1 sm:gap-1.5 group transition-transform active:scale-95"
+                            className="flex items-center gap-1.5 group transition-transform active:scale-90"
                         >
-                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-all duration-200">
-                                <Bookmark
-                                    className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all duration-200 ${isSaved
-                                        ? 'fill-[#5D41E6] text-[#5D41E6] scale-105'
-                                        : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6] group-hover:scale-110'
-                                        }`}
-                                />
-                            </div>
+                            <Bookmark
+                                className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-200 ${isSaved
+                                    ? 'fill-[#5D41E6] text-[#5D41E6]'
+                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6] group-hover:scale-110'
+                                    }`}
+                            />
                             {savesCount > 0 && (
-                                <span className={`text-xs sm:text-sm font-semibold tabular-nums ${isSaved ? 'text-[#5D41E6]' : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'}`}>
+                                <span className={`text-sm font-semibold tabular-nums ${isSaved ? 'text-[#5D41E6]' : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'}`}>
                                     {savesCount}
                                 </span>
                             )}
@@ -486,13 +484,11 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                         {/* Share */}
                         <button
                             onClick={handleShare}
-                            className="flex items-center gap-1 sm:gap-1.5 group transition-transform active:scale-95"
+                            className="flex items-center gap-1.5 group transition-transform active:scale-90"
                         >
-                            <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50 transition-all duration-200">
-                                <Share2 className="w-5 h-5 sm:w-[22px] sm:h-[22px] text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 group-hover:scale-110 transition-all duration-200" />
-                            </div>
+                            <Share2 className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 group-hover:scale-110 transition-all duration-200" />
                             {quote.shares_count > 0 && (
-                                <span className="text-xs sm:text-sm font-semibold tabular-nums text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200">
+                                <span className="text-sm font-semibold tabular-nums text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200">
                                     {quote.shares_count}
                                 </span>
                             )}
@@ -505,26 +501,24 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                                     e.stopPropagation();
                                     setShowCollectionModal(true);
                                 }}
-                                className="flex items-center gap-1 sm:gap-1.5 group"
+                                className="flex items-center gap-1.5 group transition-transform active:scale-90"
                                 title="Add to Collection"
                             >
-                                <div className="p-1 sm:p-1.5 rounded-full group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors">
-                                    <Folder
-                                        className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-all ${quote.collection_ids && quote.collection_ids.length > 0
-                                            ? 'fill-[#5D41E6] text-[#5D41E6]'
-                                            : 'text-gray-600 dark:text-gray-400 group-hover:text-[#5D41E6]'
-                                            }`}
-                                    />
-                                </div>
+                                <Folder
+                                    className={`w-5 h-5 sm:w-6 sm:h-6 transition-all ${quote.collection_ids && quote.collection_ids.length > 0
+                                        ? 'fill-[#5D41E6] text-[#5D41E6]'
+                                        : 'text-gray-500 dark:text-gray-400 group-hover:text-[#5D41E6]'
+                                        }`}
+                                />
                             </button>
                         )}
                     </div>
 
                     {/* Right: Views */}
                     {quote.views_count > 0 && (
-                        <div className="flex items-center gap-1 sm:gap-1.5 text-gray-500 dark:text-gray-400 group">
-                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors" />
-                            <span className="text-[10px] sm:text-xs font-semibold tabular-nums group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">{quote.views_count}</span>
+                        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 group">
+                            <Eye className="w-4 h-4 sm:w-5 sm:h-5 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors" />
+                            <span className="text-xs sm:text-sm font-semibold tabular-nums group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">{quote.views_count}</span>
                         </div>
                     )}
                 </div>
@@ -563,6 +557,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                 onClose={() => setShowShareModal(false)}
                 quote={quote}
                 colorScheme={colorSchemes[quote.id % colorSchemes.length]}
+                onShare={trackShare}
             />
 
             {/* Toast Notification */}

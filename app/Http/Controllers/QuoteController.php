@@ -6,6 +6,7 @@ use App\Models\Quote;
 use App\Models\Category;
 use App\Services\NotificationService;
 use App\Services\ContentModerationService;
+use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -271,7 +272,19 @@ class QuoteController extends Controller
      */
     public function share(Quote $quote)
     {
+        $user = auth()->user();
+        
+        // Increment share count
         $quote->increment('shares_count');
+        
+        // Track user category preferences
+        if ($user && $quote->category_id) {
+            app(RecommendationService::class)->trackCategoryInteraction(
+                $user,
+                $quote->category_id,
+                'share'
+            );
+        }
 
         return back();
     }

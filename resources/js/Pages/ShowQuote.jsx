@@ -88,7 +88,10 @@ export default function ShowQuote({ quote }) {
 
     const handleShare = () => {
         setShowShareModal(true);
-        // Track share intent
+    };
+
+    const trackShare = () => {
+        // Track share when user actually completes a share
         router.post(`/quotes/${quote.id}/share`, {}, {
             preserveScroll: true,
             preserveState: true,
@@ -365,6 +368,7 @@ export default function ShowQuote({ quote }) {
                 onClose={() => setShowShareModal(false)}
                 quote={quote}
                 colorScheme={colorScheme}
+                onShare={trackShare}
             />
 
             {/* Toast Notifications */}

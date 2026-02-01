@@ -53,7 +53,7 @@ const templates = [
     },
 ];
 
-export default function QuoteImageGenerator({ quote, colorScheme }) {
+export default function QuoteImageGenerator({ quote, colorScheme, onDownload }) {
     const [selectedTemplate, setSelectedTemplate] = useState(templates[0]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [showWatermark, setShowWatermark] = useState(true);
@@ -75,6 +75,9 @@ export default function QuoteImageGenerator({ quote, colorScheme }) {
             link.download = `quote-${quote.id}-${Date.now()}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
+            
+            // Track successful download/share
+            if (onDownload) onDownload();
         } catch (error) {
             console.error('Error generating image:', error);
             // Show error message in UI instead of alert

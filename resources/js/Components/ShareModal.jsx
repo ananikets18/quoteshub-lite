@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X, Download, Copy, Check, Twitter, Facebook, Linkedin, MessageCircle, Instagram } from 'lucide-react';
 import QuoteImageGenerator from './QuoteImageGenerator';
 
-export default function ShareModal({ show, onClose, quote, colorScheme }) {
+export default function ShareModal({ show, onClose, quote, colorScheme, onShare }) {
     const [copied, setCopied] = useState(false);
     const [activeTab, setActiveTab] = useState('share'); // 'share' or 'download'
 
@@ -17,6 +17,8 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
             await navigator.clipboard.writeText(shareUrl);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
+            // Track successful share
+            if (onShare) onShare();
         } catch (err) {
             console.error('Failed to copy:', err);
         }
@@ -25,27 +27,37 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
     const handleTwitterShare = () => {
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
         window.open(twitterUrl, '_blank', 'width=550,height=420');
+        // Track share action
+        if (onShare) onShare();
     };
 
     const handleFacebookShare = () => {
         const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
         window.open(facebookUrl, '_blank', 'width=550,height=420');
+        // Track share action
+        if (onShare) onShare();
     };
 
     const handleLinkedInShare = () => {
         const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
         window.open(linkedinUrl, '_blank', 'width=550,height=420');
+        // Track share action
+        if (onShare) onShare();
     };
 
     const handleWhatsAppShare = () => {
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
         window.open(whatsappUrl, '_blank');
+        // Track share action
+        if (onShare) onShare();
     };
 
     const handleEmailShare = () => {
         const subject = encodeURIComponent('Check out this quote from QuotesHub');
         const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        // Track share action
+        if (onShare) onShare();
     };
 
     return (
@@ -187,6 +199,8 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
                                                         text: shareText,
                                                         url: shareUrl,
                                                     });
+                                                    // Track successful share
+                                                    if (onShare) onShare();
                                                 } catch (err) {
                                                     console.log('Share cancelled');
                                                 }
@@ -210,7 +224,7 @@ export default function ShareModal({ show, onClose, quote, colorScheme }) {
                             </div>
                         </div>
                     ) : (
-                        <QuoteImageGenerator quote={quote} colorScheme={colorScheme} />
+                        <QuoteImageGenerator quote={quote} colorScheme={colorScheme} onDownload={onShare} />
                     )}
                 </div>
             </div>

@@ -118,7 +118,7 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                 {/* Quotes Grid */}
                 {quotes.data.length > 0 ? (
                     <>
-                        <div className="space-y-4">
+                        <div className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {quotes.data.map((quote) => (
                                 <div key={quote.id} className="relative">
                                     <QuoteCard
@@ -129,7 +129,7 @@ export default function Show({ auth, collection, quotes, isOwner, collections = 
                                     {isOwner && (
                                         <button
                                             onClick={() => openRemoveQuoteModal(quote.id)}
-                                            className="absolute top-2 right-2 p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition shadow-sm"
+                                            className="absolute top-4 right-4 p-2 bg-white/90 dark:bg-gray-800/90 hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition shadow-sm z-10"
                                             title="Remove from collection"
                                         >
                                             <Trash2 className="w-4 h-4" />

@@ -51,7 +51,7 @@ export default function Category({ auth, category, quotes, sort, collections = [
                 {/* Quotes Grid */}
                 {quotes.data.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                             {quotes.data.map((quote) => (
                                 <QuoteCard 
                                     key={quote.id} 

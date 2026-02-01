@@ -34,7 +34,7 @@ export default function Saved({ auth, quotes, collections = [] }) {
 
                 {visibleQuotes.length > 0 ? (
                     <>
-                        <div className="space-y-4 mb-6">
+                        <div className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 mb-6">
                             {quotes.data
                                 .filter(quote => visibleQuotes.includes(quote.id))
                                 .map((quote) => (

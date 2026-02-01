@@ -83,7 +83,7 @@ export default function Index({
                 {quotes.total > 0 && (
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className="lg:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all font-semibold"
+                        className="lg:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 rounded-2xl shadow border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all font-semibold"
                     >
                         <Filter className="w-5 h-5" />
                         <span>{showFilters ? 'Hide Filters' : 'Show Filters'}</span>
@@ -162,7 +162,7 @@ export default function Index({
 
                             {/* Date */}
                             <div className="mb-6">
-                                <label className="block text-sm mb-2 flex items-center gap-1">
+                                <label className="flex items-center gap-1 text-sm mb-2">
                                     <Calendar className="w-4 h-4" />
                                     Date Range
                                 </label>
@@ -216,22 +216,24 @@ export default function Index({
                     )}
 
                     {/* Results */}
-                    <div className={`${quotes.total > 0 ? 'lg:col-span-3' : 'lg:col-span-4'} space-y-4`}>
-                        <p className="text-sm text-gray-600">
+                    <div className={`${quotes.total > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
+                        <p className="text-sm text-gray-600 mb-4">
                             {quotes.total} result
                             {quotes.total !== 1 && 's'}
                         </p>
 
                         {quotes.data.length ? (
                             <>
-                                {quotes.data.map((quote) => (
-                                    <QuoteCard
-                                        key={quote.id}
-                                        quote={quote}
-                                        auth={auth}
-                                        collections={collections}
-                                    />
-                                ))}
+                                <div className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    {quotes.data.map((quote) => (
+                                        <QuoteCard
+                                            key={quote.id}
+                                            quote={quote}
+                                            auth={auth}
+                                            collections={collections}
+                                        />
+                                    ))}
+                                </div>
 
                                 {quotes.links.length > 3 && (
                                     <div className="flex flex-wrap gap-2 justify-center mt-6">
@@ -277,8 +279,9 @@ export default function Index({
                                         onClick={clearFilters}
                                         className="px-6 py-3 bg-gradient-to-r from-[#5D41E6] to-[#7C3AED] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
                                     >
-                                    Clear Filters
-                                </button>
+                                        Clear Filters
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
