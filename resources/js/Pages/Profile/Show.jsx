@@ -87,13 +87,15 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
                                         <Edit className="w-4 h-4 mr-2" />
                                         Edit Profile
                                     </Link>
-                                    <button
-                                        onClick={() => router.post('/logout')}
+                                    <Link
+                                        href={route('logout')}
+                                        method="post"
+                                        as="button"
                                         className="flex-1 sm:flex-none inline-flex items-center justify-center px-4 sm:px-5 py-2.5 bg-white dark:bg-gray-800 border-2 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-semibold rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-700 transition-all shadow-sm hover:shadow-md"
                                     >
                                         <LogOut className="w-4 h-4 mr-2" />
                                         Logout
-                                    </button>
+                                    </Link>
                                 </div>
                             ) : (
                                 <button
