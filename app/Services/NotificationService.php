@@ -93,6 +93,42 @@ class NotificationService
     }
 
     /**
+     * Remove quote liked notification when unlike happens
+     */
+    public function removeQuoteLikedNotification(User $liker, Quote $quote): void
+    {
+        // Don't try to remove if user unliked their own quote
+        if ($liker->id === $quote->user_id) {
+            return;
+        }
+
+        // Delete the notification
+        Notification::where('user_id', $quote->user_id)
+            ->where('actor_id', $liker->id)
+            ->where('type', Notification::TYPE_QUOTE_LIKED)
+            ->whereJsonContains('data->quote_id', $quote->id)
+            ->delete();
+    }
+
+    /**
+     * Remove quote saved notification when unsave happens
+     */
+    public function removeQuoteSavedNotification(User $saver, Quote $quote): void
+    {
+        // Don't try to remove if user unsaved their own quote
+        if ($saver->id === $quote->user_id) {
+            return;
+        }
+
+        // Delete the notification
+        Notification::where('user_id', $quote->user_id)
+            ->where('actor_id', $saver->id)
+            ->where('type', Notification::TYPE_QUOTE_SAVED)
+            ->whereJsonContains('data->quote_id', $quote->id)
+            ->delete();
+    }
+
+    /**
      * Create a comment added notification
      */
     public function notifyCommentAdded(User $commenter, Quote $quote, string $commentContent): void

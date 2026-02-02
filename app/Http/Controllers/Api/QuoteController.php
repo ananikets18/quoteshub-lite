@@ -238,14 +238,16 @@ class QuoteController extends Controller
         if ($like) {
             // Unlike
             $like->delete();
+            app(\App\Services\NotificationService::class)->removeQuoteLikedNotification($user, $quote);
             $message = 'Quote unliked';
             $is_liked = false;
         } else {
             // Like
-            Like::create([
+            $created = Like::create([
                 'user_id' => $user->id,
                 'quote_id' => $quote->id,
             ]);
+            app(\App\Services\NotificationService::class)->notifyQuoteLiked($user, $quote);
             $message = 'Quote liked';
             $is_liked = true;
         }
@@ -276,15 +278,17 @@ class QuoteController extends Controller
         if ($save) {
             // Unsave
             $save->delete();
+            app(\App\Services\NotificationService::class)->removeQuoteSavedNotification($user, $quote);
             $message = 'Quote removed from saved';
             $is_saved = false;
         } else {
             // Save
-            Save::create([
+            $created = Save::create([
                 'user_id' => $user->id,
                 'quote_id' => $quote->id,
                 'collection' => $validated['collection'] ?? 'default',
             ]);
+            app(\App\Services\NotificationService::class)->notifyQuoteSaved($user, $quote);
             $message = 'Quote saved';
             $is_saved = true;
         }

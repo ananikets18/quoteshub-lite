@@ -273,15 +273,31 @@ class QuoteController extends Controller
     public function like(Quote $quote)
     {
         $user = auth()->user();
-        $like = $quote->likes()->where('user_id', $user->id)->first();
+        
+        try {
+            \DB::transaction(function () use ($quote, $user) {
+                $like = $quote->likes()->where('user_id', $user->id)->lockForUpdate()->first();
 
-        if ($like) {
-            $like->delete();
-        } else {
-            $quote->likes()->create(['user_id' => $user->id]);
-            
-            // Trigger notification
-            app(NotificationService::class)->notifyQuoteLiked($user, $quote);
+                if ($like) {
+                    // Unlike - remove the like and its notification
+                    $like->delete();
+                    app(NotificationService::class)->removeQuoteLikedNotification($user, $quote);
+                } else {
+                    // Like - use firstOrCreate to handle race conditions
+                    $created = $quote->likes()->firstOrCreate(['user_id' => $user->id]);
+                    
+                    // Trigger notification only when actually creating a new like
+                    if ($created->wasRecentlyCreated) {
+                        app(NotificationService::class)->notifyQuoteLiked($user, $quote);
+                    }
+                }
+            });
+        } catch (\Exception $e) {
+            \Log::error('Like toggle error', [
+                'user_id' => $user->id,
+                'quote_id' => $quote->id,
+                'error' => $e->getMessage()
+            ]);
         }
 
         return back();
@@ -293,18 +309,34 @@ class QuoteController extends Controller
     public function save(Quote $quote)
     {
         $user = auth()->user();
-        $save = $quote->saves()->where('user_id', $user->id)->first();
+        
+        try {
+            \DB::transaction(function () use ($quote, $user) {
+                $save = $quote->saves()->where('user_id', $user->id)->lockForUpdate()->first();
 
-        if ($save) {
-            $save->delete();
-        } else {
-            $quote->saves()->create([
+                if ($save) {
+                    // Unsave - remove the save and its notification
+                    $save->delete();
+                    app(NotificationService::class)->removeQuoteSavedNotification($user, $quote);
+                } else {
+                    // Save - use firstOrCreate to handle race conditions
+                    $created = $quote->saves()->firstOrCreate(
+                        ['user_id' => $user->id],
+                        ['collection' => 'default']
+                    );
+                    
+                    // Trigger notification only when actually creating a new save
+                    if ($created->wasRecentlyCreated) {
+                        app(NotificationService::class)->notifyQuoteSaved($user, $quote);
+                    }
+                }
+            });
+        } catch (\Exception $e) {
+            \Log::error('Save toggle error', [
                 'user_id' => $user->id,
-                'collection' => 'default',
+                'quote_id' => $quote->id,
+                'error' => $e->getMessage()
             ]);
-            
-            // Trigger notification
-            app(NotificationService::class)->notifyQuoteSaved($user, $quote);
         }
 
         return back();
