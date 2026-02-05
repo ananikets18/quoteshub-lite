@@ -30,26 +30,14 @@ export default function CreateQuote({ categories }) {
         if (e) e.preventDefault();
         if (!data.content || processing) return;
 
-        console.log('Submitting quote with data:', {
-            content: data.content,
-            author: data.author,
-            source: data.source,
-            category_ids: data.category_ids,
-            categories_available: categories?.length || 0
-        });
-
         post(route('quotes.store'), {
             onError: (errors) => {
-                console.error('Quote submission errors:', errors);
                 // Ensure the tab with errors is visible
                 if (errors.content || errors.author || errors.source) {
                     setActiveTab('text');
                 } else if (errors.category_ids) {
                     setActiveTab('tags');
                 }
-            },
-            onSuccess: () => {
-                console.log('Quote created successfully');
             }
         });
     };

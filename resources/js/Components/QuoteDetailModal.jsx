@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Heart, Bookmark, Share2, Eye, Download, Copy, Check } from 'lucide-react';
 import { router } from '@inertiajs/react';
 import ShareModal from './ShareModal';
+import useDebounce from '@/Hooks/useDebounce';
 
 // Professional color schemes matching QuoteCard
 const colorSchemes = [
@@ -19,6 +20,9 @@ const colorSchemes = [
 export default function QuoteDetailModal({ quote, isOpen, onClose }) {
     const [isLiked, setIsLiked] = useState(quote?.is_liked || false);
     const [isSaved, setIsSaved] = useState(quote?.is_saved || false);
+    const [expectedLiked, setExpectedLiked] = useState(quote?.is_liked || false);
+    const [expectedSaved, setExpectedSaved] = useState(quote?.is_saved || false);
+
     const [likesCount, setLikesCount] = useState(quote?.likes_count || 0);
     const [savesCount, setSavesCount] = useState(quote?.saves_count || 0);
     const [copied, setCopied] = useState(false);
@@ -30,7 +34,11 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
     useEffect(() => {
         if (quote) {
             setIsLiked(quote.is_liked || false);
+            setExpectedLiked(quote.is_liked || false);
+
             setIsSaved(quote.is_saved || false);
+            setExpectedSaved(quote.is_saved || false);
+
             setLikesCount(quote.likes_count || 0);
             setSavesCount(quote.saves_count || 0);
         }
@@ -56,7 +64,7 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
                         source: 'modal',
                         duration: 0,
                     }),
-                }).catch(err => console.log('View tracking failed:', err));
+                }).catch(() => { }); // Silently ignore tracking errors
             }
         } else {
             document.body.style.overflow = 'unset';
@@ -75,7 +83,7 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
                             source: 'modal',
                             duration: duration,
                         }),
-                    }).catch(err => console.log('Duration tracking failed:', err));
+                    }).catch(() => { }); // Silently ignore tracking errors
                 }
                 setViewStartTime(null);
             }
@@ -101,46 +109,66 @@ export default function QuoteDetailModal({ quote, isOpen, onClose }) {
         }
     };
 
+    // Debounced sync for Likes
+    const syncLike = useDebounce(() => {
+        if (isLiked !== expectedLiked) {
+            setExpectedLiked(isLiked);
+            router.post(`/quotes/${quote.id}/like`, {}, {
+                preserveState: true,
+                preserveScroll: true,
+                only: [],
+                onError: () => {
+                    // Revert on error
+                    const previousState = !isLiked;
+                    setIsLiked(previousState);
+                    setExpectedLiked(previousState);
+                    setLikesCount(previousState ? likesCount + 1 : likesCount - 1);
+                },
+            });
+        }
+    }, 500);
+
     const handleLike = (e) => {
         e.stopPropagation();
 
-        // Optimistic update - instant UI feedback
+        // Optimistic update
         const newIsLiked = !isLiked;
         setIsLiked(newIsLiked);
         setLikesCount(newIsLiked ? likesCount + 1 : likesCount - 1);
 
-        // Background sync with server
-        router.post(`/quotes/${quote.id}/like`, {}, {
-            preserveState: true,
-            preserveScroll: true,
-            only: [],
-            onError: () => {
-                // Revert on error
-                setIsLiked(!newIsLiked);
-                setLikesCount(newIsLiked ? likesCount : likesCount + 1);
-            },
-        });
+        // Trigger debounced sync
+        syncLike();
     };
+
+    // Debounced sync for Saves
+    const syncSave = useDebounce(() => {
+        if (isSaved !== expectedSaved) {
+            setExpectedSaved(isSaved);
+            router.post(`/quotes/${quote.id}/save`, {}, {
+                preserveState: true,
+                preserveScroll: true,
+                only: [],
+                onError: () => {
+                    // Revert on error
+                    const previousState = !isSaved;
+                    setIsSaved(previousState);
+                    setExpectedSaved(previousState);
+                    setSavesCount(previousState ? savesCount + 1 : savesCount - 1);
+                },
+            });
+        }
+    }, 500);
 
     const handleSave = (e) => {
         e.stopPropagation();
 
-        // Optimistic update - instant UI feedback
+        // Optimistic update
         const newIsSaved = !isSaved;
         setIsSaved(newIsSaved);
         setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
 
-        // Background sync with server
-        router.post(`/quotes/${quote.id}/save`, {}, {
-            preserveState: true,
-            preserveScroll: true,
-            only: [],
-            onError: () => {
-                // Revert on error
-                setIsSaved(!newIsSaved);
-                setSavesCount(newIsSaved ? savesCount : savesCount + 1);
-            },
-        });
+        // Trigger debounced sync
+        syncSave();
     };
 
     const handleShare = () => {

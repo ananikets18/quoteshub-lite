@@ -202,7 +202,7 @@ export default function ShareModal({ show, onClose, quote, colorScheme, onShare 
                                                     // Track successful share
                                                     if (onShare) onShare();
                                                 } catch (err) {
-                                                    console.log('Share cancelled');
+                                                    // User cancelled share - silently ignore
                                                 }
                                             }}
                                             className="flex items-center justify-center gap-2 px-3 py-2 sm:py-2.5 bg-[#5D41E6] hover:bg-[#4b33c2] text-white rounded-lg font-medium text-xs sm:text-sm transition-all hover:scale-105"

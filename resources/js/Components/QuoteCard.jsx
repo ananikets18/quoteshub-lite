@@ -9,6 +9,7 @@ import ShareModal from './ShareModal';
 import Toast from './Toast';
 import AuthPromptModal from './AuthPromptModal';
 import axios from 'axios';
+import useDebounce from '@/Hooks/useDebounce';
 
 // Professional color schemes matching QuoteDetailModal
 const colorSchemes = [
@@ -25,6 +26,9 @@ const colorSchemes = [
 export default function QuoteCard({ quote, compact = false, auth, collections = [], onUnsave = null, showSavedContext = false }) {
     const [isLiked, setIsLiked] = useState(quote.is_liked || false);
     const [isSaved, setIsSaved] = useState(quote.is_saved || false);
+    const [expectedLiked, setExpectedLiked] = useState(quote.is_liked || false);
+    const [expectedSaved, setExpectedSaved] = useState(quote.is_saved || false);
+
     const [likesCount, setLikesCount] = useState(quote.likes_count || 0);
     const [savesCount, setSavesCount] = useState(quote.saves_count || 0);
     const [showModal, setShowModal] = useState(false);
@@ -53,7 +57,11 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
     // Sync state when quote prop changes (e.g., after page refresh)
     useEffect(() => {
         setIsLiked(quote.is_liked || false);
+        setExpectedLiked(quote.is_liked || false);
+
         setIsSaved(quote.is_saved || false);
+        setExpectedSaved(quote.is_saved || false);
+
         setLikesCount(quote.likes_count || 0);
         setSavesCount(quote.saves_count || 0);
     }, [quote.id, quote.is_liked, quote.is_saved, quote.likes_count, quote.saves_count]);
@@ -72,94 +80,117 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
     // Format timestamp to relative time
     const formatTimestamp = (timestamp) => {
         if (!timestamp) return null;
-        
+
         const now = new Date();
         const postDate = new Date(timestamp);
         const diffInSeconds = Math.floor((now - postDate) / 1000);
-        
+
         if (diffInSeconds < 60) return 'just now';
         if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
         if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
         if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d`;
         if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)}w`;
-        
+
         // For older posts, show actual date
         return postDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
 
     // Check if quote is long (over 280 characters)
     const isLongQuote = quote.content && quote.content.length > 280;
-    const displayContent = (!isExpanded && isLongQuote) 
-        ? quote.content.substring(0, 280) + '...' 
+    const displayContent = (!isExpanded && isLongQuote)
+        ? quote.content.substring(0, 280) + '...'
         : quote.content;
+
+    // Debounced sync for Likes
+    const syncLike = useDebounce(() => {
+        if (isLiked !== expectedLiked) {
+            setExpectedLiked(isLiked);
+            router.post(`/quotes/${quote.id}/like`, {}, {
+                preserveState: true,
+                preserveScroll: true,
+                only: [],
+                onError: () => {
+                    // Revert on error
+                    const previousState = !isLiked;
+                    setIsLiked(previousState);
+                    setExpectedLiked(previousState);
+                    setLikesCount(previousState ? likesCount + 1 : likesCount - 1);
+                    showNotification('Failed to update like. Please try again.', 'error');
+                },
+            });
+        }
+    }, 500);
 
     const handleLike = (e) => {
         e.stopPropagation();
 
-        // Check authentication
         if (!auth?.user) {
             setAuthAction('like');
             setShowAuthModal(true);
             return;
         }
 
-        // Optimistic update - instant UI feedback
+        // Optimistic update
         const newIsLiked = !isLiked;
         setIsLiked(newIsLiked);
         setLikesCount(newIsLiked ? likesCount + 1 : likesCount - 1);
 
-        // Background sync with server
-        router.post(`/quotes/${quote.id}/like`, {}, {
-            preserveState: true,
-            preserveScroll: true,
-            only: [],
-            onError: () => {
-                // Revert on error
-                setIsLiked(!newIsLiked);
-                setLikesCount(newIsLiked ? likesCount : likesCount + 1);
-                showNotification('Failed to update like. Please try again.', 'error');
-            },
-        });
+        // Trigger debounced sync
+        syncLike();
     };
+
+    // Debounced sync for Saves
+    const syncSave = useDebounce(() => {
+        if (isSaved !== expectedSaved) {
+            setExpectedSaved(isSaved);
+            router.post(`/quotes/${quote.id}/save`, {}, {
+                preserveState: true,
+                preserveScroll: true,
+                only: [],
+                onError: () => {
+                    // Revert on error
+                    const previousState = !isSaved;
+                    setIsSaved(previousState);
+                    setExpectedSaved(previousState);
+                    setSavesCount(previousState ? savesCount + 1 : savesCount - 1);
+
+                    // Stop fading if it was an unsave that failed
+                    setIsFadingOut(false);
+
+                    showNotification('Failed to save quote. Please try again.', 'error');
+                },
+            });
+        }
+    }, 500);
 
     const handleSave = (e) => {
         e.stopPropagation();
 
-        // Check authentication
         if (!auth?.user) {
             setAuthAction('save');
             setShowAuthModal(true);
             return;
         }
 
-        // Optimistic update - instant UI feedback
+        // Optimistic update
         const newIsSaved = !isSaved;
         const wasUnsaved = isSaved && !newIsSaved;
 
         setIsSaved(newIsSaved);
         setSavesCount(newIsSaved ? savesCount + 1 : savesCount - 1);
 
-        // If unsaving and callback provided (e.g., from Saved page), trigger fade out
+        // If unsaving and callback provided, trigger fade out immediately
+        // Note: We might revert this if the server request fails, but for UX responsiveness this is better
         if (wasUnsaved && onUnsave) {
             setIsFadingOut(true);
             setTimeout(() => {
-                onUnsave(quote.id);
-            }, 300); // Match the transition duration
+                // If we haven't reverted due to error (checked via ref ideally, but simplistic here)
+                if (onUnsave && isFadingOut) onUnsave(quote.id);
+            }, 300);
         }
 
-        // Background sync with server
-        router.post(`/quotes/${quote.id}/save`, {}, {
-            preserveState: true,
-            preserveScroll: true,
-            only: [],
-            onError: () => {
-                // Revert on error
-                setIsSaved(!newIsSaved);
-                setSavesCount(newIsSaved ? savesCount : savesCount + 1);
-                setIsFadingOut(false);
-                showNotification('Failed to save quote. Please try again.', 'error');
-            },
-        });
+        // Trigger debounced sync
+        syncSave();
     };
 
     const handleShare = async (e) => {
@@ -390,7 +421,7 @@ export default function QuoteCard({ quote, compact = false, auth, collections = 
                         <p className="text-base sm:text-lg md:text-xl leading-relaxed text-gray-900 dark:text-white whitespace-pre-line">
                             {displayContent}
                         </p>
-                        
+
                         {/* Read More/Less Button for Long Quotes */}
                         {isLongQuote && (
                             <button

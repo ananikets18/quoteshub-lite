@@ -59,22 +59,20 @@ export default function Index({
                                             <Link
                                                 key={i}
                                                 href={link.url}
-                                                dangerouslySetInnerHTML={{
-                                                    __html: link.label,
-                                                }}
                                                 className={`px-4 py-2 rounded-xl transition-all ${link.active
                                                     ? 'bg-[#5D41E6] text-white shadow-md'
                                                     : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                                     }`}
-                                            />
+                                            >
+                                                {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
+                                            </Link>
                                         ) : (
                                             <span
                                                 key={i}
                                                 className="px-4 py-2 rounded-xl opacity-50 text-gray-500 dark:text-gray-500"
-                                                dangerouslySetInnerHTML={{
-                                                    __html: link.label,
-                                                }}
-                                            />
+                                            >
+                                                {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
+                                            </span>
                                         )
                                     )}
                                 </div>
@@ -90,7 +88,7 @@ export default function Index({
                                     No results found
                                 </h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                                    {searchQuery 
+                                    {searchQuery
                                         ? `No quotes found matching "${searchQuery}". Try different keywords.`
                                         : 'Start searching to find inspiring quotes.'
                                     }

@@ -31,6 +31,7 @@ export default function UpdateProfileInformationForm({ status }) {
                     value={data.name}
                     onChange={(e) => setData('name', e.target.value)}
                     required
+                    maxLength="255"
                     className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
                 />
                 {errors.name && (
@@ -51,6 +52,9 @@ export default function UpdateProfileInformationForm({ status }) {
                     type="text"
                     value={data.username}
                     onChange={(e) => setData('username', e.target.value)}
+                    maxLength="50"
+                    pattern="^[a-zA-Z0-9._-]+$"
+                    title="Username can only contain letters, numbers, dots, hyphens, and underscores."
                     className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
                 />
                 {errors.username && (
@@ -139,6 +143,7 @@ export default function UpdateProfileInformationForm({ status }) {
                     value={data.location}
                     onChange={(e) => setData('location', e.target.value)}
                     placeholder="City, Country"
+                    maxLength="100"
                     className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-colors"
                 />
                 {errors.location && (

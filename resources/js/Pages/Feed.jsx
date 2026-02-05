@@ -18,7 +18,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
     const [hasMore, setHasMore] = useState(!!initialQuotes.next_page_url);
     const loadingRef = useRef(false);
     const observerRef = useRef(null);
-    const sentinelRef = useRef(null);
+
 
     // Scroll direction for dynamic header/nav
     const { scrollDirection, scrollY } = useScrollDirection();
@@ -111,30 +111,29 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
         router.visit(`/category/${categorySlug}`);
     };
 
-    // Intersection Observer for infinite scroll (better performance)
-    useEffect(() => {
-        const options = {
-            root: null,
-            rootMargin: '300px',
-            threshold: 0.1
-        };
+    // Intersection Observer callback ref pattern
+    // This ensures we observe the node whenever it mounts/unmounts (e.g. after initial loading)
+    const lastElementRef = useCallback((node) => {
+        if (loading) return;
+
+        if (observerRef.current) {
+            observerRef.current.disconnect();
+        }
 
         observerRef.current = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && hasMore && !loadingRef.current) {
                 loadMore();
             }
-        }, options);
+        }, {
+            root: null,
+            rootMargin: '300px',
+            threshold: 0.1
+        });
 
-        if (sentinelRef.current) {
-            observerRef.current.observe(sentinelRef.current);
+        if (node) {
+            observerRef.current.observe(node);
         }
-
-        return () => {
-            if (observerRef.current) {
-                observerRef.current.disconnect();
-            }
-        };
-    }, [loadMore, hasMore]);
+    }, [loading, hasMore, loadMore]);
 
     // Determine if header should be visible
     const isHeaderVisible = scrollDirection === 'up' || scrollY < 50;
@@ -271,7 +270,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                         </div>
 
                         {/* Infinite Scroll Sentinel */}
-                        <div ref={sentinelRef} className="h-24 flex items-center justify-center mb-4">
+                        <div ref={lastElementRef} className="h-24 flex items-center justify-center mb-4">
                             {loading && (
                                 <div className="flex flex-col items-center gap-3 py-8">
                                     <div className="relative">

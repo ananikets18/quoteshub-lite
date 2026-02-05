@@ -52,9 +52,9 @@ export default function Tag({ auth, tag, quotes, sort, collections = [] }) {
                     <>
                         <div className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {quotes.data.map((quote) => (
-                                <QuoteCard 
-                                    key={quote.id} 
-                                    quote={quote} 
+                                <QuoteCard
+                                    key={quote.id}
+                                    quote={quote}
                                     auth={auth}
                                     collections={collections}
                                 />
@@ -69,19 +69,20 @@ export default function Tag({ auth, tag, quotes, sort, collections = [] }) {
                                         <Link
                                             key={index}
                                             href={link.url}
-                                            className={`px-4 py-2 rounded-xl ${
-                                                link.active
+                                            className={`px-4 py-2 rounded-xl ${link.active
                                                     ? 'bg-[#5D41E6] text-white'
                                                     : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700'
-                                            }`}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
+                                                }`}
+                                        >
+                                            {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
+                                        </Link>
                                     ) : (
                                         <span
                                             key={index}
                                             className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
+                                        >
+                                            {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
+                                        </span>
                                     )
                                 ))}
                             </div>
