@@ -48,7 +48,7 @@ export default function UpdatePasswordForm() {
 
             {/* Current Password */}
             <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-gray-200">
                     Current Password *
                 </label>
                 <input
@@ -60,7 +60,7 @@ export default function UpdatePasswordForm() {
                     }
                     autoComplete="current-password"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.current_password && (
                     <p className="mt-1 text-sm text-red-600 flex gap-1 items-center">
@@ -72,7 +72,7 @@ export default function UpdatePasswordForm() {
 
             {/* New Password */}
             <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-gray-200">
                     New Password *
                 </label>
                 <input
@@ -82,7 +82,7 @@ export default function UpdatePasswordForm() {
                     onChange={(e) => setData('password', e.target.value)}
                     autoComplete="new-password"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.password && (
                     <p className="mt-1 text-sm text-red-600 flex gap-1 items-center">
@@ -94,7 +94,7 @@ export default function UpdatePasswordForm() {
 
             {/* Confirm Password */}
             <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-gray-200">
                     Confirm New Password *
                 </label>
                 <input
@@ -106,7 +106,7 @@ export default function UpdatePasswordForm() {
                     }
                     autoComplete="new-password"
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
                 {errors.password_confirmation && (
                     <p className="mt-1 text-sm text-red-600 flex gap-1 items-center">
@@ -121,7 +121,7 @@ export default function UpdatePasswordForm() {
                 <button
                     type="submit"
                     disabled={processing}
-                    className="px-6 py-2.5 rounded-lg text-white font-semibold bg-gradient-to-r from-purple-600 to-pink-600 disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-lg text-white font-semibold bg-[#5D41E6] hover:bg-[#4a31c9] active:bg-[#3d28a8] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 shadow-md hover:shadow-lg"
                 >
                     {processing ? 'Updating...' : 'Update Password'}
                 </button>

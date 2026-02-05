@@ -67,25 +67,27 @@ export default function Header({
 
     return (
         <header
-            className={`sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top transition-transform duration-300 ${
-                isVisible ? "translate-y-0" : "-translate-y-full"
-            }`}
+            className={`sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 safe-area-top transition-transform duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"
+                }`}
         >
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 max-w-3xl mx-auto w-full">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-2 sm:py-3.5 max-w-3xl mx-auto w-full">
                 {/* Left: Title or Logo */}
-                <div className="flex-1 min-w-0 mr-3">
+                <div className="flex-1 min-w-0 mr-2 sm:mr-3 max-w-[60%] sm:max-w-none">
                     {showLogo ? (
                         <Link
                             href="/"
                             className="inline-flex items-center gap-1 hover:opacity-80 transition-opacity"
                         >
-                            <ApplicationLogo className="w-7 h-7 sm:w-8 sm:h-8 text-[#5D41E6] dark:text-purple-400 flex-shrink-0" />
-                            <span className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white leading-none">
+                            <ApplicationLogo className="w-6 h-6 sm:w-8 sm:h-8 text-[#5D41E6] dark:text-purple-400 flex-shrink-0" />
+                            <span className="text-lg sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white leading-none">
                                 QuotesHub
                             </span>
                         </Link>
                     ) : (
-                        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
+                        <h1
+                            className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate"
+                            title={title || "QuotesHub"}
+                        >
                             {title || "QuotesHub"}
                         </h1>
                     )}
@@ -99,7 +101,7 @@ export default function Header({
                             className="streak-badge hover:scale-105 transition-transform active:scale-95 cursor-pointer"
                         >
                             <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
-                            <span className="text-sm sm:text-base">{auth.user.daily_streak || 0}</span>
+                            <span className="text-xs sm:text-base font-semibold">{auth.user.daily_streak || 0}</span>
                         </Link>
                     )}
 

@@ -146,13 +146,13 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                 description="Your personalized feed of inspiring quotes. Discover, like, and share wisdom from around the world."
             />
             {/* Sticky Header Section - Hides on scroll down */}
-            <div className={`sticky top-[60px] z-30 bg-gray-50 dark:bg-gray-900 transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+            <div className={`sticky top-[52px] sm:top-[56px] z-30 bg-gray-50 dark:bg-gray-900 transition-transform duration-300 ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
                 }`}>
 
                 {/* Filter Tabs - Enhanced Design */}
                 <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-sm">
-                    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3">
-                        <div className="flex items-center gap-2">
+                    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-2 sm:py-3">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             {filters.map((filter) => {
                                 const Icon = filter.icon;
                                 const isActive = activeFilter === filter.id;
@@ -161,13 +161,13 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                                     <button
                                         key={filter.id}
                                         onClick={() => changeFilter(filter.id)}
-                                        className={`flex-1 group relative px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 ${isActive
+                                        className={`flex-1 group relative px-3 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-xs sm:text-base transition-all duration-200 ${isActive
                                             ? 'bg-gradient-to-r from-[#5D41E6] to-[#7C3AED] text-white shadow-md hover:shadow-lg scale-[1.02]'
                                             : 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
                                             }`}
                                     >
-                                        <div className="flex items-center justify-center gap-2">
-                                            <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? '' : 'opacity-80'}`} />
+                                        <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                                            <Icon className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${isActive ? '' : 'opacity-80'}`} />
                                             <span className="whitespace-nowrap">{filter.label}</span>
                                         </div>
                                     </button>
@@ -180,7 +180,7 @@ export default function Feed({ quotes: initialQuotes, categories, collections = 
                 {/* Categories Horizontal Scroll - Enhanced */}
                 {categories && categories.length > 0 && (
                     <div className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-                        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+                        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-2 sm:py-4">
                             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
                                 {categories?.map((category) => (
                                     <button

@@ -154,7 +154,7 @@ export default function UpdateProfileInformationForm({ status }) {
                 <button
                     type="submit"
                     disabled={processing}
-                    className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    className="px-6 py-2.5 bg-[#5D41E6] hover:bg-[#4a31c9] active:bg-[#3d28a8] text-white font-semibold rounded-lg shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                     {processing ? 'Saving...' : 'Save Changes'}
                 </button>
