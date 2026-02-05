@@ -212,7 +212,7 @@ class QuoteController extends Controller
 
         // Warn about URLs but allow (for now)
         $warnings = [];
-        if (in_array('contains_url', $moderationResult['flags'])) {0dyu0
+        if (in_array('contains_url', $moderationResult['flags'])) {
             $warnings[] = 'Note: Your quote contains URLs. It may be reviewed by moderators.';
         }
 
