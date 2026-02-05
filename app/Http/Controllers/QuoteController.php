@@ -103,9 +103,14 @@ class QuoteController extends Controller
                 'status' => 'approved', // MVP: Auto-approve all quotes. Moderation via report system.
             ]);
 
-            // Attach categories
+            // Attach categories and increment their quotes_count
             if (!empty($validated['category_ids'])) {
                 $quote->categories()->attach($validated['category_ids']);
+                
+                // Increment quotes_count for each category since quote is approved
+                foreach ($validated['category_ids'] as $categoryId) {
+                    \App\Models\Category::where('id', $categoryId)->increment('quotes_count');
+                }
             }
             
             return $quote;
@@ -207,11 +212,14 @@ class QuoteController extends Controller
 
         // Warn about URLs but allow (for now)
         $warnings = [];
-        if (in_array('contains_url', $moderationResult['flags'])) {
+        if (in_array('contains_url', $moderationResult['flags'])) {0dyu0
             $warnings[] = 'Note: Your quote contains URLs. It may be reviewed by moderators.';
         }
 
         \DB::transaction(function () use ($quote, $validated) {
+            // Get old categories before sync
+            $oldCategoryIds = $quote->categories->pluck('id')->toArray();
+            
             $quote->update([
                 'content' => $validated['content'],
                 'author' => $validated['author'],
@@ -219,11 +227,33 @@ class QuoteController extends Controller
                 'background_gradient' => $validated['background_gradient'] ?? $quote->background_gradient,
             ]);
 
-            // Sync categories
+            // Sync categories and update counts if quote is approved
             if (isset($validated['category_ids'])) {
-                $quote->categories()->sync($validated['category_ids']);
+                $newCategoryIds = $validated['category_ids'];
+                $quote->categories()->sync($newCategoryIds);
+                
+                // Update category counts only if quote is approved
+                if ($quote->status === 'approved') {
+                    // Decrement count for removed categories
+                    $removedCategories = array_diff($oldCategoryIds, $newCategoryIds);
+                    if (!empty($removedCategories)) {
+                        \App\Models\Category::whereIn('id', $removedCategories)->decrement('quotes_count');
+                    }
+                    
+                    // Increment count for added categories
+                    $addedCategories = array_diff($newCategoryIds, $oldCategoryIds);
+                    if (!empty($addedCategories)) {
+                        \App\Models\Category::whereIn('id', $addedCategories)->increment('quotes_count');
+                    }
+                }
             } else {
+                // Detach all categories
                 $quote->categories()->detach();
+                
+                // Decrement count for all old categories if quote is approved
+                if ($quote->status === 'approved' && !empty($oldCategoryIds)) {
+                    \App\Models\Category::whereIn('id', $oldCategoryIds)->decrement('quotes_count');
+                }
             }
         });
 

@@ -100,13 +100,15 @@ export default function Index({ auth, collections }) {
                                 Organize your saved quotes into custom collections
                             </p>
                         </div>
-                        <button
-                            onClick={() => setShowCreateModal(true)}
-                            className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 sm:py-3 bg-gradient-to-r from-[#5D41E6] to-[#7C3AED] hover:shadow-xl text-white font-semibold rounded-2xl transition-all shadow-lg hover:scale-105 active:scale-95"
-                        >
-                            <FolderPlus className="w-4 h-4 mr-2" />
-                            New Collection
-                        </button>
+                        {collections.length > 0 && (
+                            <button
+                                onClick={() => setShowCreateModal(true)}
+                                className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 sm:py-3 bg-gradient-to-r from-[#5D41E6] to-[#7C3AED] hover:shadow-xl text-white font-semibold rounded-2xl transition-all shadow-lg hover:scale-105 active:scale-95"
+                            >
+                                <FolderPlus className="w-4 h-4 mr-2" />
+                                New Collection
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -205,145 +207,222 @@ export default function Index({ auth, collections }) {
             </div>
 
             {/* Create Collection Modal */}
-            <Modal show={showCreateModal} onClose={() => setShowCreateModal(false)}>
-                <form onSubmit={handleCreate} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Create New Collection</h2>
-
-                    <div className="mb-4">
-                        <InputLabel htmlFor="name" value="Collection Name" />
-                        <TextInput
-                            id="name"
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="mt-1 block w-full"
-                            placeholder="e.g., Motivational, Work Quotes, etc."
-                            required
-                        />
-                        <InputError message={errors.name} className="mt-2" />
+            <Modal show={showCreateModal} onClose={() => setShowCreateModal(false)} maxWidth="md">
+                <div className="p-4 sm:p-6 bg-white dark:bg-gray-800">
+                    <div className="flex items-start mb-4 sm:mb-6">
+                        <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+                            <FolderPlus className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div className="ml-3 sm:ml-4">
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Create New Collection</h3>
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Organize your favorite quotes</p>
+                        </div>
                     </div>
 
-                    <div className="mb-4">
-                        <InputLabel htmlFor="description" value="Description (optional)" />
-                        <textarea
-                            id="description"
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                            rows="3"
-                            placeholder="What's this collection about?"
-                        />
-                        <InputError message={errors.description} className="mt-2" />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={formData.is_public}
-                                onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
-                                className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    <form onSubmit={handleCreate} className="space-y-4 sm:space-y-6">
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                                Collection Name
+                            </label>
+                            <TextInput
+                                id="name"
+                                type="text"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                className="mt-1 block w-full text-sm sm:text-base"
+                                placeholder="e.g., Motivational, Work Quotes, etc."
+                                required
+                                autoFocus
+                                maxLength={100}
                             />
-                            <span className="ml-2 text-sm text-gray-700">Make this collection public</span>
-                        </label>
-                    </div>
+                            <InputError message={errors.name} className="mt-2" />
+                        </div>
 
-                    <div className="flex justify-end space-x-3">
-                        <SecondaryButton type="button" onClick={() => setShowCreateModal(false)}>
-                            Cancel
-                        </SecondaryButton>
-                        <PrimaryButton type="submit">Create Collection</PrimaryButton>
-                    </div>
-                </form>
+                        <div>
+                            <label htmlFor="description" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                                Description (optional)
+                            </label>
+                            <textarea
+                                id="description"
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="mt-1 block w-full text-sm sm:text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-500 focus:ring-purple-500 dark:focus:ring-purple-500 rounded-lg shadow-sm transition-colors"
+                                rows={3}
+                                placeholder="What's this collection about?"
+                                maxLength={500}
+                            />
+                            <InputError message={errors.description} className="mt-2" />
+                        </div>
+
+                        <div className="pt-1 sm:pt-2">
+                            <label className="flex items-start cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.is_public}
+                                    onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
+                                    className="w-5 h-5 mt-0.5 rounded border-gray-300 dark:border-gray-600 text-purple-600 shadow-sm focus:ring-purple-500 dark:focus:ring-purple-500 dark:focus:ring-offset-gray-800 transition-colors flex-shrink-0"
+                                />
+                                <div className="ml-3">
+                                    <span className="block text-sm font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                                        Make this collection public
+                                    </span>
+                                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                        Public collections can be viewed by anyone
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <button
+                                type="button"
+                                onClick={() => setShowCreateModal(false)}
+                                className="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-800 transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-800 transition-all shadow-sm"
+                            >
+                                Create Collection
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </Modal>
 
             {/* Edit Collection Modal */}
-            <Modal show={showEditModal} onClose={() => setShowEditModal(false)}>
-                <form onSubmit={handleEdit} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Edit Collection</h2>
-
-                    <div className="mb-4">
-                        <InputLabel htmlFor="edit-name" value="Collection Name" />
-                        <TextInput
-                            id="edit-name"
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="mt-1 block w-full"
-                            required
-                        />
-                        <InputError message={errors.name} className="mt-2" />
+            <Modal show={showEditModal} onClose={() => setShowEditModal(false)} maxWidth="md">
+                <div className="p-4 sm:p-6 bg-white dark:bg-gray-800">
+                    <div className="flex items-start mb-4 sm:mb-6">
+                        <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+                            <Edit className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div className="ml-3 sm:ml-4">
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Edit Collection</h3>
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Update your collection details</p>
+                        </div>
                     </div>
 
-                    <div className="mb-4">
-                        <InputLabel htmlFor="edit-description" value="Description (optional)" />
-                        <textarea
-                            id="edit-description"
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                            rows="3"
-                        />
-                        <InputError message={errors.description} className="mt-2" />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={formData.is_public}
-                                onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
-                                className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    <form onSubmit={handleEdit} className="space-y-4 sm:space-y-6">
+                        <div>
+                            <label htmlFor="edit-name" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                                Collection Name
+                            </label>
+                            <TextInput
+                                id="edit-name"
+                                type="text"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                className="mt-1 block w-full text-sm sm:text-base"
+                                required
+                                autoFocus
+                                maxLength={100}
                             />
-                            <span className="ml-2 text-sm text-gray-700">Make this collection public</span>
-                        </label>
-                    </div>
+                            <InputError message={errors.name} className="mt-2" />
+                        </div>
 
-                    <div className="flex justify-end space-x-3">
-                        <SecondaryButton type="button" onClick={() => setShowEditModal(false)}>
-                            Cancel
-                        </SecondaryButton>
-                        <PrimaryButton type="submit">Save Changes</PrimaryButton>
-                    </div>
-                </form>
+                        <div>
+                            <label htmlFor="edit-description" className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                                Description (optional)
+                            </label>
+                            <textarea
+                                id="edit-description"
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="mt-1 block w-full text-sm sm:text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-500 focus:ring-purple-500 dark:focus:ring-purple-500 rounded-lg shadow-sm transition-colors"
+                                rows={3}
+                                maxLength={500}
+                            />
+                            <InputError message={errors.description} className="mt-2" />
+                        </div>
+
+                        <div className="pt-1 sm:pt-2">
+                            <label className="flex items-start cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.is_public}
+                                    onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
+                                    className="w-5 h-5 mt-0.5 rounded border-gray-300 dark:border-gray-600 text-purple-600 shadow-sm focus:ring-purple-500 dark:focus:ring-purple-500 dark:focus:ring-offset-gray-800 transition-colors flex-shrink-0"
+                                />
+                                <div className="ml-3">
+                                    <span className="block text-sm font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                                        Make this collection public
+                                    </span>
+                                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                        Public collections can be viewed by anyone
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <button
+                                type="button"
+                                onClick={() => setShowEditModal(false)}
+                                className="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-800 transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-800 transition-all shadow-sm"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </Modal>
 
             {/* Delete Collection Modal */}
             <Modal show={showDeleteModal} onClose={() => setShowDeleteModal(false)} maxWidth="md">
-                <div className="p-6">
-                    <div className="flex items-center mb-4">
-                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                            <AlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="p-4 sm:p-6 bg-white dark:bg-gray-800">
+                    <div className="flex items-start mb-4 sm:mb-6">
+                        <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+                            <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7 text-red-600 dark:text-red-400" />
                         </div>
-                        <div className="ml-4">
-                            <h3 className="text-lg font-medium text-gray-900">Delete Collection</h3>
-                            <p className="text-sm text-gray-600 mt-1">This action cannot be undone</p>
+                        <div className="ml-3 sm:ml-4">
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Delete Collection</h3>
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">This action cannot be undone</p>
                         </div>
                     </div>
 
                     {deletingCollection && (
-                        <div className="mb-6">
-                            <p className="text-gray-700">
+                        <div className="mb-4 sm:mb-6">
+                            <p className="text-gray-900 dark:text-white">
                                 Are you sure you want to delete <strong>"{deletingCollection.name}"</strong>?
                             </p>
-                            <p className="text-sm text-gray-600 mt-2">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                                 The quotes themselves will not be deleted, only removed from this collection.
                             </p>
                             {deletingCollection.quotes_count > 0 && (
-                                <p className="text-sm text-yellow-600 mt-2">
-                                    ⚠️ This collection contains {deletingCollection.quotes_count} quote{deletingCollection.quotes_count !== 1 ? 's' : ''}.
+                                <p className="text-sm text-yellow-700 dark:text-yellow-400 mt-2 flex items-center">
+                                    <AlertTriangle className="w-4 h-4 mr-1 flex-shrink-0" />
+                                    This collection contains {deletingCollection.quotes_count} quote{deletingCollection.quotes_count !== 1 ? 's' : ''}.
                                 </p>
                             )}
                         </div>
                     )}
 
-                    <div className="flex justify-end space-x-3">
-                        <SecondaryButton onClick={() => setShowDeleteModal(false)} disabled={isDeleting}>
+                    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <button
+                            type="button"
+                            onClick={() => setShowDeleteModal(false)}
+                            disabled={isDeleting}
+                            className="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
                             Cancel
-                        </SecondaryButton>
-                        <DangerButton onClick={handleDelete} disabled={isDeleting}>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                            className="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                        >
                             {isDeleting ? 'Deleting...' : 'Delete Collection'}
-                        </DangerButton>
+                        </button>
                     </div>
                 </div>
             </Modal>

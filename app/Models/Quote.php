@@ -148,7 +148,35 @@ class Quote extends Model
     {
         parent::boot();
 
-        // Decrement tag usage counts when quote is deleted
+        // Update category counts when quote status changes to approved
+        static::updated(function ($quote) {
+            try {
+                // If quote status changed to approved, increment category counts
+                if ($quote->isDirty('status') && $quote->status === 'approved' && $quote->getOriginal('status') !== 'approved') {
+                    if ($quote->categories()->exists()) {
+                        $quote->categories()->each(function ($category) {
+                            $category->increment('quotes_count');
+                        });
+                    }
+                }
+                
+                // If quote status changed from approved to something else, decrement category counts
+                if ($quote->isDirty('status') && $quote->status !== 'approved' && $quote->getOriginal('status') === 'approved') {
+                    if ($quote->categories()->exists()) {
+                        $quote->categories()->each(function ($category) {
+                            $category->decrement('quotes_count');
+                        });
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error in Quote updated event', [
+                    'quote_id' => $quote->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        });
+
+        // Decrement tag usage counts and category counts when quote is deleted
         static::deleting(function ($quote) {
             try {
                 // Decrement usage count for all tags
@@ -157,6 +185,13 @@ class Quote extends Model
                         if ($tag && \Schema::hasColumn('tags', 'usage_count')) {
                             $tag->decrement('usage_count');
                         }
+                    });
+                }
+
+                // Decrement category quotes_count if quote was approved
+                if ($quote->status === 'approved' && $quote->categories()->exists()) {
+                    $quote->categories()->each(function ($category) {
+                        $category->decrement('quotes_count');
                     });
                 }
 

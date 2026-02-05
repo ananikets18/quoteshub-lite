@@ -20,12 +20,15 @@ export default function Saved({ auth, quotes, collections = [] }) {
             <div className="px-4 py-6 pb-20">
                 {/* Header with Collections Button */}
                 <div className="flex items-center justify-between mb-6">
-                    <p className="text-gray-600 dark:text-gray-400">
-                        {visibleQuotes.length} quote{visibleQuotes.length !== 1 ? 's' : ''} saved
-                    </p>
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Saved Quotes</h1>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {visibleQuotes.length} quote{visibleQuotes.length !== 1 ? 's' : ''} saved
+                        </p>
+                    </div>
                     <Link
                         href={route('collections.index')}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#5D41E6] hover:bg-[#4b33c2] text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#5D41E6] hover:bg-[#4b33c2] text-white text-sm font-medium rounded-xl hover:shadow-lg transition-all"
                     >
                         <FolderPlus className="w-4 h-4" />
                         Collections

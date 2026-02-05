@@ -107,6 +107,9 @@ class CollectionController extends Controller
 
         $collection = $request->user()->collections()->create($validated);
 
+        // Clear any cached collection data
+        cache()->forget('user_collections_' . $request->user()->id);
+
         return redirect()->route('collections.show', $collection->slug)
             ->with('success', 'Collection created successfully!');
     }

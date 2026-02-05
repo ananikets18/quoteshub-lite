@@ -19,11 +19,6 @@ class SearchController extends Controller
         // Validate input
         $validated = $request->validate([
             'q' => 'nullable|string|max:500',
-            'category' => 'nullable|integer|exists:categories,id',
-            'tag' => 'nullable|string|max:100',
-            'start_date' => 'nullable|date|before_or_equal:today',
-            'end_date' => 'nullable|date|after_or_equal:start_date|before_or_equal:today',
-            'sort' => 'nullable|in:latest,popular,most_saved,oldest',
         ]);
 
         try {
@@ -47,48 +42,10 @@ class SearchController extends Controller
                 });
             }
 
-            // Filter by category
-            if ($categoryId = $validated['category'] ?? null) {
-                $query->whereHas('categories', function ($q) use ($categoryId) {
-                    $q->where('categories.id', $categoryId);
-                });
-            }
+            // Sort by latest
+            $query->orderByDesc('created_at');
 
-            // Filter by tag
-            if ($tag = $validated['tag'] ?? null) {
-                $tag = trim($tag);
-                $query->whereHas('tags', function ($q) use ($tag) {
-                    $q->where('tags.name', $tag);
-                });
-            }
-
-            // Date range filter
-            if ($startDate = $validated['start_date'] ?? null) {
-                $query->whereDate('created_at', '>=', $startDate);
-            }
-            if ($endDate = $validated['end_date'] ?? null) {
-                $query->whereDate('created_at', '<=', $endDate);
-            }
-
-            // Sort by popularity or date
-            $sort = $validated['sort'] ?? 'latest';
-        switch ($sort) {
-            case 'popular':
-                $query->orderByDesc('likes_count');
-                break;
-            case 'most_saved':
-                $query->orderByDesc('saves_count');
-                break;
-            case 'oldest':
-                $query->orderBy('created_at');
-                break;
-            case 'latest':
-            default:
-                $query->orderByDesc('created_at');
-                break;
-        }
-
-        $quotes = $query->paginate(12)->withQueryString();
+            $quotes = $query->paginate(12)->withQueryString();
 
         // Add user interaction flags if authenticated
         if (auth()->check()) {
@@ -103,33 +60,19 @@ class SearchController extends Controller
                 return $quote;
             });
         }
-
-            // Load filter options
-            $categories = Category::orderBy('name')->get();
-            $popularTags = Tag::withCount('quotes')
-                ->orderByDesc('quotes_count')
-                ->take(20)
-                ->get();
             
-            // Get user's collections if authenticated
-            $collections = auth()->check() 
-                ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
-                : [];
+        // Get user's collections if authenticated
+        $collections = auth()->check() 
+            ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
+            : [];
         } catch (\Exception $e) {
             \Log::error('Search error: ' . $e->getMessage());
             
             return Inertia::render('Search/Index', [
                 'quotes' => ['data' => [], 'links' => [], 'total' => 0],
-                'categories' => Category::orderBy('name')->get(),
-                'popularTags' => Tag::withCount('quotes')->orderByDesc('quotes_count')->take(20)->get(),
                 'collections' => [],
                 'filters' => [
                     'q' => $validated['q'] ?? '',
-                    'category' => '',
-                    'tag' => '',
-                    'start_date' => '',
-                    'end_date' => '',
-                    'sort' => 'latest',
                 ],
                 'error' => 'An error occurred while searching. Please try again.',
             ]);
@@ -137,16 +80,9 @@ class SearchController extends Controller
 
         return Inertia::render('Search/Index', [
             'quotes' => $quotes,
-            'categories' => $categories,
-            'popularTags' => $popularTags,
             'collections' => $collections,
             'filters' => [
                 'q' => $request->input('q'),
-                'category' => $request->input('category'),
-                'tag' => $request->input('tag'),
-                'start_date' => $request->input('start_date'),
-                'end_date' => $request->input('end_date'),
-                'sort' => $sort,
             ],
         ]);
     }

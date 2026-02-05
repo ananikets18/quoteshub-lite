@@ -120,7 +120,7 @@ class ProfileController extends Controller
         
         // Get user's collections for the add-to-collection dropdown
         $collections = $user->collections()
-            ->select('id', 'name', 'slug')
+            ->select('id', 'name', 'slug', 'created_at')
             ->orderBy('name')
             ->get();
         
