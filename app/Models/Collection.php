@@ -30,12 +30,11 @@ class Collection extends Model
             if (empty($collection->slug)) {
                 $collection->slug = Str::slug($collection->name);
                 
-                // Ensure slug is unique for this user
+                // Ensure slug is globally unique (not just per-user)
+                // This matches the database constraint: collections_slug_unique
                 $originalSlug = $collection->slug;
                 $count = 1;
-                while (static::where('user_id', $collection->user_id)
-                    ->where('slug', $collection->slug)
-                    ->exists()) {
+                while (static::where('slug', $collection->slug)->exists()) {
                     $collection->slug = $originalSlug . '-' . $count++;
                 }
             }

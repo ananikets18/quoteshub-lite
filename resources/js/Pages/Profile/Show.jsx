@@ -16,7 +16,8 @@ export default function Show({ auth, profile, stats, isFollowing, isOwnProfile, 
         setFollowing(newFollowing);
         setFollowersCount(newFollowing ? followersCount + 1 : followersCount - 1);
 
-        router.post(`/users/${profile.username}/follow`, {}, {
+        const method = newFollowing ? 'post' : 'delete';
+        router[method](`/users/${profile.username}/follow`, {}, {
             preserveState: true,
             preserveScroll: true,
             onError: () => {

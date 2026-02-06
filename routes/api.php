@@ -50,9 +50,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me/saved', [UserController::class, 'savedQuotes']);
     Route::get('/me/collections', [UserController::class, 'collections']);
     
-    // Streak update with rate limiting (once per day per user)
-    Route::post('/me/streak', [UserController::class, 'updateStreak'])
-        ->middleware('throttle:5,1440'); // 5 attempts per 24 hours
+    // Streak update (localStorage caching on frontend prevents excessive calls)
+    Route::post('/me/streak', [UserController::class, 'updateStreak']);
     
     // Avatar & Cover Image Upload
     Route::post('/me/avatar', [App\Http\Controllers\Api\AvatarController::class, 'upload']);

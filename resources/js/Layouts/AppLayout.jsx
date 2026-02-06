@@ -6,6 +6,7 @@ import BottomNav from '@/Components/BottomNav';
 import KeyboardShortcutsModal from '@/Components/KeyboardShortcutsModal';
 import { useGlobalShortcuts } from '@/Hooks/useKeyboardShortcuts';
 import useScrollDirection from '@/Hooks/useScrollDirection';
+import { StreakProvider } from '@/Contexts/StreakContext';
 import Footer from '@/Components/Footer';
 import Toast from '@/Components/Toast';
 
@@ -38,6 +39,8 @@ export default function AppLayout({ children, title, showHeader = true, showNav 
         }
     }, [auth?.user, refreshUnreadCount]);
 
+
+
     useEffect(() => {
         if (flash?.success) {
             setToast({ message: flash.success, type: 'success' });
@@ -59,50 +62,52 @@ export default function AppLayout({ children, title, showHeader = true, showNav 
         <>
             <Head title={title} />
 
-            <div
-                className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900"
-                data-user-username={auth.user?.username}
-            >
-                {showHeader && (
-                    <Header
-                        title={title}
-                        showLogo={showLogo}
-                        isVisible={isNavVisible}
-                        unreadCount={unreadCount}
-                        refreshUnreadCount={refreshUnreadCount}
+            <StreakProvider>
+                <div
+                    className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900"
+                    data-user-username={auth.user?.username}
+                >
+                    {showHeader && (
+                        <Header
+                            title={title}
+                            showLogo={showLogo}
+                            isVisible={isNavVisible}
+                            unreadCount={unreadCount}
+                            refreshUnreadCount={refreshUnreadCount}
+                        />
+                    )}
+
+                    <main className={`flex-grow max-w-lg mx-auto w-full ${showNav ? 'pb-20 md:pb-10' : 'pb-10'}`}>
+                        {children}
+                    </main>
+
+                    {showFooter && <Footer />}
+
+                    {showNav && (
+                        <BottomNav
+                            isVisible={isNavVisible}
+                            auth={auth}
+                            unreadCount={unreadCount}
+                        />
+                    )}
+                </div>
+
+                {toast && (
+                    <Toast
+                        show={true}
+                        message={toast.message}
+                        type={toast.type}
+                        onClose={() => setToast(null)}
                     />
                 )}
 
-                <main className={`flex-grow max-w-lg mx-auto w-full ${showNav ? 'pb-20 md:pb-10' : 'pb-10'}`}>
-                    {children}
-                </main>
-
-                {showFooter && <Footer />}
-
-                {showNav && (
-                    <BottomNav
-                        isVisible={isNavVisible}
-                        auth={auth}
-                        unreadCount={unreadCount}
-                    />
-                )}
-            </div>
-
-            {toast && (
-                <Toast
-                    show={true}
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={() => setToast(null)}
+                {/* Keyboard Shortcuts Help Modal */}
+                <KeyboardShortcutsModal
+                    show={showShortcutsModal}
+                    onClose={() => setShowShortcutsModal(false)}
+                    isAuthenticated={!!auth.user}
                 />
-            )}
-
-            {/* Keyboard Shortcuts Help Modal */}
-            <KeyboardShortcutsModal
-                show={showShortcutsModal}
-                onClose={() => setShowShortcutsModal(false)}
-                isAuthenticated={!!auth.user}
-            />
+            </StreakProvider>
         </>
     );
 }

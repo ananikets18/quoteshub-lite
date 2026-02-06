@@ -5,6 +5,7 @@ import axios from "axios";
 import { Flame, Bell, Settings } from "lucide-react";
 import NotificationDropdown from "./NotificationDropdown";
 import ApplicationLogo from "./ApplicationLogo";
+import { useStreakContext } from "@/Contexts/StreakContext";
 
 export default function Header({
     title,
@@ -21,6 +22,7 @@ export default function Header({
     const [localUnreadCount, setLocalUnreadCount] = useState(0);
     const [isMounted, setIsMounted] = useState(false);
     const bellButtonRef = useRef(null);
+    const { currentStreak } = useStreakContext();
 
     const useSharedCount = refreshUnreadCountProp != null;
     const unreadCount = useSharedCount
@@ -101,7 +103,7 @@ export default function Header({
                             className="streak-badge hover:scale-105 transition-transform active:scale-95 cursor-pointer"
                         >
                             <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
-                            <span className="text-xs sm:text-base font-semibold">{auth.user.daily_streak || 0}</span>
+                            <span className="text-xs sm:text-base font-semibold">{currentStreak}</span>
                         </Link>
                     )}
 

@@ -2,8 +2,10 @@ import { Head } from '@inertiajs/react';
 import SeoHead from '@/Components/SeoHead';
 import AppLayout from '@/Layouts/AppLayout';
 import { Trophy, Lock, Star, Flame, Zap, Award, Target, Share2, Crown } from 'lucide-react';
+import { useStreakContext } from '@/Contexts/StreakContext';
 
 export default function Achievements({ auth, achievements, progress, totalPoints }) {
+    const { currentStreak } = useStreakContext();
     const categories = {
         creation: { name: 'Creation', icon: '✍️', color: 'purple', description: 'Crafting quotes' },
         popularity: { name: 'Popularity', icon: '⭐', color: 'yellow', description: 'Getting recognized' },
@@ -65,7 +67,7 @@ export default function Achievements({ auth, achievements, progress, totalPoints
                             </div>
 
                             <div className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400 filter drop-shadow-lg mb-1">
-                                {auth.user.daily_streak || 0}
+                                {currentStreak}
                             </div>
                             <div className="text-orange-200 font-medium text-lg tracking-wide mb-6">Day Streak</div>
                         </div>

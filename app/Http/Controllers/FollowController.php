@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Follow;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -24,11 +25,27 @@ class FollowController extends Controller
         }
 
         if (!$currentUser->following()->where('following_id', $userToFollow->id)->exists()) {
-            $currentUser->following()->attach($userToFollow->id);
-            // Note: Counters are automatically updated by Follow model observers
+            // Use Follow model to ensure observers are triggered
+            Follow::create([
+                'follower_id' => $currentUser->id,
+                'following_id' => $userToFollow->id,
+            ]);
+            
+            // Refresh user models to get updated counts
+            $currentUser->refresh();
+            $userToFollow->refresh();
+            
+            // Clear dashboard cache for both users to reflect updated counts
+            $this->clearDashboardCache($currentUser->id);
+            $this->clearDashboardCache($userToFollow->id);
             
             // Trigger notification
             app(NotificationService::class)->notifyNewFollower($currentUser, $userToFollow);
+        }
+
+        // If on dashboard, force a visit to refresh stats
+        if ($request->header('referer') && str_contains($request->header('referer'), '/dashboard')) {
+            return redirect()->route('dashboard');
         }
 
         return back();
@@ -43,8 +60,26 @@ class FollowController extends Controller
         $currentUser = $request->user();
 
         if ($currentUser->following()->where('following_id', $userToUnfollow->id)->exists()) {
-            $currentUser->following()->detach($userToUnfollow->id);
-            // Note: Counters are automatically updated by Follow model observers
+            // Use Follow model to ensure observers are triggered
+            Follow::where('follower_id', $currentUser->id)
+                ->where('following_id', $userToUnfollow->id)
+                ->delete();
+            
+            // Refresh user models to get updated counts
+            $currentUser->refresh();
+            $userToUnfollow->refresh();
+            
+            // Clear dashboard cache for both users to reflect updated counts
+            $this->clearDashboardCache($currentUser->id);
+            $this->clearDashboardCache($userToUnfollow->id);
+            
+            // Remove the follower notification
+            app(NotificationService::class)->removeFollowerNotification($currentUser, $userToUnfollow);
+        }
+
+        // If on dashboard, force a visit to refresh stats
+        if ($request->header('referer') && str_contains($request->header('referer'), '/dashboard')) {
+            return redirect()->route('dashboard');
         }
 
         return back();
@@ -156,5 +191,23 @@ class FollowController extends Controller
             'followingCount' => count($followingIds),
             'collections' => $collections,
         ]);
+    }
+
+    /**
+     * Clear dashboard cache for a user from both default and Redis stores.
+     */
+    private function clearDashboardCache(int $userId): void
+    {
+        $cacheKey = 'dashboard_stats_' . $userId;
+        
+        // Clear from default cache
+        \Illuminate\Support\Facades\Cache::forget($cacheKey);
+        
+        // Try to clear from Redis cache if available
+        try {
+            \Illuminate\Support\Facades\Cache::store('redis')->forget($cacheKey);
+        } catch (\Throwable $e) {
+            // Redis not available, skip
+        }
     }
 }

@@ -40,9 +40,8 @@ class EnsureOnboardingCompleted
             return $next($request);
         }
 
-        // Only redirect to onboarding if email is verified
-        // This ensures: Register → Verify Email → Onboarding → App
-        if ($request->user()->hasVerifiedEmail() && !$request->user()->onboarding_completed) {
+        // Redirect to onboarding if not completed
+        if (!$request->user()->onboarding_completed) {
             return redirect()->route('onboarding.show');
         }
 

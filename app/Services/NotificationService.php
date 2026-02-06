@@ -129,6 +129,18 @@ class NotificationService
     }
 
     /**
+     * Remove follower notification when unfollow happens
+     */
+    public function removeFollowerNotification(User $unfollower, User $unfollowedUser): void
+    {
+        // Delete the notification
+        Notification::where('user_id', $unfollowedUser->id)
+            ->where('actor_id', $unfollower->id)
+            ->where('type', Notification::TYPE_NEW_FOLLOWER)
+            ->delete();
+    }
+
+    /**
      * Create a comment added notification
      */
     public function notifyCommentAdded(User $commenter, Quote $quote, string $commentContent): void

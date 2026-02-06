@@ -2,8 +2,11 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import SeoHead from '@/Components/SeoHead';
 import { Home, TrendingUp, BookOpen, Users, Sparkles, ArrowRight, Heart, Bookmark, Eye, BarChart3, Award, Zap, Clock, TrendingDown } from 'lucide-react';
+import { useStreakContext } from '@/Contexts/StreakContext';
 
 export default function Dashboard({ auth, stats }) {
+    const { currentStreak } = useStreakContext();
+
     return (
         <AppLayout title="Dashboard">
             <SeoHead
@@ -53,7 +56,7 @@ export default function Dashboard({ auth, stats }) {
                         </div>
                         <Link href="/achievements" className="text-center group cursor-pointer px-3 py-4 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all">
                             <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#5D41E6] dark:group-hover:text-purple-400 transition-colors flex items-center justify-center gap-1">
-                                {stats?.daily_streak || 0}
+                                {currentStreak}
                                 <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" />
                             </div>
                             <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider mt-2">Day Streak</div>

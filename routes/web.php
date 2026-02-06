@@ -145,7 +145,7 @@ Route::middleware(['auth', 'noindex'])->group(function () {
 
     
     Route::get('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
-    Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store')->middleware('throttle:10,1');
+    Route::post('/quotes', [QuoteController::class, 'store'])->name('quotes.store')->middleware('throttle:30,1');
     Route::get('/quotes/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit');
     Route::put('/quotes/{quote}', [QuoteController::class, 'update'])->name('quotes.update');
     Route::delete('/quotes/{quote}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
@@ -227,8 +227,8 @@ Route::middleware(['auth', 'noindex'])->group(function () {
     Route::post('/quotes/{quote}/move', [CollectionController::class, 'moveQuote'])->name('collections.moveQuote');
     
     // Follow system
-    Route::post('/users/{username}/follow', [FollowController::class, 'follow'])->name('users.follow');
-    Route::delete('/users/{username}/follow', [FollowController::class, 'unfollow'])->name('users.unfollow');
+    Route::post('/users/{username}/follow', [FollowController::class, 'follow'])->name('users.follow')->middleware('throttle:30,1');
+    Route::delete('/users/{username}/follow', [FollowController::class, 'unfollow'])->name('users.unfollow')->middleware('throttle:30,1');
     Route::get('/following-feed', [FollowController::class, 'feed'])->name('following.feed');
     
     // API routes for follow functionality (for onboarding)
