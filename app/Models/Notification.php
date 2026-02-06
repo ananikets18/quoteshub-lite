@@ -153,7 +153,7 @@ class Notification extends Model
     public function getUrl(): ?string
     {
         return match($this->type) {
-            self::TYPE_NEW_FOLLOWER => $this->actor ? "/u/{$this->actor->username}" : null,
+            self::TYPE_NEW_FOLLOWER => $this->actor ? "/{$this->actor->username}" : null,
             self::TYPE_QUOTE_LIKED, self::TYPE_QUOTE_SAVED, self::TYPE_COMMENT_ADDED => 
                 isset($this->data['quote_id']) ? "/quotes/{$this->data['quote_id']}" : null,
             self::TYPE_ACHIEVEMENT_UNLOCKED => "/profile",
