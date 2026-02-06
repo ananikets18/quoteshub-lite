@@ -266,6 +266,59 @@ After deployment, you should see:
 
 ---
 
-**Status:** ✅ Fix Applied - Ready for Testing  
+## Update: UTF-8 Encoding Issue (2026-02-06 14:47)
+
+### Root Cause Confirmed
+The transaction fixes revealed the **actual error**: Malformed UTF-8 characters in quote content/user data causing JSON encoding failures in notifications.
+
+### Additional Fixes Applied
+
+**1. NotificationService UTF-8 Sanitization**
+- Added `sanitizeForJson()` method to clean malformed UTF-8
+- Applied to all user-generated content in notifications:
+  - Quote content
+  - Usernames
+  - Comments
+  - Admin reasons
+  - Achievement descriptions
+
+**2. Database Cleanup Command**
+Created `php artisan cleanup:utf8` to fix existing malformed data in:
+- Quotes (content, author, source)
+- Users (name, username, bio)
+
+### Deployment Steps (UPDATED)
+
+```bash
+# 1. Pull latest changes
+git pull origin main
+
+# 2. Clean existing malformed data
+php artisan cleanup:utf8
+
+# 3. Clear old failed notifications (optional)
+php artisan tinker
+>>> Notification::whereDate('created_at', '<', now()->subDays(7))->delete();
+>>> exit
+
+# 4. Deploy normally
+php artisan down
+php artisan config:clear
+php artisan cache:clear
+php artisan config:cache
+php artisan route:cache
+php artisan queue:restart
+php artisan up
+```
+
+### Expected Results
+- ✅ Like/save actions now succeed with valid quote data
+- ✅ Notifications created without JSON encoding errors
+- ✅ Existing malformed content cleaned up
+- ✅ Future content automatically sanitized
+
+---
+
+**Status:** ✅ Complete Fix Applied - UTF-8 Issue Resolved  
 **Last Updated:** 2026-02-06  
 **Priority:** HIGH - Affects core user engagement features

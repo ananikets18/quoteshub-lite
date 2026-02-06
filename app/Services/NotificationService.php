@@ -12,6 +12,24 @@ use App\Events\NotificationSent;
 class NotificationService
 {
     /**
+     * Sanitize string for JSON encoding by fixing malformed UTF-8
+     */
+    protected function sanitizeForJson(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        // Remove any invalid UTF-8 characters
+        $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+        
+        // Additional cleanup: remove null bytes and control characters except newlines/tabs
+        $value = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $value);
+        
+        return $value;
+    }
+
+    /**
      * Create a new follower notification
      */
     public function notifyNewFollower(User $follower, User $followedUser): void
@@ -21,7 +39,7 @@ class NotificationService
             'actor_id' => $follower->id,
             'type' => Notification::TYPE_NEW_FOLLOWER,
             'data' => [
-                'follower_username' => $follower->username,
+                'follower_username' => $this->sanitizeForJson($follower->username),
             ],
         ]);
     }
@@ -54,7 +72,7 @@ class NotificationService
             'type' => Notification::TYPE_QUOTE_LIKED,
             'data' => [
                 'quote_id' => $quote->id,
-                'quote_content' => substr($quote->content, 0, 100),
+                'quote_content' => $this->sanitizeForJson(substr($quote->content, 0, 100)),
             ],
         ]);
     }
@@ -87,7 +105,7 @@ class NotificationService
             'type' => Notification::TYPE_QUOTE_SAVED,
             'data' => [
                 'quote_id' => $quote->id,
-                'quote_content' => substr($quote->content, 0, 100),
+                'quote_content' => $this->sanitizeForJson(substr($quote->content, 0, 100)),
             ],
         ]);
     }
@@ -156,8 +174,8 @@ class NotificationService
             'type' => Notification::TYPE_COMMENT_ADDED,
             'data' => [
                 'quote_id' => $quote->id,
-                'quote_content' => substr($quote->content, 0, 100),
-                'comment_content' => substr($commentContent, 0, 100),
+                'quote_content' => $this->sanitizeForJson(substr($quote->content, 0, 100)),
+                'comment_content' => $this->sanitizeForJson(substr($commentContent, 0, 100)),
             ],
         ]);
     }
@@ -172,8 +190,8 @@ class NotificationService
             'actor_id' => null,
             'type' => Notification::TYPE_ACHIEVEMENT_UNLOCKED,
             'data' => [
-                'achievement_name' => $achievementName,
-                'achievement_description' => $achievementDescription,
+                'achievement_name' => $this->sanitizeForJson($achievementName),
+                'achievement_description' => $this->sanitizeForJson($achievementDescription),
             ],
         ]);
     }
@@ -188,8 +206,8 @@ class NotificationService
             'actor_id' => $admin?->id,
             'type' => Notification::TYPE_ADMIN_WARNING,
             'data' => [
-                'reason' => $reason,
-                'admin_name' => $admin?->name ?? 'Admin',
+                'reason' => $this->sanitizeForJson($reason),
+                'admin_name' => $this->sanitizeForJson($admin?->name ?? 'Admin'),
             ],
         ]);
     }
@@ -205,9 +223,9 @@ class NotificationService
             'type' => Notification::TYPE_QUOTE_REMOVED,
             'data' => [
                 'quote_id' => $quote->id,
-                'quote_content' => substr($quote->content, 0, 100),
-                'reason' => $reason,
-                'admin_name' => $admin?->name ?? 'Admin',
+                'quote_content' => $this->sanitizeForJson(substr($quote->content, 0, 100)),
+                'reason' => $this->sanitizeForJson($reason),
+                'admin_name' => $this->sanitizeForJson($admin?->name ?? 'Admin'),
             ],
         ]);
     }
