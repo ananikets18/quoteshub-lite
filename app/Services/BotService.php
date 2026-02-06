@@ -16,7 +16,64 @@ use Carbon\Carbon;
 class BotService
 {
     /**
-     * Perform random bot activities
+     * Post scheduled quotes (called by scheduler)
+     */
+    public function postScheduledQuote(): array
+    {
+        if (!config('bot.enabled')) {
+            return ['success' => false, 'message' => 'Bot system is disabled'];
+        }
+
+        // Check if we're within active hours
+        if (!$this->isActiveHour()) {
+            return ['success' => false, 'message' => 'Outside active hours'];
+        }
+
+        // Check if we've reached daily quote limit for NEW quotes only
+        // (exclude imported quotes from today's count)
+        $dailyQuotesPosted = Quote::whereIn('user_id', User::bots()->pluck('id'))
+            ->whereDate('created_at', today())
+            ->whereTime('created_at', '>=', now()->startOfDay()->addHours(6)) // Only count from 6 AM
+            ->count();
+
+        $dailyLimit = config('bot.behavior.daily_quote_limit', 40);
+
+        if ($dailyQuotesPosted >= $dailyLimit) {
+            return ['success' => false, 'message' => 'Daily quote limit reached'];
+        }
+
+        // Get a random bot user
+        $bot = User::bots()
+            ->where('is_active', true)
+            ->inRandomOrder()
+            ->first();
+
+        if (!$bot) {
+            return ['success' => false, 'message' => 'No bot users available'];
+        }
+
+        // Get a random quote that hasn't been posted recently
+        $availableQuote = $this->getAvailableQuoteForPosting($bot);
+        
+        if (!$availableQuote) {
+            return ['success' => false, 'message' => 'No quotes available to post'];
+        }
+
+        // Post the quote
+        if ($this->postQuote($bot, $availableQuote)) {
+            return [
+                'success' => true,
+                'bot_username' => $bot->username,
+                'quotes_posted_today' => $dailyQuotesPosted + 1,
+                'daily_limit' => $dailyLimit,
+            ];
+        }
+
+        return ['success' => false, 'message' => 'Failed to create quote'];
+    }
+
+    /**
+     * Perform random bot activities (likes, saves, follows)
      */
     public function performActivities(): array
     {
@@ -51,12 +108,6 @@ class BotService
 
             // Perform various activities based on probability
             try {
-                if ($this->shouldPerformAction('create_quote', $bot)) {
-                    if ($this->createQuote($bot)) {
-                        $results['quotes_created']++;
-                    }
-                }
-
                 if ($this->shouldPerformAction('like_quote', $bot)) {
                     if ($this->likeRandomQuote($bot)) {
                         $results['likes_given']++;
@@ -156,6 +207,134 @@ class BotService
         if (!$bot->last_bot_activity || 
             $bot->last_bot_activity->isToday() === false) {
             $bot->update(['daily_action_count' => 0]);
+        }
+    }
+
+    /**
+     * Get an available quote for posting
+     */
+    protected function getAvailableQuoteForPosting(User $bot): ?object
+    {
+        // Get quotes that haven't been posted in the last 7 days
+        return DB::table('quotes')
+            ->where('status', 'approved')
+            ->where(function ($query) use ($bot) {
+                $query->where(function ($q) {
+                    // Never posted quotes assigned to bots
+                    $q->whereIn('user_id', User::bots()->pluck('id'))
+                      ->where('created_at', '<', now()->subDays(7));
+                })
+                ->orWhere(function ($q) {
+                    // Unassigned quotes
+                    $q->whereNull('user_id');
+                });
+            })
+            ->inRandomOrder()
+            ->first();
+    }
+
+    /**
+     * Post a quote for a bot user
+     */
+    protected function postQuote(User $bot, object $quoteData): bool
+    {
+        try {
+            $quote = Quote::create([
+                'user_id' => $bot->id,
+                'content' => $quoteData->content,
+                'author' => $quoteData->author,
+                'source' => $quoteData->source,
+                'status' => 'approved',
+            ]);
+
+            // Copy categories from original if it has an ID
+            if (isset($quoteData->id)) {
+                $categories = DB::table('category_quote')
+                    ->where('quote_id', $quoteData->id)
+                    ->pluck('category_id');
+                    
+                if ($categories->isNotEmpty()) {
+                    $quote->categories()->attach($categories);
+                }
+            }
+
+            $this->incrementBotActivity($bot);
+            $this->logActivity($bot, 'create_quote', $quote->id);
+
+            Log::info('Bot posted scheduled quote', [
+                'bot_username' => $bot->username,
+                'quote_id' => $quote->id,
+                'content_preview' => substr($quote->content, 0, 50) . '...',
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Bot post quote error', [
+                'bot_id' => $bot->id,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Create a quote from dataset as a bot
+     */
+    public function createQuoteFromDataset(User $bot): bool
+    {
+        try {
+            // Get a random unposted quote
+            $quote = DB::table('quotes')
+                ->where('status', 'approved')
+                ->whereNull('user_id')
+                ->orWhere(function ($query) {
+                    $query->whereIn('user_id', User::bots()->pluck('id'))
+                        ->where('created_at', '<', now()->subDays(30)); // Can repost old quotes
+                })
+                ->inRandomOrder()
+                ->first();
+
+            if (!$quote) {
+                // Fallback to creating from config samples
+                return $this->createQuote($bot);
+            }
+
+            // Create the quote
+            $newQuote = Quote::create([
+                'user_id' => $bot->id,
+                'content' => $quote->content,
+                'author' => $quote->author,
+                'source' => $quote->source,
+                'status' => 'approved',
+            ]);
+
+            // Copy categories if they exist
+            if ($quote->id) {
+                $categories = DB::table('category_quote')
+                    ->where('quote_id', $quote->id)
+                    ->pluck('category_id');
+                    
+                if ($categories->isNotEmpty()) {
+                    $newQuote->categories()->attach($categories);
+                }
+            }
+
+            $this->incrementBotActivity($bot);
+            $this->logActivity($bot, 'create_quote', $newQuote->id);
+
+            Log::info('Bot posted quote', [
+                'bot_username' => $bot->username,
+                'quote_id' => $newQuote->id,
+                'content_preview' => substr($newQuote->content, 0, 50) . '...',
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Bot create quote from dataset error', [
+                'bot_id' => $bot->id,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
         }
     }
 
