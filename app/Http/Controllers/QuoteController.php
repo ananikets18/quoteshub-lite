@@ -322,11 +322,20 @@ class QuoteController extends Controller
                     }
                 }
             });
+
+            // Refresh the quote to ensure we have the latest counts
+            $quote->refresh();
+            
         } catch (\Exception $e) {
             \Log::error('Like toggle error', [
                 'user_id' => $user->id,
                 'quote_id' => $quote->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->withErrors([
+                'like' => 'Failed to update like. Please try again.'
             ]);
         }
 
@@ -361,11 +370,20 @@ class QuoteController extends Controller
                     }
                 }
             });
+
+            // Refresh the quote to ensure we have the latest counts
+            $quote->refresh();
+            
         } catch (\Exception $e) {
             \Log::error('Save toggle error', [
                 'user_id' => $user->id,
                 'quote_id' => $quote->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->withErrors([
+                'save' => 'Failed to save quote. Please try again.'
             ]);
         }
 

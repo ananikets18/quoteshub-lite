@@ -231,32 +231,50 @@ class QuoteController extends Controller
         $quote = Quote::findOrFail($id);
         $user = Auth::user();
 
-        $like = Like::where('user_id', $user->id)
-            ->where('quote_id', $quote->id)
-            ->first();
+        try {
+            \DB::transaction(function () use ($quote, $user, &$is_liked, &$message) {
+                $like = $quote->likes()->where('user_id', $user->id)->lockForUpdate()->first();
 
-        if ($like) {
-            // Unlike
-            $like->delete();
-            app(\App\Services\NotificationService::class)->removeQuoteLikedNotification($user, $quote);
-            $message = 'Quote unliked';
-            $is_liked = false;
-        } else {
-            // Like
-            $created = Like::create([
+                if ($like) {
+                    // Unlike
+                    $like->delete();
+                    app(\App\Services\NotificationService::class)->removeQuoteLikedNotification($user, $quote);
+                    $message = 'Quote unliked';
+                    $is_liked = false;
+                } else {
+                    // Like - use firstOrCreate to handle race conditions
+                    $created = $quote->likes()->firstOrCreate(['user_id' => $user->id]);
+                    
+                    if ($created->wasRecentlyCreated) {
+                        app(\App\Services\NotificationService::class)->notifyQuoteLiked($user, $quote);
+                    }
+                    $message = 'Quote liked';
+                    $is_liked = true;
+                }
+            });
+
+            // Refresh to get latest counts
+            $quote->refresh();
+
+            return response()->json([
+                'message' => $message,
+                'is_liked' => $is_liked,
+                'likes_count' => $quote->likes_count,
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('API Like toggle error', [
                 'user_id' => $user->id,
                 'quote_id' => $quote->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-            app(\App\Services\NotificationService::class)->notifyQuoteLiked($user, $quote);
-            $message = 'Quote liked';
-            $is_liked = true;
+            
+            return response()->json([
+                'message' => 'Failed to update like. Please try again.',
+                'error' => true
+            ], 500);
         }
-
-        return response()->json([
-            'message' => $message,
-            'is_liked' => $is_liked,
-            'likes_count' => $quote->fresh()->likes_count,
-        ]);
     }
 
     /**
@@ -271,33 +289,53 @@ class QuoteController extends Controller
             'collection' => 'nullable|string|max:100',
         ]);
 
-        $save = Save::where('user_id', $user->id)
-            ->where('quote_id', $quote->id)
-            ->first();
+        try {
+            \DB::transaction(function () use ($quote, $user, $validated, &$is_saved, &$message) {
+                $save = $quote->saves()->where('user_id', $user->id)->lockForUpdate()->first();
 
-        if ($save) {
-            // Unsave
-            $save->delete();
-            app(\App\Services\NotificationService::class)->removeQuoteSavedNotification($user, $quote);
-            $message = 'Quote removed from saved';
-            $is_saved = false;
-        } else {
-            // Save
-            $created = Save::create([
+                if ($save) {
+                    // Unsave
+                    $save->delete();
+                    app(\App\Services\NotificationService::class)->removeQuoteSavedNotification($user, $quote);
+                    $message = 'Quote removed from saved';
+                    $is_saved = false;
+                } else {
+                    // Save - use firstOrCreate to handle race conditions
+                    $created = $quote->saves()->firstOrCreate(
+                        ['user_id' => $user->id],
+                        ['collection' => $validated['collection'] ?? 'default']
+                    );
+                    
+                    if ($created->wasRecentlyCreated) {
+                        app(\App\Services\NotificationService::class)->notifyQuoteSaved($user, $quote);
+                    }
+                    $message = 'Quote saved';
+                    $is_saved = true;
+                }
+            });
+
+            // Refresh to get latest counts
+            $quote->refresh();
+
+            return response()->json([
+                'message' => $message,
+                'is_saved' => $is_saved,
+                'saves_count' => $quote->saves_count,
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('API Save toggle error', [
                 'user_id' => $user->id,
                 'quote_id' => $quote->id,
-                'collection' => $validated['collection'] ?? 'default',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-            app(\App\Services\NotificationService::class)->notifyQuoteSaved($user, $quote);
-            $message = 'Quote saved';
-            $is_saved = true;
+            
+            return response()->json([
+                'message' => 'Failed to save quote. Please try again.',
+                'error' => true
+            ], 500);
         }
-
-        return response()->json([
-            'message' => $message,
-            'is_saved' => $is_saved,
-            'saves_count' => $quote->fresh()->saves_count,
-        ]);
     }
 
     /**
