@@ -63,11 +63,6 @@ class User extends Authenticatable
         'profile_is_private',
         'show_email',
         'show_activity_status',
-        
-        // Bot system
-        'is_bot',
-        'last_bot_activity',
-        'daily_action_count',
     ];
 
     /**
@@ -108,11 +103,6 @@ class User extends Authenticatable
             'profile_is_private' => 'boolean',
             'show_email' => 'boolean',
             'show_activity_status' => 'boolean',
-            
-            // Bot system
-            'is_bot' => 'boolean',
-            'last_bot_activity' => 'datetime',
-            'daily_action_count' => 'integer',
         ];
     }
 
@@ -364,30 +354,6 @@ class User extends Authenticatable
     public function getIsAdminAttribute(): bool
     {
         return $this->isAdmin();
-    }
-
-    /**
-     * Scope query to only include bot users
-     */
-    public function scopeBots($query)
-    {
-        return $query->where('is_bot', true);
-    }
-
-    /**
-     * Scope query to exclude bot users
-     */
-    public function scopeRealUsers($query)
-    {
-        return $query->where('is_bot', false);
-    }
-
-    /**
-     * Check if user is a bot
-     */
-    public function isBot(): bool
-    {
-        return $this->is_bot === true;
     }
 
     /**

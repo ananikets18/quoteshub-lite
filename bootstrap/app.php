@@ -13,17 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withSchedule(function (Schedule $schedule): void {
-        // Run bot activities every 15 minutes (if enabled)
-        $schedule->command('bot:activity')
-            ->everyFifteenMinutes()
-            ->when(fn() => config('bot.enabled'));
-        
-        // Daily cleanup of old bot content
-        $schedule->command('bot:activity --cleanup')
-            ->daily()
-            ->at('03:00');
-        
-        // Existing scheduled commands
         $schedule->command('engagement:calculate')
             ->hourly();
     })
