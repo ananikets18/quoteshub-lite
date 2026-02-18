@@ -6,15 +6,13 @@ use App\Models\Quote;
 use App\Models\Category;
 use App\Models\Tag;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class SearchController extends Controller
 {
     /**
      * Global search for quotes
      */
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         // Validate input
         $validated = $request->validate([
@@ -68,29 +66,27 @@ class SearchController extends Controller
         } catch (\Exception $e) {
             \Log::error('Search error: ' . $e->getMessage());
             
-            return Inertia::render('Search/Index', [
-                'quotes' => ['data' => [], 'links' => [], 'total' => 0],
-                'collections' => [],
-                'filters' => [
-                    'q' => $validated['q'] ?? '',
-                ],
-                'error' => 'An error occurred while searching. Please try again.',
-            ]);
+            $filters = [
+                'q' => $validated['q'] ?? '',
+            ];
+            $error = 'An error occurred while searching. Please try again.';
+            $quotes = ['data' => [], 'links' => [], 'total' => 0];
+            $collections = [];
+            
+            return view('search.index', compact('quotes', 'collections', 'filters', 'error'));
         }
 
-        return Inertia::render('Search/Index', [
-            'quotes' => $quotes,
-            'collections' => $collections,
-            'filters' => [
-                'q' => $request->input('q'),
-            ],
-        ]);
+        $filters = [
+            'q' => $request->input('q'),
+        ];
+        
+        return view('search.index', compact('quotes', 'collections', 'filters'));
     }
 
     /**
      * Show quotes in a specific category
      */
-    public function category(Request $request, string $slug): Response
+    public function category(Request $request, string $slug)
     {
         // Validate input
         $validated = $request->validate([
@@ -147,18 +143,13 @@ class SearchController extends Controller
             abort(500, 'An error occurred while loading the category');
         }
 
-        return Inertia::render('Search/Category', [
-            'category' => $category,
-            'quotes' => $quotes,
-            'sort' => $sort,
-            'collections' => $collections,
-        ]);
+        return view('search.category', compact('category', 'quotes', 'sort', 'collections'));
     }
 
     /**
      * Show quotes with a specific tag
      */
-    public function tag(Request $request, string $name): Response
+    public function tag(Request $request, string $name)
     {
         // Validate input
         $validated = $request->validate([
@@ -218,11 +209,6 @@ class SearchController extends Controller
             abort(500, 'An error occurred while loading the tag');
         }
 
-        return Inertia::render('Search/Tag', [
-            'tag' => $tag,
-            'quotes' => $quotes,
-            'sort' => $sort,
-            'collections' => $collections,
-        ]);
+        return view('search.tag', compact('tag', 'quotes', 'sort', 'collections'));
     }
 }

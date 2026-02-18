@@ -11,7 +11,6 @@ use App\Http\Controllers\OgImageController;
 use App\Http\Controllers\ActivityController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 use App\Http\Controllers\TopicController;
 
@@ -23,7 +22,7 @@ Route::get('/api/activity/feed', [ActivityController::class, 'feed'])->name('act
 Route::get('/api/activity/trending', [ActivityController::class, 'trending'])->name('activity.trending');
 Route::get('/api/activity/suggested-users', [ActivityController::class, 'suggestedUsers'])->name('activity.suggested');
 
-// Notification API routes (session-based auth for Inertia)
+// Notification API routes (session-based auth)
 Route::middleware('auth')->group(function () {
     Route::get('/api/notifications', [App\Http\Controllers\Api\NotificationController::class, 'index'])->name('api.notifications.index');
     Route::get('/api/notifications/unread-count', [App\Http\Controllers\Api\NotificationController::class, 'unreadCount'])->name('api.notifications.unread-count');
@@ -44,12 +43,12 @@ Route::get('/category/{slug}', [SearchController::class, 'category'])->name('cat
 Route::get('/tag/{name}', [SearchController::class, 'tag'])->name('tag.show');
 
 // Static Pages
-Route::inertia('/about', 'Static/About')->name('about');
-Route::inertia('/privacy', 'Static/Privacy')->name('privacy');
-Route::inertia('/terms', 'Static/Terms')->name('terms');
-Route::inertia('/guidelines', 'Static/Guidelines')->name('guidelines');
-Route::inertia('/contact', 'Static/Contact')->name('contact');
-Route::inertia('/cookies', 'Static/Cookies')->name('cookies');
+Route::view('/about', 'static.about')->name('about');
+Route::view('/privacy', 'static.privacy')->name('privacy');
+Route::view('/terms', 'static.terms')->name('terms');
+Route::view('/guidelines', 'static.guidelines')->name('guidelines');
+Route::view('/contact', 'static.contact')->name('contact');
+Route::view('/cookies', 'static.cookies')->name('cookies');
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
@@ -129,15 +128,13 @@ Route::get('/dashboard', function () {
         $stats = \Illuminate\Support\Facades\Cache::remember($cacheKey, $ttl, $buildStats);
     }
 
-    return Inertia::render('Dashboard', [
-        'stats' => $stats,
-    ]);
+    return view('dashboard', compact('stats'));
 })->middleware(['auth'])->name('dashboard');
 
 Route::middleware(['auth', 'noindex'])->group(function () {
     // Notifications
     Route::get('/notifications', function () {
-        return Inertia::render('Notifications');
+        return view('notifications');
     })->name('notifications');
     
     // Achievements
@@ -184,15 +181,15 @@ Route::middleware(['auth', 'noindex'])->group(function () {
             ]
         );
         
-        return Inertia::render('Settings', [
-            'preferences' => $preferences,
-            'privacy' => [
-                'profile_is_private' => $user->profile_is_private ?? false,
-                'show_email' => $user->show_email ?? false,
-                'show_activity_status' => $user->show_activity_status ?? true,
-            ],
-            'status' => session('status'),
-        ]);
+        $privacy = [
+            'profile_is_private' => $user->profile_is_private ?? false,
+            'show_email' => $user->show_email ?? false,
+            'show_activity_status' => $user->show_activity_status ?? true,
+        ];
+        
+        $status = session('status');
+        
+        return view('settings', compact('preferences', 'privacy', 'status'));
     })->name('settings');
     
     // Saved quotes (private - requires auth)

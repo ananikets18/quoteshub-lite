@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Tag;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class TopicController extends Controller
 {
@@ -34,9 +33,6 @@ class TopicController extends Controller
             ->take(15)
             ->get();
 
-        return Inertia::render('Topics/Index', [
-            'categories' => $categories,
-            'tags' => $tags,
-        ]);
+        return view('topics.index', compact('categories', 'tags'));
     }
 }

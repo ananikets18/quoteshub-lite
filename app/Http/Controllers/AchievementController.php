@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Services\AchievementService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class AchievementController extends Controller
 {
@@ -19,7 +17,7 @@ class AchievementController extends Controller
     /**
      * Display the achievements page
      */
-    public function index(): Response
+    public function index()
     {
         $user = auth()->user();
 
@@ -27,11 +25,7 @@ class AchievementController extends Controller
         $progress = $this->achievementService->getProgress($user);
         $totalPoints = $this->achievementService->getTotalPoints($user);
 
-        return Inertia::render('Achievements', [
-            'achievements' => $achievements,
-            'progress' => $progress,
-            'totalPoints' => $totalPoints,
-        ]);
+        return view('achievements', compact('achievements', 'progress', 'totalPoints'));
     }
 
     /**

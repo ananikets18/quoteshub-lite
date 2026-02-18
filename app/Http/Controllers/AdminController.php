@@ -8,8 +8,6 @@ use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class AdminController extends Controller
 {
@@ -18,7 +16,7 @@ class AdminController extends Controller
     /**
      * Show admin dashboard.
      */
-    public function index(): Response
+    public function index()
     {
         $stats = [
             'pending_reports' => Report::where('status', 'pending')->count(),
@@ -27,15 +25,13 @@ class AdminController extends Controller
             'recent_reports' => Report::where('status', 'pending')->count(),
         ];
 
-        return Inertia::render('Admin/Dashboard', [
-            'stats' => $stats,
-        ]);
+        return view('admin.dashboard', compact('stats'));
     }
 
     /**
      * Show all reports.
      */
-    public function reports(Request $request): Response
+    public function reports(Request $request)
     {
         $status = $request->input('status', 'pending');
         
@@ -46,10 +42,7 @@ class AdminController extends Controller
             ->orderByDesc('created_at')
             ->paginate(20);
 
-        return Inertia::render('Admin/Reports', [
-            'reports' => $reports,
-            'currentStatus' => $status,
-        ]);
+        return view('admin.reports', compact('reports', 'status'));
     }
 
     /**
@@ -88,7 +81,7 @@ class AdminController extends Controller
     /**
      * Show user management page.
      */
-    public function users(Request $request): Response
+    public function users(Request $request)
     {
         $search = $request->input('search');
         $role = $request->input('role');
@@ -108,13 +101,12 @@ class AdminController extends Controller
             ->orderByDesc('created_at')
             ->paginate(20);
 
-        return Inertia::render('Admin/Users', [
-            'users' => $users,
-            'filters' => [
-                'search' => $search,
-                'role' => $role,
-            ],
-        ]);
+        $filters = [
+            'search' => $search,
+            'role' => $role,
+        ];
+        
+        return view('admin.users', compact('users', 'filters'));
     }
 
     /**

@@ -6,7 +6,6 @@ use App\Models\Quote;
 use App\Models\Category;
 use App\Services\RecommendationService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class FeedController extends Controller
 {
@@ -37,10 +36,7 @@ class FeedController extends Controller
                     $quotes = $this->getForYouFeed($request);
                     $categories = Category::active()->ordered()->get();
                     
-                    return Inertia::render('Feed', [
-                        'quotes' => $quotes,
-                        'categories' => $categories,
-                    ]);
+                    return view('feed', compact('quotes', 'categories'));
                 }
                 // Fall back to latest for guests
                 $query->latest();
@@ -72,11 +68,7 @@ class FeedController extends Controller
             ? auth()->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
             : [];
 
-        return Inertia::render('Feed', [
-            'quotes' => $quotes,
-            'categories' => $categories,
-            'collections' => $collections,
-        ]);
+        return view('feed', compact('quotes', 'categories', 'collections'));
     }
 
     /**

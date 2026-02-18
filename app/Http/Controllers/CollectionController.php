@@ -7,8 +7,6 @@ use App\Models\Quote;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
-use Inertia\Inertia;
-use Inertia\Response;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CollectionController extends Controller
@@ -18,7 +16,7 @@ class CollectionController extends Controller
     /**
      * Display all collections for the authenticated user.
      */
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         // Ensure user is authenticated
         if (!$request->user()) {
@@ -31,15 +29,13 @@ class CollectionController extends Controller
             ->latest()
             ->get();
 
-        return Inertia::render('Collections/Index', [
-            'collections' => $collections,
-        ]);
+        return view('collections.index', compact('collections'));
     }
 
     /**
      * Show a specific collection.
      */
-    public function show(Request $request, string $slug): Response
+    public function show(Request $request, string $slug)
     {
         $collection = Collection::where('slug', $slug)->firstOrFail();
 
@@ -86,12 +82,9 @@ class CollectionController extends Controller
             ? $request->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
             : [];
 
-        return Inertia::render('Collections/Show', [
-            'collection' => $collection,
-            'quotes' => $quotes,
-            'isOwner' => $isOwner,
-            'collections' => $collections,
-        ]);
+        $collection->load('user');
+        
+        return view('collections.show', compact('collection', 'quotes', 'isOwner', 'collections'));
     }
 
     /**

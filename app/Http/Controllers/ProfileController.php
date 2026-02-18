@@ -9,15 +9,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class ProfileController extends Controller
 {
     /**
      * Display a user's public profile.
      */
-    public function show(Request $request, string $username): Response
+    public function show(Request $request, string $username)
     {
         $user = User::where('username', $username)->firstOrFail();
         
@@ -61,14 +59,10 @@ class ProfileController extends Controller
             ? $request->user()->collections()->select('id', 'name', 'slug')->orderBy('name')->get()
             : [];
         
-        return Inertia::render('Profile/Show', [
-            'profile' => $user,
-            'stats' => $stats,
-            'isFollowing' => $isFollowing,
-            'isOwnProfile' => $request->user()?->id === $user->id,
-            'quotes' => $quotes,
-            'collections' => $collections,
-        ]);
+        $profile = $user;
+        $isOwnProfile = $request->user()?->id === $user->id;
+        
+        return view('profile.show', compact('profile', 'stats', 'isFollowing', 'isOwnProfile', 'quotes', 'collections'));
     }
     
 
@@ -76,13 +70,11 @@ class ProfileController extends Controller
     /**
      * Display the user's profile edit form.
      */
-    public function edit(Request $request): Response
+    public function edit(Request $request)
     {
         $user = $request->user();
         
-        return Inertia::render('Profile/Edit', [
-            'user' => $user,
-        ]);
+        return view('profile.edit', compact('user'));
     }
 
     /**
@@ -91,7 +83,7 @@ class ProfileController extends Controller
     /**
      * Display the user's saved quotes (private to the user).
      */
-    public function saved(Request $request): Response
+    public function saved(Request $request)
     {
         // Ensure user is authenticated
         if (!$request->user()) {
@@ -124,10 +116,7 @@ class ProfileController extends Controller
             ->orderBy('name')
             ->get();
         
-        return Inertia::render('Profile/Saved', [
-            'quotes' => $quotes,
-            'collections' => $collections,
-        ]);
+        return view('profile.saved', compact('quotes', 'collections'));
     }
 
 

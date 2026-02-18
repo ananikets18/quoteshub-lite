@@ -18,7 +18,6 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
             \App\Http\Middleware\PreventBackHistory::class,
             \App\Http\Middleware\EnsureUserIsActive::class,
@@ -26,7 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Enable session-based authentication for API routes
-        // This allows API calls from the Inertia frontend to authenticate using sessions
+        // This allows API calls from the frontend to authenticate using sessions
         $middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
@@ -46,17 +45,13 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*')) {
                 return response()->json(['message' => 'Record not found.'], 404);
             }
-            return \Inertia\Inertia::render('Error', ['status' => 404])
-                ->toResponse($request)
-                ->setStatusCode(404);
+            return response()->view('errors.404', ['status' => 404], 404);
         });
 
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e, \Illuminate\Http\Request $request) {
             if ($request->is('api/*')) {
                 return response()->json(['message' => 'Forbidden.'], 403);
             }
-            return \Inertia\Inertia::render('Error', ['status' => 403])
-                ->toResponse($request)
-                ->setStatusCode(403);
+            return response()->view('errors.403', ['status' => 403], 403);
         });
     })->create();

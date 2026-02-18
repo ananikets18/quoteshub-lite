@@ -8,7 +8,6 @@ use App\Services\NotificationService;
 use App\Services\ContentModerationService;
 use App\Services\RecommendationService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class QuoteController extends Controller
@@ -32,10 +31,7 @@ class QuoteController extends Controller
         // Get user's rate limit info
         $rateLimitInfo = $this->moderationService->getRemainingQuotes(auth()->user());
 
-        return Inertia::render('CreateQuote', [
-            'categories' => $categories,
-            'rateLimitInfo' => $rateLimitInfo,
-        ]);
+        return view('quotes.create', compact('categories', 'rateLimitInfo'));
     }
 
     /**
@@ -138,9 +134,7 @@ class QuoteController extends Controller
             $quote->is_saved = $quote->isSavedBy(auth()->user());
         }
 
-        return Inertia::render('ShowQuote', [
-            'quote' => $quote,
-        ]);
+        return view('quotes.show', compact('quote'));
     }
 
     /**
@@ -159,10 +153,8 @@ class QuoteController extends Controller
 
             $categories = Category::active()->ordered()->get();
 
-            return Inertia::render('EditQuote', [
-                'quote' => $quote->load('categories'),
-                'categories' => $categories,
-            ]);
+            $quote->load('categories');
+            return view('quotes.edit', compact('quote', 'categories'));
         } catch (\Exception $e) {
             \Log::error('Quote edit failed', [
                 'quote_id' => $quote->id,

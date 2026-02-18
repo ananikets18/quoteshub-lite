@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
 
 class SettingsController extends Controller
 {
@@ -62,9 +61,7 @@ class SettingsController extends Controller
             ]);
         }
 
-        return Inertia::render('Settings/BlockedUsers', [
-            'blockedUsers' => $blockedUsers,
-        ]);
+        return view('settings.blocked-users', compact('blockedUsers'));
     }
 
     /**

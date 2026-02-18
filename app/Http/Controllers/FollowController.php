@@ -7,8 +7,6 @@ use App\Models\Follow;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class FollowController extends Controller
 {
@@ -88,7 +86,7 @@ class FollowController extends Controller
     /**
      * Show followers list for a user.
      */
-    public function followers(Request $request, string $username): Response
+    public function followers(Request $request, string $username)
     {
         $user = User::where('username', $username)->firstOrFail();
         
@@ -107,16 +105,13 @@ class FollowController extends Controller
             return $follower;
         });
 
-        return Inertia::render('Follow/Followers', [
-            'user' => $user,
-            'followers' => $followers,
-        ]);
+        return view('follow.followers', compact('user', 'followers'));
     }
 
     /**
      * Show following list for a user.
      */
-    public function following(Request $request, string $username): Response
+    public function following(Request $request, string $username)
     {
         $user = User::where('username', $username)->firstOrFail();
         
@@ -135,30 +130,26 @@ class FollowController extends Controller
             return $followedUser;
         });
 
-        return Inertia::render('Follow/Following', [
-            'user' => $user,
-            'following' => $following,
-        ]);
+        return view('follow.following', compact('user', 'following'));
     }
 
     /**
      * Show feed of quotes from followed users.
      */
-    public function feed(Request $request): Response
+    public function feed(Request $request)
     {
         $user = $request->user();
         
         $followingIds = $user->following()->pluck('following_id')->toArray();
         
         if (empty($followingIds)) {
-            return Inertia::render('Follow/Feed', [
-                'quotes' => [
+            $quotes = [
                     'data' => [],
                     'links' => [],
                     'total' => 0,
-                ],
-                'followingCount' => 0,
-            ]);
+            ];
+            $followingCount = 0;
+            return view('follow.feed', compact('quotes', 'followingCount'));
         }
 
         $quotes = \App\Models\Quote::whereIn('user_id', $followingIds)
@@ -186,11 +177,8 @@ class FollowController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('Follow/Feed', [
-            'quotes' => $quotes,
-            'followingCount' => count($followingIds),
-            'collections' => $collections,
-        ]);
+        $followingCount = count($followingIds);
+        return view('follow.feed', compact('quotes', 'followingCount', 'collections'));
     }
 
     /**

@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\UserNotificationPreference;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class NotificationPreferenceController extends Controller
 {
     /**
      * Show the notification preferences page
      */
-    public function edit(): Response
+    public function edit()
     {
         $user = auth()->user();
         
@@ -36,9 +34,7 @@ class NotificationPreferenceController extends Controller
             ]
         );
 
-        return Inertia::render('Profile/NotificationPreferences', [
-            'preferences' => $preferences,
-        ]);
+        return view('profile.notification-preferences', compact('preferences'));
     }
 
     /**

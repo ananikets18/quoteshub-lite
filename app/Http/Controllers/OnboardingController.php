@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
 
 class OnboardingController extends Controller
 {
@@ -25,11 +24,8 @@ class OnboardingController extends Controller
         // Get creators for follow step
         $creators = $this->getCreators();
 
-        return Inertia::render('Onboarding/Index', [
-            'user' => $user,
-            'currentStep' => $this->getCurrentStep($user),
-            'creators' => $creators,
-        ]);
+        $currentStep = $this->getCurrentStep($user);
+        return view('onboarding.index', compact('user', 'currentStep', 'creators'));
     }
 
     /**
