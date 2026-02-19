@@ -146,14 +146,19 @@ class ActivityController extends Controller
      */
     public function trending()
     {
-        // Get quotes with most likes in the last 24 hours
-        $trending = Quote::where('status', 'approved')
-            ->where('created_at', '>=', now()->subWeek())
-            ->withCount(['likes' => function ($query) {
-                $query->where('created_at', '>=', now()->subDay());
-            }])
-            ->orderByDesc('likes_count')
-            ->orderByDesc('views_count')
+        // Get quotes with most engagement in the last 24 hours
+        $trending = Quote::select('quotes.*')
+            ->selectRaw('(
+                SELECT COUNT(*) 
+                FROM likes 
+                WHERE likes.quote_id = quotes.id 
+                AND likes.created_at >= ?
+            ) as recent_likes_count', [now()->subDay()])
+            ->where('quotes.status', 'approved')
+            ->where('quotes.created_at', '>=', now()->subWeek())
+            ->orderByRaw('recent_likes_count DESC')
+            ->orderBy('quotes.views_count', 'DESC')
+            ->with(['user:id,username,name,avatar', 'categories:id,name,slug'])
             ->limit(5)
             ->get()
             ->map(function ($quote) {
@@ -161,9 +166,12 @@ class ActivityController extends Controller
                     'id' => $quote->id,
                     'content' => $quote->content,
                     'author' => $quote->author,
-                    'likes_today' => $quote->likes_count,
-                    'total_likes' => $quote->likes()->count(),
+                    'user' => $quote->user,
+                    'categories' => $quote->categories,
+                    'likes_today' => $quote->recent_likes_count,
+                    'total_likes' => $quote->likes_count,
                     'views' => $quote->views_count,
+                    'trending_score' => ($quote->recent_likes_count * 3) + ($quote->views_count * 0.1),
                 ];
             });
 
@@ -179,9 +187,12 @@ class ActivityController extends Controller
         
         if (!$user) {
             // For non-authenticated users, show popular users
-            $suggested = User::where('is_active', true)
-                ->withCount(['quotes', 'followers'])
-                ->orderByDesc('followers_count')
+            $suggested = User::select('users.*')
+                ->selectRaw('(SELECT COUNT(*) FROM quotes WHERE quotes.user_id = users.id AND quotes.deleted_at IS NULL AND quotes.status = ?) as total_quotes', ['approved'])
+                ->selectRaw('(SELECT COUNT(*) FROM follows WHERE follows.following_id = users.id) as total_followers')
+                ->where('users.is_active', true)
+                ->orderByRaw('total_followers DESC')
+                ->orderByRaw('total_quotes DESC')
                 ->limit(5)
                 ->get();
         } else {
@@ -223,16 +234,21 @@ class ActivityController extends Controller
 
             // If no suggestions from network/categories, fallback to popular users
             if ($suggestedIds->isEmpty()) {
-                $suggested = User::whereNotIn('id', $followingIds)
-                    ->where('is_active', true)
-                    ->withCount(['quotes', 'followers'])
-                    ->orderByDesc('followers_count')
+                $suggested = User::select('users.*')
+                    ->selectRaw('(SELECT COUNT(*) FROM quotes WHERE quotes.user_id = users.id AND quotes.deleted_at IS NULL AND quotes.status = ?) as total_quotes', ['approved'])
+                    ->selectRaw('(SELECT COUNT(*) FROM follows WHERE follows.following_id = users.id) as total_followers')
+                    ->whereNotIn('users.id', $followingIds)
+                    ->where('users.is_active', true)
+                    ->orderByRaw('total_followers DESC')
+                    ->orderByRaw('total_quotes DESC')
                     ->limit(5)
                     ->get();
             } else {
-                $suggested = User::whereIn('id', $suggestedIds)
-                    ->where('is_active', true)
-                    ->withCount(['quotes', 'followers'])
+                $suggested = User::select('users.*')
+                    ->selectRaw('(SELECT COUNT(*) FROM quotes WHERE quotes.user_id = users.id AND quotes.deleted_at IS NULL AND quotes.status = ?) as total_quotes', ['approved'])
+                    ->selectRaw('(SELECT COUNT(*) FROM follows WHERE follows.following_id = users.id) as total_followers')
+                    ->whereIn('users.id', $suggestedIds)
+                    ->where('users.is_active', true)
                     ->get();
             }
         }
@@ -244,8 +260,8 @@ class ActivityController extends Controller
                 'username' => $suggestedUser->username,
                 'avatar' => $suggestedUser->avatar,
                 'bio' => $suggestedUser->bio,
-                'followers_count' => $suggestedUser->followers_count ?? 0,
-                'quotes_count' => $suggestedUser->quotes_count ?? 0,
+                'followers_count' => $suggestedUser->total_followers ?? 0,
+                'quotes_count' => $suggestedUser->total_quotes ?? 0,
             ];
         });
 

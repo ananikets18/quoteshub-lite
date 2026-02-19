@@ -29,6 +29,7 @@
 
         <!-- Additional Meta Tags -->
         <meta name="theme-color" content="#8B5CF6">
+        <meta name="authenticated" content="{{ auth()->check() ? 'true' : 'false' }}">
         <link rel="canonical" href="{{ url()->current() }}">
 
         <!-- Favicon -->
@@ -48,7 +49,16 @@
         @stack('styles')
     </head>
     <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900">
-        @yield('content')
+        <!-- Navigation -->
+        @include('layouts.navigation')
+        
+        <!-- Main Content -->
+        <main>
+            @yield('content')
+        </main>
+        
+        <!-- Toast Notifications -->
+        <x-toast />
         
         @stack('scripts')
     </body>
