@@ -55,21 +55,31 @@ Alpine.start();
 
 // Theme toggle functionality
 window.toggleTheme = function () {
-    if (localStorage.theme === 'dark') {
-        localStorage.theme = 'light';
-        document.documentElement.classList.remove('dark');
+    var root = document.documentElement;
+    var current = localStorage.getItem('qh-theme') || 'dark';
+    if (current === 'dark') {
+        localStorage.setItem('qh-theme', 'light');
+        root.classList.remove('dark');
+        root.classList.add('light');
     } else {
-        localStorage.theme = 'dark';
-        document.documentElement.classList.add('dark');
+        localStorage.setItem('qh-theme', 'dark');
+        root.classList.remove('light');
+        root.classList.add('dark');
     }
 };
 
-// Initialize theme on page load
-if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-} else {
-    document.documentElement.classList.remove('dark');
-}
+// Initialize theme on page load (FOUC already handled inline in <head>)
+(function () {
+    var t = localStorage.getItem('qh-theme');
+    var root = document.documentElement;
+    if (t === 'light') {
+        root.classList.remove('dark');
+        root.classList.add('light');
+    } else {
+        root.classList.add('dark');
+        root.classList.remove('light');
+    }
+})();
 
 // Make appData globally available for components
 window.appData = window.appData || {

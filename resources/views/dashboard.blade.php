@@ -1,177 +1,159 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard - QuotesHub')
+@section('title', 'Dashboard — QuotesHub')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-400">Welcome back, {{ auth()->user()->name }}!</p>
-        </div>
+<div class="app-main">
+    <div class="feed-container" style="max-width: 760px;">
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Quotes -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Quotes</p>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $stats['quotes_count'] ?? 0 }}</p>
-                    </div>
-                    <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                        <svg class="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                        </svg>
-                    </div>
+            {{-- Header --}}
+            <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Welcome back, {{ auth()->user()->name }} 👋</p>
                 </div>
-            </div>
-
-            <!-- Total Likes -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border-l-4 border-red-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Likes</p>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $stats['likes_count'] ?? 0 }}</p>
-                    </div>
-                    <div class="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                        <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Followers -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Followers</p>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $stats['followers_count'] ?? 0 }}</p>
-                    </div>
-                    <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                        <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Following -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border-l-4 border-green-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Following</p>
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $stats['following_count'] ?? 0 }}</p>
-                    </div>
-                    <div class="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                        <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <a href="{{ route('quotes.create') }}" class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl shadow-lg p-6 text-white hover:shadow-xl transition-shadow">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold mb-2">Create Quote</h3>
-                        <p class="text-purple-100 text-sm">Share an inspiring quote</p>
-                    </div>
-                    <svg class="w-12 h-12 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                <a href="{{ route('quotes.create') }}" class="btn-brand">
+                    <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
-                </div>
-            </a>
+                    New Quote
+                </a>
+            </div>
 
-            <a href="{{ route('profile.show', auth()->user()->username) }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between">
+            {{-- Stats grid --}}
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px;" class="sm:grid-cols-4">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(139,92,246,0.15);">📝</div>
+                    <div class="stat-value">{{ $stats['quotes_count'] ?? 0 }}</div>
+                    <div class="stat-label">Quotes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(244,63,94,0.15);">❤️</div>
+                    <div class="stat-value">{{ $stats['total_likes'] ?? 0 }}</div>
+                    <div class="stat-label">Total Likes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(59,130,246,0.15);">👥</div>
+                    <div class="stat-value">{{ $stats['followers_count'] ?? 0 }}</div>
+                    <div class="stat-label">Followers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(245,158,11,0.15);">🔥</div>
+                    <div class="stat-value">{{ $stats['daily_streak'] ?? 0 }}</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+            </div>
+
+            {{-- This week --}}
+            <div class="panel-card" style="margin-bottom:24px;">
+                <div class="panel-card-header">📅 This Week</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border-subtle);">
+                    @foreach([
+                        ['Quotes', $stats['this_week']['quotes'] ?? 0, '📝'],
+                        ['Likes',  $stats['this_week']['likes']  ?? 0, '❤️'],
+                        ['New Followers', $stats['this_week']['followers'] ?? 0, '👤'],
+                    ] as $item)
+                        <div style="background:var(--bg-card);padding:16px;text-align:center;">
+                            <div style="font-size:20px;margin-bottom:4px;">{{ $item[2] }}</div>
+                            <div style="font-size:20px;font-weight:800;color:#f1f5f9;">{{ $item[1] }}</div>
+                            <div style="font-size:12px;color:#64748b;">{{ $item[0] }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Quick Actions --}}
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px;">
+                <a href="{{ route('quotes.create') }}"
+                   style="padding:20px;border-radius:18px;background:#8D34E9;text-decoration:none;display:flex;align-items:center;gap:12px;transition:transform 0.2s ease,box-shadow 0.2s ease;box-shadow:0 4px 20px rgba(141,52,233,0.35);"
+                   onmouseover="this.style.transform='translateY(-2px)';this.style.background='#7B2DD0';this.style.boxShadow='0 8px 32px rgba(141,52,233,0.45)'"
+                   onmouseout="this.style.transform='';this.style.background='#8D34E9';this.style.boxShadow='0 4px 20px rgba(141,52,233,0.35)'">
+                    <div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✍️</div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">My Profile</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">View your public profile</p>
+                        <div style="font-size:14px;font-weight:700;color:#fff;">Create Quote</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,0.7);">Share your wisdom</div>
                     </div>
-                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </div>
-            </a>
-
-            <a href="{{ route('saved') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between">
+                </a>
+                <a href="{{ route('profile.show', auth()->user()->username) }}"
+                   class="panel-card"
+                   style="padding:20px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:border-color 0.2s ease,transform 0.2s ease;"
+                   onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(139,92,246,0.3)'"
+                   onmouseout="this.style.transform='';this.style.borderColor=''">
+                    <div style="width:40px;height:40px;border-radius:12px;background:rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👤</div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Saved Quotes</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">Your bookmarked quotes</p>
+                        <div style="font-size:14px;font-weight:700;color:#e2e8f0;">My Profile</div>
+                        <div style="font-size:12px;color:#64748b;">View public page</div>
                     </div>
-                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                </div>
-            </a>
-        </div>
+                </a>
+                <a href="{{ route('saved') }}"
+                   class="panel-card"
+                   style="padding:20px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:border-color 0.2s ease,transform 0.2s ease;"
+                   onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(139,92,246,0.3)'"
+                   onmouseout="this.style.transform='';this.style.borderColor=''">
+                    <div style="width:40px;height:40px;border-radius:12px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🔖</div>
+                    <div>
+                        <div style="font-size:14px;font-weight:700;color:#e2e8f0;">Saved Quotes</div>
+                        <div style="font-size:12px;color:#64748b;">{{ $stats['total_saves'] ?? 0 }} saved</div>
+                    </div>
+                </a>
+                <a href="{{ route('achievements') }}"
+                   class="panel-card"
+                   style="padding:20px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:border-color 0.2s ease,transform 0.2s ease;"
+                   onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(139,92,246,0.3)'"
+                   onmouseout="this.style.transform='';this.style.borderColor=''">
+                    <div style="width:40px;height:40px;border-radius:12px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🏆</div>
+                    <div>
+                        <div style="font-size:14px;font-weight:700;color:#e2e8f0;">Achievements</div>
+                        <div style="font-size:12px;color:#64748b;">View your badges</div>
+                    </div>
+                </a>
+            </div>
 
-        <!-- Recent Activity -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Your Recent Quotes -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Your Recent Quotes</h3>
-                <div class="space-y-4">
-                    @forelse($recentQuotes ?? [] as $quote)
-                        <div class="flex items-start space-x-3 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-0">
-                            <div class="flex-1 min-w-0">
-                                <a href="{{ route('quotes.show', $quote->id) }}" class="text-sm text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 line-clamp-2">
-                                    "{{ $quote->content }}"
-                                </a>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">— {{ $quote->author }}</p>
-                                <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                    <span>❤️ {{ $quote->likes_count }}</span>
-                                    <span>💾 {{ $quote->saves_count }}</span>
-                                    <span>👁️ {{ $quote->views_count }}</span>
+            {{-- Recent Quotes --}}
+            @if(count($stats['recent_quotes'] ?? []) > 0)
+                <div class="panel-card" style="margin-bottom:24px;">
+                    <div class="panel-card-header" style="display:flex;align-items:center;justify-content:space-between;">
+                        <span>📜 Recent Quotes</span>
+                        <a href="{{ route('profile.show', auth()->user()->username) }}"
+                           style="font-size:12px;color:#8b5cf6;font-weight:600;text-decoration:none;">View all →</a>
+                    </div>
+                    <div style="padding:8px 12px;display:flex;flex-direction:column;gap:4px;">
+                        @foreach($stats['recent_quotes'] as $q)
+                            <a href="{{ route('quotes.show', $q['id']) }}"
+                               style="display:flex;align-items:flex-start;gap:12px;padding:10px 8px;border-radius:12px;text-decoration:none;transition:background 0.2s ease;"
+                               onmouseover="this.style.background='rgba(255,255,255,0.04)'"
+                               onmouseout="this.style.background=''">
+                                <div style="flex:1;min-width:0;">
+                                    <p style="font-family:'Playfair Display',serif;font-size:14px;color:#cbd5e1;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
+                                        "{{ $q['content'] }}"
+                                    </p>
                                 </div>
-                            </div>
-                        </div>
-                    @empty
-                        <x-empty-state 
-                            icon="✍️"
-                            title="No quotes yet"
-                            message="Start sharing inspiring quotes!"
-                            actionText="Create Quote"
-                            actionUrl="{{ route('quotes.create') }}"
-                        />
-                    @endforelse
+                                <div style="display:flex;gap:10px;flex-shrink:0;font-size:12px;color:#64748b;align-items:center;padding-top:2px;">
+                                    <span>❤️ {{ $q['likes_count'] }}</span>
+                                    <span>💾 {{ $q['saves_count'] }}</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+            @endif
 
-            <!-- Recent Notifications -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Notifications</h3>
-                    <a href="{{ route('notifications') }}" class="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400">View all</a>
-                </div>
-                <div class="space-y-4">
-                    @forelse($recentNotifications ?? [] as $notification)
-                        <div class="flex items-start space-x-3 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-0">
-                            <img src="{{ $notification->actor->avatar ?? '/images/default-avatar.png' }}" 
-                                 alt="{{ $notification->actor->name ?? 'User' }}" 
-                                 class="w-10 h-10 rounded-full">
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm text-gray-900 dark:text-white">{{ $notification->data['message'] ?? 'New notification' }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
-                            </div>
+            {{-- Top quote --}}
+            @if($stats['top_quote'] ?? false)
+                <div class="panel-card" style="margin-bottom:24px;overflow:hidden;">
+                    <div class="panel-card-header">⭐ Your Best Quote</div>
+                    <div style="padding:16px 20px;background:linear-gradient(135deg, rgba(124,58,237,0.08), rgba(219,39,119,0.04));">
+                        <p style="font-family:'Playfair Display',serif;font-size:16px;color:#e2e8f0;line-height:1.6;">
+                            "{{ $stats['top_quote']['content'] }}"
+                        </p>
+                        <div style="margin-top:12px;display:flex;gap:16px;font-size:13px;color:#64748b;">
+                            <span>❤️ {{ $stats['top_quote']['likes_count'] }} likes</span>
+                            <span>💾 {{ $stats['top_quote']['saves_count'] }} saves</span>
                         </div>
-                    @empty
-                        <x-empty-state 
-                            icon="🔔"
-                            title="No notifications"
-                            message="You're all caught up!"
-                        />
-                    @endforelse
+                    </div>
                 </div>
-            </div>
-        </div>
+            @endif
+
     </div>
 </div>
 @endsection

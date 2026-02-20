@@ -1,18 +1,19 @@
 @props([
-    'icon' => '📭',
-    'title' => 'No items found',
-    'message' => 'There are no items to display.',
+    'icon'       => '📭',
+    'title'      => 'Nothing here',
+    'message'    => '',
     'actionText' => null,
-    'actionUrl' => null
+    'actionUrl'  => null,
 ])
 
-<div class="flex flex-col items-center justify-center py-12 px-4 text-center">
-    <div class="text-6xl mb-4">{{ $icon }}</div>
-    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{{ $title }}</h3>
-    <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md">{{ $message }}</p>
-    
+<div class="empty-state">
+    <div class="empty-state-icon">{{ $icon }}</div>
+    <div class="empty-state-title">{{ $title }}</div>
+    @if($message)
+        <div class="empty-state-msg">{{ $message }}</div>
+    @endif
     @if($actionText && $actionUrl)
-        <a href="{{ $actionUrl }}" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors">
+        <a href="{{ $actionUrl }}" class="btn-brand mt-4" style="font-size:14px; padding:10px 24px;">
             {{ $actionText }}
         </a>
     @endif

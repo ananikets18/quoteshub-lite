@@ -16,7 +16,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
-                serif: ['Merriweather', ...defaultTheme.fontFamily.serif],
+                serif: ['Playfair Display', 'Merriweather', ...defaultTheme.fontFamily.serif],
             },
             colors: {
                 primary: {
