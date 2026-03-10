@@ -84,7 +84,7 @@ class FollowController extends Controller
     }
 
     /**
-     * Clear dashboard cache for a user from both default and Redis stores.
+     * Clear dashboard cache for a user from default store.
      */
     private function clearDashboardCache(int $userId): void
     {
@@ -92,12 +92,5 @@ class FollowController extends Controller
         
         // Clear from default cache
         \Illuminate\Support\Facades\Cache::forget($cacheKey);
-        
-        // Try to clear from Redis cache if available
-        try {
-            \Illuminate\Support\Facades\Cache::store('redis')->forget($cacheKey);
-        } catch (\Throwable $e) {
-            // Redis not available, skip
-        }
     }
 }
