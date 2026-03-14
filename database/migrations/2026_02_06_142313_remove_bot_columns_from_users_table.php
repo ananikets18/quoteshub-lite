@@ -12,12 +12,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // First, delete all bot users and their related data
-        DB::table('users')->where('is_bot', true)->delete();
+        if (Schema::hasColumn('users', 'is_bot')) {
+            // First, delete all bot users and their related data
+            DB::table('users')->where('is_bot', true)->delete();
+        }
         
         // Remove bot columns from users table
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['is_bot', 'last_bot_activity', 'daily_action_count']);
+            if (Schema::hasColumn('users', 'is_bot')) {
+                $table->dropColumn('is_bot');
+            }
+            if (Schema::hasColumn('users', 'last_bot_activity')) {
+                $table->dropColumn('last_bot_activity');
+            }
+            if (Schema::hasColumn('users', 'daily_action_count')) {
+                $table->dropColumn('daily_action_count');
+            }
         });
     }
 
