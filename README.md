@@ -11,3 +11,4 @@ A platform to discover and share inspiring quotes. Join a community of thinkers 
 - **Notifications** – In-app and optional email alerts
 
 
+More to come....
