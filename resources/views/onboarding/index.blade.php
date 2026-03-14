@@ -63,26 +63,43 @@
             </form>
         </div>
 
-        {{-- ==================== Step 3: Choose Categories ==================== --}}
+        {{-- ==================== Step 3: Follow Creators ==================== --}}
         <div x-show="currentStep === 3" x-transition class="panel-card" style="padding:36px;">
-            <div style="font-size:36px;text-align:center;margin-bottom:16px;">📚</div>
-            <h2 style="font-size:22px;font-weight:800;color:#f1f5f9;text-align:center;margin-bottom:6px;">What inspires you?</h2>
-            <p style="font-size:14px;color:#64748b;text-align:center;margin-bottom:24px;">Pick topics you love — we'll personalise your feed.</p>
+            <div style="font-size:36px;text-align:center;margin-bottom:16px;">👥</div>
+            <h2 style="font-size:22px;font-weight:800;color:#f1f5f9;text-align:center;margin-bottom:6px;">Follow some creators</h2>
+            <p style="font-size:14px;color:#64748b;text-align:center;margin-bottom:24px;">Start building your feed by following these curators.</p>
 
-            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:28px;">
-                @foreach($categories ?? [] as $cat)
-                    <button type="button"
-                            @click="toggleInterest({{ $cat->id }})"
-                            :style="interests.includes({{ $cat->id }}) ? 'background:rgba(141,52,233,0.2);border-color:var(--brand);color:#d8b4fe;' : ''"
-                            style="padding:9px 18px;border-radius:99px;border:1.5px solid var(--border-muted);font-size:13px;font-weight:600;color:#94a3b8;background:var(--bg-input);cursor:pointer;transition:all 0.2s ease;">
-                        {{ $cat->icon ?? '' }} {{ $cat->name }}
-                    </button>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;">
+                @foreach($creators ?? [] as $creator)
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg-input);border-radius:14px;border:1px solid var(--border-subtle);">
+                        <img src="{{ $creator->avatar ?? '/images/default-avatar.png' }}" alt="{{ $creator->name }}"
+                             style="width:46px;height:46px;border-radius:13px;object-fit:cover;border:1.5px solid var(--border-muted);flex-shrink:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:14px;font-weight:700;color:#e2e8f0;">{{ $creator->name }}</div>
+                            <div style="font-size:12px;color:#64748b;">@{{ $creator->username }} · {{ number_format($creator->followers_count) }} followers</div>
+                            @if($creator->bio)
+                                <div style="font-size:12px;color:#475569;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;">{{ $creator->bio }}</div>
+                            @endif
+                        </div>
+                        <div x-data="{ followed: {{ json_encode((bool)($creator->is_following ?? false)) }} }">
+                            <button @click="followed = true; axios.post('/follow/{{ $creator->id }}')"
+                                    x-show="!followed"
+                                    style="font-size:13px;padding:7px 16px;border-radius:10px;background:var(--brand);color:#fff;border:none;cursor:pointer;font-weight:600;white-space:nowrap;">
+                                Follow
+                            </button>
+                            <span x-show="followed" style="font-size:13px;color:#34d399;font-weight:600;">✓ Following</span>
+                        </div>
+                    </div>
                 @endforeach
+
+                @if(empty($creators) || (is_countable($creators) && count($creators) === 0))
+                    <p style="text-align:center;font-size:14px;color:#64748b;padding:20px;">No suggestions yet — you can follow people from their profiles!</p>
+                @endif
             </div>
 
             <div style="display:flex;gap:10px;justify-content:flex-end;">
                 <button @click="nextStep()" style="font-size:14px;color:#64748b;background:none;border:none;cursor:pointer;">Skip</button>
-                <button @click="submitStep(3, { interests: interests })" class="btn-brand" :disabled="loading">Continue →</button>
+                <button @click="nextStep()" class="btn-brand">Continue →</button>
             </div>
         </div>
 
