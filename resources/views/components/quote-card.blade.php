@@ -26,7 +26,7 @@
                        class="quote-card-user-name block hover:opacity-80 transition-opacity truncate">
                         {{ $quote->user->name }}
                     </a>
-                    <div class="quote-card-user-handle truncate">@{{ $quote->user->username }}</div>
+                    <div class="quote-card-user-handle truncate">{{ '@' . $quote->user->username }}</div>
                 </div>
                 <span class="quote-card-time">{{ $quote->created_at->diffForHumans() }}</span>
             </div>

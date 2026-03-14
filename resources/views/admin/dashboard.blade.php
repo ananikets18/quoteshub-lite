@@ -53,7 +53,7 @@
                             <img src="{{ $u->avatar ?? '/images/default-avatar.png' }}" style="width:32px;height:32px;border-radius:8px;object-fit:cover;">
                             <div style="flex:1;min-width:0;">
                                 <div style="font-size:13px;font-weight:600;color:#e2e8f0;">{{ $u->name }}</div>
-                                <div style="font-size:11px;color:#64748b;">@{{ $u->username }} · {{ $u->created_at->diffForHumans() }}</div>
+                                <div style="font-size:11px;color:#64748b;">{{ '@' . $u->username }} · {{ $u->created_at->diffForHumans() }}</div>
                             </div>
                             <span style="font-size:11px;padding:2px 8px;border-radius:99px;{{ $u->role === 'admin' ? 'background:rgba(141,52,233,0.2);color:#c084fc;border:1px solid var(--brand-border);' : 'background:var(--border-subtle);color:#64748b;' }}">{{ $u->role ?? 'user' }}</span>
                         </div>

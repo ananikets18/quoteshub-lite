@@ -76,7 +76,7 @@
                              style="width:46px;height:46px;border-radius:13px;object-fit:cover;border:1.5px solid var(--border-muted);flex-shrink:0;">
                         <div style="flex:1;min-width:0;">
                             <div style="font-size:14px;font-weight:700;color:#e2e8f0;">{{ $creator->name }}</div>
-                            <div style="font-size:12px;color:#64748b;">@{{ $creator->username }} · {{ number_format($creator->followers_count) }} followers</div>
+                            <div style="font-size:12px;color:#64748b;">{{ '@' . $creator->username }} · {{ number_format($creator->followers_count) }} followers</div>
                             @if($creator->bio)
                                 <div style="font-size:12px;color:#475569;margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;">{{ $creator->bio }}</div>
                             @endif

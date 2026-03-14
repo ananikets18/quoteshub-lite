@@ -19,6 +19,7 @@ class QuoteSeeder extends Seeder
             ['email' => 'test@example.com'],
             [
                 'name' => 'Test User',
+                'username' => 'testuser',
                 'password' => bcrypt('password'),
             ]
         );

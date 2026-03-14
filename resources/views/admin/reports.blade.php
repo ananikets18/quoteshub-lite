@@ -38,7 +38,7 @@
                             @if($report->quote)
                                 <div style="background:var(--bg-input);border-radius:12px;padding:12px 14px;border-left:3px solid var(--brand);margin-bottom:10px;">
                                     <p style="font-size:14px;color:#94a3b8;font-family:'Playfair Display',serif;line-height:1.5;">"{{ Str::limit($report->quote->content, 120) }}"</p>
-                                    <div style="font-size:12px;color:#475569;margin-top:6px;">by {{ $report->quote->author }} · posted by @{{ $report->quote->user->username ?? 'deleted' }}</div>
+                                    <div style="font-size:12px;color:#475569;margin-top:6px;">by {{ $report->quote->author }} · posted by {{ '@' . ($report->quote->user->username ?? 'deleted') }}</div>
                                 </div>
                                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                                     <a href="{{ route('quotes.show', $report->quote) }}" target="_blank" class="btn-ghost" style="font-size:12px;padding:6px 12px;">View Quote ↗</a>

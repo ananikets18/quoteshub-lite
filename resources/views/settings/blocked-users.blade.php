@@ -28,7 +28,7 @@
                          style="width:46px;height:46px;border-radius:13px;object-fit:cover;border:1.5px solid var(--border-muted);flex-shrink:0;filter:grayscale(0.4);">
                     <div style="flex:1;min-width:0;">
                         <div style="font-size:15px;font-weight:700;color:#e2e8f0;">{{ $blocked->name }}</div>
-                        <div style="font-size:13px;color:#64748b;">@{{ $blocked->username }}</div>
+                        <div style="font-size:13px;color:#64748b;">{{ '@' . $blocked->username }}</div>
                     </div>
                     <form method="DELETE" action="{{ route('users.unblock', $blocked->username) }}">
                         @csrf @method('DELETE')

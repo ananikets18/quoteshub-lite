@@ -13,7 +13,7 @@
             </a>
             <div>
                 <h1 style="font-size:20px;font-weight:800;color:#f1f5f9;letter-spacing:-0.3px;">Followers</h1>
-                <p style="font-size:13px;color:#64748b;">People following @{{ $user->username }} · {{ $followers->total() }}</p>
+                <p style="font-size:13px;color:#64748b;">People following {{ '@' . $user->username }} · {{ $followers->total() }}</p>
             </div>
         </div>
 
@@ -27,7 +27,7 @@
                     </a>
                     <div style="flex:1;min-width:0;">
                         <a href="{{ route('profile.show', $follower->username) }}" style="display:block;font-size:15px;font-weight:700;color:#e2e8f0;text-decoration:none;line-height:1.3;" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#e2e8f0'">{{ $follower->name }}</a>
-                        <div style="font-size:13px;color:#64748b;">@{{ $follower->username }}</div>
+                        <div style="font-size:13px;color:#64748b;">{{ '@' . $follower->username }}</div>
                         @if($follower->bio)
                             <div style="font-size:13px;color:#475569;margin-top:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;">{{ $follower->bio }}</div>
                         @endif

@@ -50,7 +50,7 @@
                                         <img src="{{ $u->avatar ?? '/images/default-avatar.png' }}" style="width:34px;height:34px;border-radius:9px;object-fit:cover;flex-shrink:0;">
                                         <div>
                                             <div style="font-size:13px;font-weight:600;color:#e2e8f0;">{{ $u->name }}</div>
-                                            <div style="font-size:11px;color:#64748b;">@{{ $u->username }}</div>
+                                            <div style="font-size:11px;color:#64748b;">{{ '@' . $u->username }}</div>
                                         </div>
                                     </div>
                                 </td>
