@@ -333,19 +333,21 @@
      ============================================================ --}}
 @push('scripts')
 <script>
-    Alpine.data('notificationBadge', () => ({
-        count: 0,
-        async init() {
-            try {
-                const res = await fetch('/api/notifications/unread-count', {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    this.count = data.count || 0;
-                }
-            } catch(e) {}
-        }
-    }));
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('notificationBadge', () => ({
+            count: 0,
+            async init() {
+                try {
+                    const res = await fetch('/api/notifications/unread-count', {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        this.count = data.count || 0;
+                    }
+                } catch(e) {}
+            }
+        }));
+    });
 </script>
 @endpush
