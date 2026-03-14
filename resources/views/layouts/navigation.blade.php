@@ -202,20 +202,23 @@
      MOBILE TOP BAR
      ============================================================ --}}
 <header class="app-topbar" id="app-topbar">
-    {{-- Mobile Top Bar Logo --}}
-    <a href="{{ route('home') }}" class="flex items-center gap-2 flex-shrink-0">
-        <div style="width:32px;height:32px;border-radius:10px;background:#8D34E9;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 4px 12px rgba(141,52,233,0.4);">💬</div>
-        <span style="font-size:16px;font-weight:800;color:#8D34E9;">QuotesHub</span>
+    {{-- Left: Logo --}}
+    <a href="{{ route('home') }}" class="topbar-logo flex-shrink-0">
+        <div class="topbar-logo-icon">💬</div>
+        <span class="topbar-logo-text">QuotesHub</span>
     </a>
 
-    {{-- Search bar --}}
-    <div class="search-bar" style="max-width:200px;" x-data="searchBar()">
-        <svg class="search-bar-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-        <input type="text" x-model="query" @input="onInput" placeholder="Search..." x-ref="searchInput">
+    {{-- Center/middle: Creative Search Bar --}}
+    <div class="topbar-search-wrapper" x-data="searchBar()">
+        <div class="topbar-search-inner">
+            <svg class="topbar-search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" x-model="query" @input="onInput" placeholder="Search..." x-ref="searchInput" class="topbar-search-input">
+        </div>
+        {{-- Results Dropdown --}}
         <div x-show="isOpen && results.length > 0" @click.away="close()" x-transition
-             class="absolute top-full left-0 right-0 mt-2 rounded-xl overflow-hidden z-50"
+             class="absolute top-full left-0 right-0 mt-2 rounded-xl overflow-hidden z-[60]"
              style="background: var(--bg-elevated); border: 1px solid var(--border-muted); box-shadow: 0 16px 48px rgba(0,0,0,0.5);">
             <template x-for="result in results" :key="result.id">
                 <div @click="selectResult(result)"
@@ -229,11 +232,10 @@
     </div>
 
     {{-- Right side icons --}}
-    <div class="flex items-center gap-1">
+    <div class="topbar-actions">
         {{-- Theme --}}
         <button onclick="window.toggleTheme()"
-                class="p-2 rounded-xl transition-colors hover:opacity-80"
-                style="color:#64748b;">
+                class="topbar-icon-btn" title="Toggle Theme">
             <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
             </svg>
@@ -244,27 +246,28 @@
 
         @auth
             {{-- Notifications icon --}}
-            <a href="{{ route('notifications') }}" class="relative p-2 rounded-xl" style="color:#64748b;">
+            <a href="{{ route('notifications') }}" class="topbar-icon-btn relative">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                {{-- badge via JS if needed --}}
             </a>
 
             {{-- Avatar --}}
-            <a href="{{ route('profile.show', auth()->user()->username) }}" class="flex-shrink-0">
+            <a href="{{ route('profile.show', auth()->user()->username) }}" class="flex-shrink-0 ml-1">
                 <img src="{{ auth()->user()->avatar ?? '/images/default-avatar.png' }}"
                      alt="{{ auth()->user()->name }}"
-                     style="width:32px;height:32px;border-radius:10px;object-fit:cover;border:2px solid rgba(141,52,233,0.5);">
+                     style="width:34px;height:34px;border-radius:12px;object-fit:cover;border:2px solid var(--brand-border);">
             </a>
         @else
-            <a href="{{ route('register') }}"
-               style="padding:7px 14px;border-radius:10px;font-size:13px;font-weight:600;background:#8D34E9;color:white;text-decoration:none;">
+            <a href="{{ route('login') }}" class="topbar-signin-btn hidden sm:block">
                 Sign In
             </a>
+            {{-- Smaller Sign In for extreme mobile layout --}}
+            <a href="{{ route('login') }}" class="topbar-signin-btn sm:hidden" style="padding: 8px 10px; font-size: 13px;">
+                Login
+            </a>
         @endauth
-    </div>
-</header>
+    </div></header>
 
 {{-- ============================================================
      MOBILE BOTTOM NAV
