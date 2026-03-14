@@ -133,7 +133,6 @@ class QuoteSeeder extends Seeder
                 'user_id' => $user->id,
                 'content' => $quoteData['content'],
                 'author' => $quoteData['author'],
-                'background_gradient' => $quoteData['gradient'],
                 'status' => 'approved',
                 'likes_count' => rand(10, 500),
                 'saves_count' => rand(5, 200),
