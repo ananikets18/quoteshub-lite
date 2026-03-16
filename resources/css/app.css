@@ -352,7 +352,7 @@
 
     /* ---- TOP BAR (Responsive & Creative) ---- */
     .app-topbar {
-        display: flex;
+        display: none;
         position: sticky;
         top: 0;
         z-index: 50;
@@ -372,21 +372,7 @@
         border-bottom: 1px solid var(--border-subtle);
     }
 
-    @media (min-width: 1025px) {
-        .app-topbar {
-            width: calc(100% - var(--sidebar-w));
-            margin-left: var(--sidebar-w);
-            padding: 14px 28px;
-            /* Creative floating pill effect on desktop */
-            top: 16px;
-            margin-right: 24px;
-            margin-left: calc(var(--sidebar-w) + 24px);
-            width: calc(100% - var(--sidebar-w) - 48px);
-            border-radius: 20px;
-            border: 1px solid var(--border-subtle);
-            box-shadow: 0 12px 32px rgba(0,0,0,0.05);
-        }
-    }
+
 
     /* Topbar Logo Styling */
     .topbar-logo {
