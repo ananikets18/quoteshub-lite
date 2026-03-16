@@ -34,7 +34,7 @@ class FeedController extends Controller
                 // Personalized feed handled separately
                 if (auth()->check()) {
                     $quotes = $this->getForYouFeed($request);
-                    $categories = Category::active()->ordered()->get();
+                    $categories = \Illuminate\Support\Facades\Cache::remember('active_categories', now()->addHours(1), fn() => Category::active()->ordered()->get());
                     
                     return view('feed', compact('quotes', 'categories'));
                 }
@@ -61,7 +61,7 @@ class FeedController extends Controller
             });
         }
 
-        $categories = Category::active()->ordered()->get();
+        $categories = \Illuminate\Support\Facades\Cache::remember('active_categories', now()->addHours(1), fn() => Category::active()->ordered()->get());
         
         // Get user's collections if authenticated
         $collections = auth()->check() 
@@ -80,8 +80,11 @@ class FeedController extends Controller
         $page = $request->get('page', 1);
         $perPage = 15;
 
-        // Get personalized recommendations
-        $allRecommendations = $this->recommendationService->getPersonalizedFeed($user, $perPage * 3);
+        // Get personalized recommendations with caching
+        $cacheKey = 'feed_foryou_' . $user->id;
+        $allRecommendations = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(5), function () use ($user, $perPage) {
+            return $this->recommendationService->getPersonalizedFeed($user, $perPage * 3);
+        });
         
         // Paginate manually
         $quotes = $allRecommendations->forPage($page, $perPage);

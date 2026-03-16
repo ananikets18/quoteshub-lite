@@ -38,7 +38,8 @@ class FollowController extends Controller
             $this->clearDashboardCache($userToFollow->id);
             
             // Trigger notification
-            app(NotificationService::class)->notifyNewFollower($currentUser, $userToFollow);
+            \App\Jobs\SendQuoteNotification::dispatch('follower', $currentUser->id, $userToFollow->id);
+            \App\Jobs\CheckUserAchievements::dispatch($userToFollow->id, 'follower_gained', $userToFollow->followers_count);
         }
 
         // If on dashboard, force a visit to refresh stats

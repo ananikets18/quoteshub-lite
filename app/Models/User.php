@@ -311,13 +311,8 @@ class User extends Authenticatable
             // Refresh current instance
             $this->refresh();
 
-            // Check streak achievements
-            try {
-                $achievementService = app(\App\Services\AchievementService::class);
-                $achievementService->checkAchievements($this, 'streak_updated', $this->daily_streak);
-            } catch (\Exception $e) {
-                Log::error('Failed to check streak achievements: ' . $e->getMessage());
-            }
+            // Check streak achievements asynchronously
+            \App\Jobs\CheckUserAchievements::dispatch($this->id, 'streak_updated', $this->daily_streak)->afterCommit();
         });
     }
 

@@ -26,7 +26,7 @@ class QuoteController extends Controller
      */
     public function create()
     {
-        $categories = Category::active()->ordered()->get();
+        $categories = \Illuminate\Support\Facades\Cache::remember('active_categories', now()->addHours(1), fn() => Category::active()->ordered()->get());
         
         // Get user's rate limit info
         $rateLimitInfo = $this->moderationService->getRemainingQuotes(auth()->user());
@@ -112,6 +112,10 @@ class QuoteController extends Controller
             return $quote;
         });
 
+        if ($quote) {
+            \App\Jobs\CheckUserAchievements::dispatch($user->id, 'quote_created', $user->quotes_count + 1)->afterCommit();
+        }
+
         $successMessage = 'Quote created successfully!';
         if (!empty($warnings)) {
             $successMessage .= ' ' . implode(' ', $warnings);
@@ -151,7 +155,7 @@ class QuoteController extends Controller
 
             $this->authorize('update', $quote);
 
-            $categories = Category::active()->ordered()->get();
+            $categories = \Illuminate\Support\Facades\Cache::remember('active_categories', now()->addHours(1), fn() => Category::active()->ordered()->get());
 
             $quote->load('categories');
             return view('quotes.edit', compact('quote', 'categories'));
@@ -310,7 +314,9 @@ class QuoteController extends Controller
                     
                     // Trigger notification only when actually creating a new like
                     if ($created->wasRecentlyCreated) {
-                        app(NotificationService::class)->notifyQuoteLiked($user, $quote);
+                        \App\Jobs\SendQuoteNotification::dispatch('liked', $user->id, $quote->user_id, $quote->id)->afterCommit();
+                        \App\Jobs\TrackUserInteraction::dispatch($user->id, $quote->id, 'like')->afterCommit();
+                        \App\Jobs\CheckUserAchievements::dispatch($user->id, 'quote_liked', $quote->id)->afterCommit();
                     }
                 }
             });
@@ -358,7 +364,9 @@ class QuoteController extends Controller
                     
                     // Trigger notification only when actually creating a new save
                     if ($created->wasRecentlyCreated) {
-                        app(NotificationService::class)->notifyQuoteSaved($user, $quote);
+                        \App\Jobs\SendQuoteNotification::dispatch('saved', $user->id, $quote->user_id, $quote->id)->afterCommit();
+                        \App\Jobs\TrackUserInteraction::dispatch($user->id, $quote->id, 'save')->afterCommit();
+                        \App\Jobs\CheckUserAchievements::dispatch($user->id, 'quote_saved')->afterCommit();
                     }
                 }
             });
@@ -392,13 +400,9 @@ class QuoteController extends Controller
         // Increment share count
         $quote->increment('shares_count');
         
-        // Track user category preferences
-        if ($user && $quote->category_id) {
-            app(RecommendationService::class)->trackCategoryInteraction(
-                $user,
-                $quote->category_id,
-                'share'
-            );
+        // Track user interaction
+        if ($user) {
+            \App\Jobs\TrackUserInteraction::dispatch($user->id, $quote->id, 'share')->afterCommit();
         }
 
         return back();
