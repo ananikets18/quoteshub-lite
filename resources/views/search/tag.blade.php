@@ -13,7 +13,7 @@
                 <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
                     <div style="font-size:32px;font-weight:800;color:var(--brand);font-family:'Playfair Display',serif;">#</div>
                     <div>
-                        <h1 style="font-size:24px;font-weight:800;color:#f1f5f9;letter-spacing:-0.3px;margin-bottom:4px;">{{ $tag->name }}</h1>
+                        <h1 style="font-size:24px;font-weight:800;letter-spacing:-0.3px;margin-bottom:4px;color:var(--text-primary, inherit);">{{ $tag->name }}</h1>
                         <div style="font-size:13px;color:#64748b;">{{ number_format($quotes->total()) }} quotes with this tag</div>
                     </div>
                 </div>

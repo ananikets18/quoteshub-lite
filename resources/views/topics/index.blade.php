@@ -38,7 +38,7 @@
                            onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 32px rgba(0,0,0,0.3)'"
                            onmouseout="this.style.transform='';this.style.boxShadow=''">
                             <div style="font-size:32px;margin-bottom:8px;">{{ $cat->icon ?? '📚' }}</div>
-                            <div style="font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:4px;">{{ $cat->name }}</div>
+                            <div style="font-size:14px;font-weight:700;margin-bottom:4px;color:var(--text-primary, inherit);">{{ $cat->name }}</div>
                             <div style="font-size:12px;color:#64748b;">{{ number_format($cat->quotes_count) }} quotes</div>
                         </a>
                     @endforeach
