@@ -112,7 +112,15 @@ class Quote extends Model
      */
     public function incrementViews(): void
     {
-        $this->increment('views_count');
+        // Buffer view in cache; flush via DB occasionally
+        $cacheKey = 'quote_views_' . $this->id;
+        $buffered = \Illuminate\Support\Facades\Cache::increment($cacheKey);
+
+        // Flush to DB every 10 views to reduce write pressure
+        if ($buffered % 10 === 0) {
+            $this->increment('views_count', 10);
+            \Illuminate\Support\Facades\Cache::put($cacheKey, 0, now()->addHour());
+        }
     }
 
     /**
