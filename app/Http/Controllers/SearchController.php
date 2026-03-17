@@ -22,8 +22,7 @@ class SearchController extends Controller
         try {
             $query = Quote::query()
                 ->approved()  // Only show approved quotes
-                ->with(['user', 'categories', 'tags'])
-                ->withCount(['likes', 'saves']);
+                ->with(['user', 'categories', 'tags']);
 
             // Search by content, author, or username
             if ($search = $validated['q'] ?? null) {
@@ -98,8 +97,7 @@ class SearchController extends Controller
 
             $query = $category->quotes()
                 ->approved()  // Only show approved quotes
-                ->with(['user', 'categories', 'tags'])
-                ->withCount(['likes', 'saves']);
+                ->with(['user', 'categories', 'tags']);
 
         // Apply sorting
         $sort = $request->input('sort', 'latest');
@@ -164,8 +162,7 @@ class SearchController extends Controller
 
             $query = $tag->quotes()
                 ->approved()  // Only show approved quotes
-                ->with(['user', 'categories', 'tags'])
-                ->withCount(['likes', 'saves']);
+                ->with(['user', 'categories', 'tags']);
 
             // Apply sorting
             $sort = $validated['sort'] ?? 'latest';

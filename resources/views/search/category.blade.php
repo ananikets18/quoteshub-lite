@@ -17,7 +17,7 @@
                         @if($category->description)
                             <p style="font-size:14px;color:#94a3b8;line-height:1.5;">{{ $category->description }}</p>
                         @endif
-                        <div style="margin-top:8px;font-size:13px;color:#64748b;">{{ number_format($category->quotes_count) }} quotes</div>
+                        <div style="margin-top:8px;font-size:13px;color:#64748b;">{{ number_format($quotes->total()) }} quotes</div>
                     </div>
                 </div>
             </div>
