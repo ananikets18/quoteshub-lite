@@ -54,3 +54,28 @@ test_bot_deploy.sh
 
 # Documentation folder
 /docs/
+
+# Local databases and runtime DB artifacts
+/database/*.sqlite
+/database/*.sqlite-shm
+/database/*.sqlite-wal
+/database/*.db
+
+# Test / coverage artifacts
+/coverage/
+/htmlcov/
+/.coverage
+/.phpunit.cache/
+
+# Frontend and tool caches
+/.cache/
+/.parcel-cache/
+/.eslintcache
+/.stylelintcache
+/.vite/
+
+# Misc temporary files
+*.tmp
+*.temp
+*.pid
+*.seed
