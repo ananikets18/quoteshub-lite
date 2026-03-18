@@ -65,34 +65,26 @@
 
 ---
 
-### Frontend (React/Inertia.js)
+### Frontend (Blade + Alpine.js)
 
 #### 1. Components
-- ✅ **NotificationDropdown** (`resources/js/Components/NotificationDropdown.jsx`)
-  - Dropdown from bell icon
-  - Shows 15 recent notifications
-  - Click to mark as read and navigate
-  - Delete individual notifications
-  - "Mark all as read" button
-  - Beautiful icons and colors per type
-  - Click-outside to close
+- ✅ **Notification Alpine State** (`resources/js/components/notifications.js`)
+   - Polling every 30 seconds
+   - Mark all as read
+   - Delete single and read notifications
+   - Local unread-count sync
 
-- ✅ **Header Component Updated** (`resources/js/Components/Header.jsx`)
-  - Notification bell with badge counter
-  - Auto-refresh every 30 seconds
-  - Red badge with count (9+ for >9 notifications)
-  - Opens dropdown on click
-  - Refreshes count when closing dropdown
+- ✅ **Navigation Badge Integration** (`resources/views/layouts/navigation.blade.php`)
+   - Bell + unread badge on desktop and mobile nav
+   - Unread count request to API endpoint
 
 #### 2. Pages
-- ✅ **Notifications Page** (`resources/js/Pages/Notifications.jsx`)
-  - Full-page view at `/notifications`
-  - Filter tabs: All / Unread
-  - Bulk actions: Mark all read, Clear all read
-  - Individual actions: Mark read, Delete
-  - Empty states
-  - Responsive design
-  - Dark mode support
+- ✅ **Notifications Page** (`resources/views/notifications.blade.php`)
+   - Full-page view at `/notifications`
+   - Bulk action: Mark all read
+   - Individual action: Mark read/delete
+   - Empty and loading states
+   - Responsive and dark-mode compatible styling
 
 ---
 
@@ -257,17 +249,17 @@ Indexes:
 
 ## 📁 Files Created/Modified
 
-### New Files (9):
+### New Files (Runtime-relevant subset):
 1. `database/migrations/2026_01_29_000001_create_notifications_table.php`
 2. `app/Models/Notification.php`
 3. `app/Services/NotificationService.php`
 4. `app/Http/Controllers/Api/NotificationController.php`
-5. `resources/js/Components/NotificationDropdown.jsx`
-6. `resources/js/Pages/Notifications.jsx`
+5. `resources/js/components/notifications.js`
+6. `resources/views/notifications.blade.php`
 7. `NOTIFICATIONS_SYSTEM.md` (full documentation)
-8. `NOTIFICATIONS_IMPLEMENTATION_SUMMARY.md` (this file)
+8. `docs/NOTIFICATIONS_IMPLEMENTATION_SUMMARY.md` (this file)
 
-### Modified Files (7):
+### Modified Files (8):
 1. `routes/api.php` - Added notification routes
 2. `routes/web.php` - Added /notifications page route
 3. `app/Models/User.php` - Added notifications relationship
@@ -275,7 +267,7 @@ Indexes:
 5. `app/Http/Controllers/QuoteController.php` - Added notification triggers
 6. `app/Http/Controllers/AdminController.php` - Added notification triggers
 7. `app/Http/Controllers/Api/AdminController.php` - Added notification trigger
-8. `resources/js/Components/Header.jsx` - Made bell functional
+8. `resources/views/layouts/navigation.blade.php` - Made bell/badge functional
 
 ---
 
@@ -320,9 +312,11 @@ Indexes:
 ## 💡 Tips for Customization
 
 ### Change polling interval:
-```jsx
-// In Header.jsx, line ~20
-const interval = setInterval(fetchUnreadCount, 30000); // Change 30000 (30s)
+```javascript
+// In resources/js/components/notifications.js
+this.pollInterval = setInterval(() => {
+   this.fetchNotifications();
+}, 30000); // Change 30000 (30s)
 ```
 
 ### Add new notification type:

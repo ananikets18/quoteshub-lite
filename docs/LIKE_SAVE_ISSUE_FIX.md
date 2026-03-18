@@ -207,7 +207,7 @@ Schema::table('saves', function (Blueprint $table) {
 
 ### 3. Add Frontend Validation
 
-Update QuoteCard.jsx to handle errors from backend:
+Update the Blade + Alpine quote card flow (`resources/views/components/quote-card.blade.php` + `resources/js/components/quoteCard.js`) to handle errors from backend:
 
 ```javascript
 router.post(`/quotes/${quote.id}/like`, {}, {

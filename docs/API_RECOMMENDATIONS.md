@@ -233,17 +233,24 @@ final_score = score × (1 + recency_bonus)
 
 ## 🎨 Frontend Integration Examples
 
-### 1. For You Tab (React/Inertia)
+### 1. For You Tab (Blade + Alpine)
 
-```javascript
-// Feed.jsx - Already implemented!
-const filters = auth.user 
-  ? [
-      { id: 'foryou', label: 'For You', icon: Sparkles },
-      { id: 'latest', label: 'Latest', icon: Clock },
-      // ...
-    ]
-  : [...];
+Use server-side filter state in `FeedController` and render pills/tabs in Blade (`resources/views/feed.blade.php`).
+
+```php
+// FeedController@index
+$sort = $request->get('sort', 'latest');
+
+switch ($sort) {
+    case 'foryou':
+        // personalized branch
+        break;
+    case 'trending':
+        // trending branch
+        break;
+    default:
+        // latest branch
+}
 ```
 
 ### 2. Track Views (JavaScript)

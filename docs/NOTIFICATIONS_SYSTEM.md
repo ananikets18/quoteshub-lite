@@ -94,55 +94,41 @@ getUnreadCount($user)
 
 ---
 
-### 4. **Frontend Components**
+### 4. **Frontend Components (Blade + Alpine)**
 
-#### NotificationDropdown Component
-**Location:** `resources/js/Components/NotificationDropdown.jsx`
+#### Sidebar / Topbar Notification Badge
+**Location:** `resources/views/layouts/navigation.blade.php`
 
 **Features:**
-- Real-time dropdown from header bell icon
-- Shows last 15 notifications
-- Click to mark as read
-- Click notification to navigate
-- Delete individual notifications
-- "Mark all as read" button
-- Elegant animations and icons
-
-**Usage:**
-```jsx
-<NotificationDropdown 
-    show={isOpen}
-    onClose={() => setIsOpen(false)}
-/>
-```
+- Notification bell with unread badge in desktop and mobile navigation
+- Badge count fetches unread count from `/api/notifications/unread-count`
+- Supports `9+` display for higher counts
 
 ---
 
-#### Header Component Updates
-**Location:** `resources/js/Components/Header.jsx`
+#### Alpine Notification State
+**Location:** `resources/js/components/notifications.js`
 
-**New Features:**
-- Notification bell icon with badge counter
-- Red badge shows unread count (9+ for >9)
-- Auto-refresh every 30 seconds
-- Click to open dropdown
-- Updates count when closing dropdown
+**Features:**
+- Polls notifications and unread count every 30 seconds
+- Mark all as read
+- Delete individual notifications
+- Bulk delete read notifications
+- Route navigation helpers for notification targets
 
 ---
 
 #### Notifications Page
-**Location:** `resources/js/Pages/Notifications.jsx`
+**Location:** `resources/views/notifications.blade.php`
 **Route:** `/notifications`
 
 **Features:**
-- Full-page notification view
-- Filter: All / Unread
+- Full-page notification list
 - Mark all as read
-- Clear all read notifications
 - Delete individual notifications
 - Click to navigate to related content
-- Empty states with illustrations
-- Responsive design
+- Empty and loading states
+- Responsive Blade layout
 
 ---
 
@@ -226,9 +212,11 @@ All components fully support dark mode with proper color schemes.
 ## 🔧 Configuration
 
 ### Polling Interval
-Change in `Header.jsx`:
-```jsx
-const interval = setInterval(fetchUnreadCount, 30000); // 30 seconds
+Configured in `resources/js/components/notifications.js`:
+```javascript
+this.pollInterval = setInterval(() => {
+   this.fetchNotifications();
+}, 30000);
 ```
 
 ### Notifications Per Page

@@ -1,5 +1,17 @@
 # UI/UX Transformation - Instagram-Style Feed
 
+> ⚠️ **Legacy note (pre-Blade migration):** This document describes an earlier React/Inertia prototype. The current app uses Blade + Alpine, with feed UI implemented in `resources/views/feed.blade.php` and quote cards in `resources/views/components/quote-card.blade.php`.
+
+## Current Implementation Snapshot (Blade)
+
+- Feed page: `resources/views/feed.blade.php`
+- Quote card: `resources/views/components/quote-card.blade.php`
+- Quote interactions: `resources/js/components/quoteCard.js`
+- Follow actions: `resources/js/components/followButton.js`
+- Search shortcut (`Ctrl/Cmd+K`): `resources/js/components/searchBar.js`
+
+The sections below are retained as historical design context.
+
 ## 🎯 Changes Made
 
 ### **What We Removed:**
@@ -149,24 +161,17 @@
 
 ## 🔧 Technical Implementation
 
-### **Files Modified:**
-1. `resources/js/Pages/Feed.jsx`
-   - Removed sidebar layout
-   - Changed to full-width feed
-   - Added inline suggested users (once, after 5th quote)
+### **Files Modified (Current Blade stack):**
+1. `resources/views/feed.blade.php`
+2. `resources/views/components/quote-card.blade.php`
+3. `resources/js/components/quoteCard.js`
+4. `resources/js/components/followButton.js`
 
-2. `resources/js/Components/SuggestedUsers.jsx`
-   - Added `inline` prop
-   - Created horizontal scroll layout
-   - Compact card design
-   - Kept backward compatibility
-
-3. `resources/css/app.css`
-   - Added `.scrollbar-hide` utility
-
-### **Files Removed from Feed:**
-- `ActivityFeed.jsx` (no longer imported)
-- `TrendingWidget.jsx` (no longer imported)
+### **Legacy React references (no longer in repo):**
+- `resources/js/Pages/Feed.jsx`
+- `resources/js/Components/SuggestedUsers.jsx`
+- `ActivityFeed.jsx`
+- `TrendingWidget.jsx`
 
 ---
 

@@ -25,6 +25,8 @@ Welcome to the QuotesHub documentation! This folder contains comprehensive docum
 ### 🔒 **Security & Testing**
 - [**SECURITY_TEST_CHECKLIST.md**](./SECURITY_TEST_CHECKLIST.md) - Security testing procedures
 - [**PHASE1_IMPLEMENTATION_SUMMARY.md**](./PHASE1_IMPLEMENTATION_SUMMARY.md) - Development milestones and testing
+- [**MIGRATION_PROGRESS.md**](./MIGRATION_PROGRESS.md) - Blade migration progress and remaining tasks
+- [**ROUTE_NAMES.md**](./ROUTE_NAMES.md) - Route naming reference
 
 ### 🎨 **UI/UX & Features**
 - [**UI_UX_ENHANCEMENTS.md**](./UI_UX_ENHANCEMENTS.md) - User interface improvements

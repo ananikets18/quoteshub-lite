@@ -51,3 +51,6 @@ bot_status.php
 clear_bot_quotes.php
 test_bot_deploy.sh
 /storage/app/bot_import_progress.json
+
+# Documentation folder
+/docs/
