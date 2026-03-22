@@ -1569,4 +1569,37 @@
     html.light .empty-state-icon {
         opacity: 1;
     }
+
+    /* Collection picker dropdown rows */
+    .collection-picker-item {
+        width: 100%;
+        text-align: left;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #e2e8f0;
+        transition: background 0.15s ease;
+    }
+
+    .collection-picker-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .collection-picker-item.in-collection {
+        color: #a78bfa;
+    }
+
+    html.light .collection-picker-item {
+        color: #1e1b4b;
+    }
+
+    html.light .collection-picker-item.in-collection {
+        color: var(--brand);
+    }
 }

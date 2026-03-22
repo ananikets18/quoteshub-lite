@@ -4,8 +4,6 @@
 @section('description', 'Discover inspiring quotes from great minds. Your daily dose of wisdom and motivation on QuotesHub.')
 
 @section('content')
-{{-- By using class="app-main", this content sits right of the desktop sidebar
-     (sidebar is rendered by layouts/navigation.blade.php which is always included) --}}
 <div class="app-main" style="display:flex; min-height:100dvh;">
 
     {{-- Center feed --}}
@@ -34,10 +32,10 @@
 
             {{-- Feed Tab Switcher --}}
             @auth
-            <div style="display:flex;gap:4px;padding:4px;background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border-subtle);margin-bottom:20px;">
+            <div style="display:flex;gap:4px;padding:4px;background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border-subtle);margin-bottom:16px;">
                 <a href="{{ route('feed') }}"
                    style="flex:1;text-align:center;padding:9px 16px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;transition:all 0.2s ease;
-                          {{ request()->routeIs('feed','home') && !request()->routeIs('following.feed') ? 'background:var(--brand);color:#fff;box-shadow:0 4px 16px rgba(141,52,233,0.35);' : 'color:#64748b;' }}">
+                          {{ !request()->routeIs('following.feed') ? 'background:var(--brand);color:#fff;box-shadow:0 4px 16px rgba(141,52,233,0.35);' : 'color:#64748b;' }}">
                     ✨ For You
                 </a>
                 <a href="{{ route('following.feed') }}"
@@ -48,46 +46,92 @@
             </div>
             @endauth
 
+            {{-- Sort / Filter bar --}}
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                @foreach(['latest' => '🕐 Latest', 'trending' => '📈 Trending', 'popular' => '🔥 Popular'] as $val => $label)
+                    <a href="{{ request()->fullUrlWithQuery(['sort' => $val]) }}"
+                       style="padding:7px 16px;border-radius:22px;font-size:13px;font-weight:600;text-decoration:none;transition:all 0.2s ease;
+                              {{ request()->get('sort', 'latest') === $val
+                                  ? 'background:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(141,52,233,0.35);'
+                                  : 'background:var(--bg-elevated);color:#64748b;border:1px solid var(--border-subtle);' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
+
             {{-- Mobile-only: Categories scroll strip --}}
             <div class="lg:hidden mb-4 -mx-3 px-3 overflow-x-auto no-scrollbar">
                 <div class="flex gap-2 pb-1" style="width:max-content;">
                     <a href="{{ route('feed') }}"
                        class="category-pill flex-shrink-0"
-                       style="{{ request()->routeIs('feed') ? 'background:rgba(139,92,246,0.2);border-color:rgba(139,92,246,0.5);' : '' }}">
+                       style="{{ !request()->has('category') ? 'background:rgba(139,92,246,0.2);border-color:rgba(139,92,246,0.5);' : '' }}">
                         🏠 All
                     </a>
                     @foreach($categories->take(10) as $cat)
-                        <a href="{{ route('category.show', $cat->slug) }}"
-                           class="category-pill flex-shrink-0">
+                        <a href="{{ route('feed', ['category' => $cat->slug]) }}"
+                           class="category-pill flex-shrink-0"
+                           style="{{ request()->get('category') === $cat->slug ? 'background:rgba(139,92,246,0.2);border-color:rgba(139,92,246,0.5);' : '' }}">
                             {{ $cat->icon ?? '●' }} {{ $cat->name }}
                         </a>
                     @endforeach
                 </div>
             </div>
 
-            {{-- Quote cards --}}
-            <div class="flex flex-col gap-4 stagger">
-                @forelse($quotes as $quote)
-                    <x-quote-card :quote="$quote" />
-                @empty
-                    <x-empty-state
-                        icon="📭"
-                        title="Nothing here yet"
-                        message="Be the first to share an inspiring quote with the community!"
-                        @auth
-                            actionText="Create First Quote"
-                            actionUrl="{{ route('quotes.create') }}"
-                        @endauth
-                    />
-                @endforelse
-            </div>
-
-            {{-- Pagination --}}
-            @if($quotes->hasPages())
-                <div class="mt-8 flex justify-center">
-                    {{ $quotes->links() }}
+            {{-- ═══ INFINITE SCROLL FEED ═══ --}}
+            <div
+                id="feed-list"
+                x-data="feedInfiniteScroll('{{ route('feed') }}', {{ json_encode(request()->only(['sort', 'category'])) }})"
+                x-init="init()"
+            >
+                {{-- Server-rendered first page (no-JS / fast initial paint) --}}
+                <div id="feed-ssr" class="flex flex-col gap-4 stagger">
+                    @forelse($quotes as $quote)
+                        <x-quote-card :quote="$quote" />
+                    @empty
+                        <x-empty-state
+                            icon="📭"
+                            title="Nothing here yet"
+                            message="Be the first to share an inspiring quote with the community!"
+                            @auth
+                                actionText="Create First Quote"
+                                actionUrl="{{ route('quotes.create') }}"
+                            @endauth
+                        />
+                    @endforelse
                 </div>
-            @endif
+
+                {{-- Dynamically appended cards go here --}}
+                <template x-if="items.length > 0">
+                    <div class="flex flex-col gap-4" id="feed-dynamic">
+                        <template x-for="q in items" :key="q.id">
+                            <div x-html="q._rendered"></div>
+                        </template>
+                    </div>
+                </template>
+
+                {{-- Loading skeleton --}}
+                <template x-if="loading">
+                    <div class="flex flex-col gap-4 mt-4">
+                        <template x-for="i in 3" :key="i">
+                            <div class="quote-card-new" style="padding:20px;">
+                                <div class="skeleton" style="height:12px;width:60%;border-radius:8px;margin-bottom:12px;"></div>
+                                <div class="skeleton" style="height:18px;width:100%;border-radius:8px;margin-bottom:8px;"></div>
+                                <div class="skeleton" style="height:18px;width:80%;border-radius:8px;"></div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                {{-- All-done message --}}
+                <template x-if="!hasMore && !loading && (items.length > 0 || {{ $quotes->count() }} > 0)">
+                    <div style="text-align:center;padding:32px 16px;color:#475569;font-size:13px;">
+                        ✨ You've seen all the quotes for now. Check back soon!
+                    </div>
+                </template>
+
+                {{-- Scroll sentinel — IntersectionObserver watches this --}}
+                <div id="scroll-sentinel" style="height:1px;margin-top:16px;"></div>
+            </div>
 
         </div>
     </div>

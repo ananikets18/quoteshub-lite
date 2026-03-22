@@ -7,6 +7,8 @@ import { notificationSystem } from './components/notifications.js';
 import { toastNotification } from './components/toast.js';
 import { followButton } from './components/followButton.js';
 import { infiniteScroll } from './components/infiniteScroll.js';
+import { feedInfiniteScroll } from './components/feedInfiniteScroll.js';
+import { collectionPicker } from './components/collectionPicker.js';
 import { searchBar } from './components/searchBar.js';
 
 // Register Alpine components
@@ -15,6 +17,8 @@ Alpine.data('notificationSystem', notificationSystem);
 Alpine.data('toastNotification', toastNotification);
 Alpine.data('followButton', followButton);
 Alpine.data('infiniteScroll', infiniteScroll);
+Alpine.data('feedInfiniteScroll', feedInfiniteScroll);
+Alpine.data('collectionPicker', collectionPicker);
 Alpine.data('searchBar', searchBar);
 
 // Mobile menu toggle
