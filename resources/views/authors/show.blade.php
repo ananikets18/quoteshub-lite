@@ -40,19 +40,47 @@
             @endforeach
         </div>
 
-        {{-- Quotes --}}
-        <div class="flex flex-col gap-4 stagger">
-            @forelse($quotes as $quote)
-                <x-quote-card :quote="$quote" />
-            @empty
-                <x-empty-state icon="📭" title="No quotes found" message="There are no published quotes by {{ $authorName }} yet." />
-            @endforelse
-        </div>
+        {{-- ═══ INFINITE SCROLL FEED ═══ --}}
+        <div
+            id="feed-list"
+            x-data="feedInfiniteScroll('{{ route('author.show', urlencode($authorName)) }}', {{ json_encode(request()->only(['sort'])) }})"
+            x-init="init()"
+        >
+            {{-- Server-rendered first page --}}
+            <div id="feed-ssr" class="flex flex-col gap-4 stagger">
+                @forelse($quotes as $quote)
+                    <x-quote-card :quote="$quote" />
+                @empty
+                    <x-empty-state icon="📭" title="No quotes found" message="There are no published quotes by {{ $authorName }} yet." />
+                @endforelse
+            </div>
 
-        {{-- Pagination --}}
-        @if($quotes->hasPages())
-            <div class="mt-8 flex justify-center">{{ $quotes->links() }}</div>
-        @endif
+            {{-- Dynamically appended cards --}}
+            <div class="flex flex-col gap-4" id="feed-dynamic"></div>
+
+            {{-- Loading skeleton --}}
+            <template x-if="loading">
+                <div class="flex flex-col gap-4 mt-4">
+                    <template x-for="i in 3" :key="i">
+                        <div class="quote-card-new" style="padding:20px;">
+                            <div class="skeleton" style="height:12px;width:60%;border-radius:8px;margin-bottom:12px;"></div>
+                            <div class="skeleton" style="height:18px;width:100%;border-radius:8px;margin-bottom:8px;"></div>
+                            <div class="skeleton" style="height:18px;width:80%;border-radius:8px;"></div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            {{-- All-done message --}}
+            <template x-if="!hasMore && !loading && {{ $quotes->count() }} > 0">
+                <div style="text-align:center;padding:32px 16px;color:#475569;font-size:13px;">
+                    ✨ You've seen all quotes by {{ $authorName }}.
+                </div>
+            </template>
+
+            {{-- Scroll sentinel --}}
+            <div id="scroll-sentinel" style="height:1px;margin-top:16px;"></div>
+        </div>
 
         {{-- Related authors --}}
         @if($relatedAuthors->count() > 0)

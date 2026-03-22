@@ -142,44 +142,50 @@ class FollowController extends Controller
         $user = $request->user();
         
         $followingIds = $user->following()->pluck('following_id')->toArray();
+        $followingCount = count($followingIds);
         
         if (empty($followingIds)) {
-            $quotes = [
-                    'data' => [],
-                    'links' => [],
-                    'total' => 0,
-            ];
-            $followingCount = 0;
+            $quotes = collect();
             return view('follow.feed', compact('quotes', 'followingCount'));
         }
 
-        $quotes = \App\Models\Quote::whereIn('user_id', $followingIds)
-            ->approved()  // Only show approved quotes
-            ->with(['user', 'categories', 'tags'])
-            ->withCount(['likes', 'saves'])
-            ->latest()
-            ->paginate(12);
+        $query = \App\Models\Quote::whereIn('user_id', $followingIds)
+            ->approved()
+            ->with(['user', 'categories', 'tags']);
+
+        // Exclude dismissed quotes
+        $dismissed = \App\Http\Controllers\Api\FeedPreferenceController::getDismissedIds($request);
+        if (!empty($dismissed)) {
+            $query->whereNotIn('id', $dismissed);
+        }
+
+        $quotes = $query->latest()->paginate(15);
 
         // Add user interaction flags
         $quotes->getCollection()->transform(function ($quote) {
             $quote->is_liked = $quote->isLikedBy(auth()->user());
             $quote->is_saved = $quote->isSavedBy(auth()->user());
-            // Add collection IDs this quote is in
             $quote->collection_ids = $quote->collections()
                 ->where('user_id', auth()->id())
                 ->pluck('collections.id')
                 ->toArray();
             return $quote;
         });
-        
-        // Get user's collections
-        $collections = auth()->user()->collections()
-            ->select('id', 'name', 'slug')
-            ->orderBy('name')
-            ->get();
 
-        $followingCount = count($followingIds);
-        return view('follow.feed', compact('quotes', 'followingCount', 'collections'));
+        // AJAX infinite scroll: return rendered HTML partial for page > 1
+        if ($request->ajax() && $quotes->currentPage() > 1) {
+            $html = '';
+            foreach ($quotes->getCollection() as $quote) {
+                $html .= view('components.quote-card', ['quote' => $quote])->render();
+            }
+            return response()->json([
+                'html'     => $html,
+                'hasMore'  => $quotes->hasMorePages(),
+                'nextPage' => $quotes->currentPage() + 1,
+            ]);
+        }
+
+        return view('follow.feed', compact('quotes', 'followingCount'));
     }
 
     /**

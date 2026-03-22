@@ -15,12 +15,20 @@ class AuthorController extends Controller
         // Decode the URL-encoded author name
         $authorName = urldecode($author);
 
-        $quotes = Quote::with(['user', 'categories', 'tags'])
+        $query = Quote::with(['user', 'categories', 'tags'])
             ->approved()
             ->where('author', $authorName)
-            ->withCount(['likes', 'saves'])
-            ->latest()
-            ->paginate(15);
+            ->withCount(['likes', 'saves']);
+
+        // Apply sorting
+        $sort = $request->get('sort', 'latest');
+        match ($sort) {
+            'trending' => $query->trending(),
+            'popular'  => $query->popular(),
+            default    => $query->latest(),
+        };
+
+        $quotes = $query->paginate(15);
 
         if ($quotes->isEmpty() && $quotes->currentPage() === 1) {
             abort(404, "No quotes found for author '{$authorName}'.");
@@ -37,6 +45,19 @@ class AuthorController extends Controller
                     ->toArray();
                 return $quote;
             });
+        }
+
+        // AJAX infinite scroll: return rendered HTML partial for page > 1
+        if ($request->ajax() && $quotes->currentPage() > 1) {
+            $html = '';
+            foreach ($quotes->getCollection() as $quote) {
+                $html .= view('components.quote-card', ['quote' => $quote])->render();
+            }
+            return response()->json([
+                'html'     => $html,
+                'hasMore'  => $quotes->hasMorePages(),
+                'nextPage' => $quotes->currentPage() + 1,
+            ]);
         }
 
         // Related authors (share a category)

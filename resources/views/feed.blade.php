@@ -100,14 +100,8 @@
                     @endforelse
                 </div>
 
-                {{-- Dynamically appended cards go here --}}
-                <template x-if="items.length > 0">
-                    <div class="flex flex-col gap-4" id="feed-dynamic">
-                        <template x-for="q in items" :key="q.id">
-                            <div x-html="q._rendered"></div>
-                        </template>
-                    </div>
-                </template>
+                {{-- Dynamically appended cards --}}
+                <div class="flex flex-col gap-4" id="feed-dynamic"></div>
 
                 {{-- Loading skeleton --}}
                 <template x-if="loading">
