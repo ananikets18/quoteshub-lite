@@ -1557,4 +1557,16 @@
     html.light .tab-item.active {
         background: #ffffff;
     }
+
+    html.light .empty-state-title {
+        color: #1e1b4b;
+    }
+
+    html.light .empty-state-msg {
+        color: #475569;
+    }
+
+    html.light .empty-state-icon {
+        opacity: 1;
+    }
 }
