@@ -29,7 +29,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/notifications/mark-all-read', [App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead'])->name('api.notifications.mark-all-read');
     Route::post('/api/notifications/{notification}/read', [App\Http\Controllers\Api\NotificationController::class, 'markAsRead'])->name('api.notifications.mark-as-read');
     Route::delete('/api/notifications/{notification}', [App\Http\Controllers\Api\NotificationController::class, 'destroy'])->name('api.notifications.destroy');
+
+    // Comment API routes
+    Route::post('/api/quotes/{quote}/comments', [App\Http\Controllers\Api\CommentController::class, 'store'])->name('api.comments.store')->middleware('throttle:30,1');
+    Route::delete('/api/comments/{comment}', [App\Http\Controllers\Api\CommentController::class, 'destroy'])->name('api.comments.destroy');
 });
+
+// Public comment listing (guests can read comments)
+Route::get('/api/quotes/{quote}/comments', [App\Http\Controllers\Api\CommentController::class, 'index'])->name('api.comments.index');
 
 Route::get('/', [FeedController::class, 'index'])->name('home');
 Route::get('/feed', [FeedController::class, 'index'])->name('feed');

@@ -75,6 +75,14 @@ class Quote extends Model
     }
 
     /**
+     * Get the comments for the quote
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class)->whereNull('parent_id')->with('user', 'replies.user')->latest();
+    }
+
+    /**
      * Get the collections that contain this quote
      */
     public function collections(): BelongsToMany

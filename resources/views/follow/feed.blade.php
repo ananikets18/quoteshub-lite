@@ -9,8 +9,20 @@
 
         {{-- Header --}}
         <div class="page-header">
-            <h1 class="page-title">👥 Following</h1>
+            <h1 class="page-title">Feed</h1>
             <p class="page-subtitle">Latest from people you follow</p>
+        </div>
+
+        {{-- Feed Tab Switcher --}}
+        <div style="display:flex;gap:4px;padding:4px;background:var(--bg-elevated);border-radius:16px;border:1px solid var(--border-subtle);margin-bottom:20px;">
+            <a href="{{ route('feed') }}"
+               style="flex:1;text-align:center;padding:9px 16px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;transition:all 0.2s ease;color:#64748b;">
+                ✨ For You
+            </a>
+            <a href="{{ route('following.feed') }}"
+               style="flex:1;text-align:center;padding:9px 16px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;transition:all 0.2s ease;background:var(--brand);color:#fff;box-shadow:0 4px 16px rgba(141,52,233,0.35);">
+                👥 Following
+            </a>
         </div>
 
         @if($followingCount === 0)

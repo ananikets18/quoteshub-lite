@@ -30,6 +30,9 @@
         <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)">
         <meta name="theme-color" content="#f1f0f8" media="(prefers-color-scheme: light)">
         <meta name="authenticated" content="{{ auth()->check() ? 'true' : 'false' }}">
+        @auth
+        <meta name="user-id" content="{{ auth()->id() }}">
+        @endauth
         <link rel="canonical" href="{{ url()->current() }}">
 
         <!-- Favicon -->

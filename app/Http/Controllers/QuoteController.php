@@ -138,7 +138,14 @@ class QuoteController extends Controller
             $quote->is_saved = $quote->isSavedBy(auth()->user());
         }
 
-        return view('quotes.show', compact('quote'));
+        // Load top-level comments with user and replies
+        $comments = \App\Models\Comment::where('quote_id', $quote->id)
+            ->topLevel()
+            ->with(['user:id,name,username,avatar', 'replies.user:id,name,username,avatar'])
+            ->latest()
+            ->get();
+
+        return view('quotes.show', compact('quote', 'comments'));
     }
 
     /**

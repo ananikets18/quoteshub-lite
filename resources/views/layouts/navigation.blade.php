@@ -340,6 +340,7 @@
         Alpine.data('notificationBadge', () => ({
             count: 0,
             async init() {
+                // Initial count from REST API
                 try {
                     const res = await fetch('/api/notifications/unread-count', {
                         headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -349,6 +350,22 @@
                         this.count = data.count || 0;
                     }
                 } catch(e) {}
+
+                // ── Real-time: listen for new notifications via Reverb WebSocket ──
+                // Only connect if Echo is available and user is authenticated
+                if (window.Echo) {
+                    const userId = document.querySelector('meta[name="user-id"]')?.content;
+                    if (userId) {
+                        window.Echo
+                            .private(`user.${userId}`)
+                            .listen('.notification.sent', (e) => {
+                                this.count++;
+                                // Optionally dispatch a custom event so the notification
+                                // page can refresh itself if it's open
+                                window.dispatchEvent(new CustomEvent('refreshNotifications'));
+                            });
+                    }
+                }
             }
         }));
     });

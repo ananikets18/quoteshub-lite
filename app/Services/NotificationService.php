@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Quote;
 use App\Models\UserNotificationPreference;
 use App\Events\NotificationSent;
+use App\Mail\AchievementUnlockedMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class NotificationService
@@ -186,14 +188,20 @@ class NotificationService
     public function notifyAchievementUnlocked(User $user, string $achievementName, string $achievementDescription): void
     {
         Notification::create([
-            'user_id' => $user->id,
+            'user_id'  => $user->id,
             'actor_id' => null,
-            'type' => Notification::TYPE_ACHIEVEMENT_UNLOCKED,
-            'data' => [
-                'achievement_name' => $this->sanitizeForJson($achievementName),
+            'type'     => Notification::TYPE_ACHIEVEMENT_UNLOCKED,
+            'data'     => [
+                'achievement_name'        => $this->sanitizeForJson($achievementName),
                 'achievement_description' => $this->sanitizeForJson($achievementDescription),
             ],
         ]);
+
+        // Send email if user opted in
+        $prefs = $user->notificationPreferences;
+        if ($prefs && $prefs->email_notifications && $prefs->isEnabled('achievement_unlocked')) {
+            Mail::to($user->email)->queue(new AchievementUnlockedMail($user, $achievementName, $achievementDescription));
+        }
     }
 
     /**
