@@ -306,6 +306,33 @@ class NotificationService
         // Broadcast the notification in real-time
         broadcast(new NotificationSent($notification))->toOthers();
 
+        // Send a Web Push notification for offline/background devices
+        if ($user->pushSubscriptions()->count() > 0) {
+            $formattedTitle = 'QuotesHub';
+            $formattedBody = 'You have a new notification';
+            $url = '/dashboard';
+
+            switch ($notification->type) {
+                case \App\Models\Notification::TYPE_NEW_FOLLOWER:
+                    $formattedTitle = 'New Follower';
+                    $formattedBody = ($notification->data['follower_username'] ?? 'Someone') . ' started following you.';
+                    $url = '/profile/' . ($notification->data['follower_username'] ?? '');
+                    break;
+                case \App\Models\Notification::TYPE_QUOTE_LIKED:
+                    $formattedTitle = 'Quote Liked';
+                    $formattedBody = 'Someone liked your quote: "' . ($notification->data['quote_content'] ?? '') . '"';
+                    $url = '/quotes/' . ($notification->data['quote_id'] ?? '');
+                    break;
+                case \App\Models\Notification::TYPE_COMMENT_ADDED:
+                    $formattedTitle = 'New Comment';
+                    $formattedBody = 'Someone commented on your quote.';
+                    $url = '/quotes/' . ($notification->data['quote_id'] ?? '');
+                    break;
+            }
+
+            $user->notify(new \App\Notifications\WebPushNotification($formattedTitle, $formattedBody, $url));
+        }
+
         return $notification;
     }
 
