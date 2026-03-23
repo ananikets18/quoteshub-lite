@@ -109,6 +109,29 @@
                 </div>
             </div>
 
+            {{-- Push Notifications --}}
+            <div class="panel-card anim-fade-up" style="margin-bottom:16px;padding:24px;" x-data="pushManager()">
+                <div style="font-size:13px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:20px;">Push Notifications</div>
+                
+                <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-elevated);border:1px solid var(--border-subtle);padding:16px;border-radius:12px;">
+                    <div>
+                        <div style="color:#e2e8f0;font-weight:600;font-size:15px;">Enable Web Push Notifications</div>
+                        <div style="color:#64748b;font-size:13px;margin-top:4px;">Receive alerts natively on this device even when QuotesHub is closed.</div>
+                    </div>
+                    <button type="button" @click="togglePush" :disabled="loading || 'denied' === permission"
+                            style="padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;transition:all 0.2s;text-align:center;min-width:110px;"
+                            :style="isSubscribed 
+                                ? 'background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);' 
+                                : 'background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.2);'"
+                            x-text="loading ? '⏳...' : (isSubscribed ? 'Disable' : 'Enable')">
+                    </button>
+                </div>
+                <div x-show="permission === 'denied'" style="margin-top:12px;color:#f59e0b;font-size:12px;display:none;">
+                    ⚠️ You have blocked notifications in your browser settings. Please unblock them to enable this feature.
+                </div>
+                <div x-show="error" style="margin-top:12px;color:#ef4444;font-size:12px;display:none;" x-text="error"></div>
+            </div>
+
             {{-- Save button --}}
             <div style="display:flex;justify-content:flex-end;gap:12px;">
                 <a href="{{ route('profile.show', $user->username) }}" class="btn-ghost">Cancel</a>
@@ -130,6 +153,97 @@ function previewImage(input, previewId) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+document.addEventListener('alpine:init', () => {
+    Alpine.data('pushManager', () => ({
+        isSubscribed: false,
+        loading: false,
+        permission: Notification.permission,
+        error: '',
+        vapidPublicKey: '{{ config('webpush.vapid.public_key') }}',
+
+        async init() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                this.error = 'Push messaging is not supported by your browser.';
+                return;
+            }
+            try {
+                const reg = await navigator.serviceWorker.register('/sw.js');
+                const sub = await reg.pushManager.getSubscription();
+                this.isSubscribed = !!sub;
+            } catch (e) {
+                console.error('SW Error:', e);
+            }
+        },
+
+        async togglePush() {
+            this.loading = true;
+            this.error = '';
+
+            try {
+                if (this.isSubscribed) {
+                    await this.unsubscribe();
+                } else {
+                    await this.subscribe();
+                }
+            } catch (err) {
+                this.error = err.message || 'An error occurred during push registration.';
+                console.error(err);
+            } finally {
+                this.loading = false;
+                this.permission = Notification.permission;
+            }
+        },
+
+        async subscribe() {
+            const reg = await navigator.serviceWorker.ready;
+            const sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey)
+            });
+
+            // Send to Laravel
+            await this.sendToBackend('POST', sub);
+            this.isSubscribed = true;
+            if (window.showToast) window.showToast('Push enabled!', 'success');
+        },
+
+        async unsubscribe() {
+            const reg = await navigator.serviceWorker.ready;
+            const sub = await reg.pushManager.getSubscription();
+            if (sub) {
+                await this.sendToBackend('DELETE', { endpoint: sub.endpoint });
+                await sub.unsubscribe();
+            }
+            this.isSubscribed = false;
+            if (window.showToast) window.showToast('Push disabled!', 'success');
+        },
+
+        async sendToBackend(method, payload) {
+            const res = await fetch('/push_subscriptions', {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('Failed to synchronize with server.');
+        },
+
+        urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+    }));
+});
 </script>
 @endpush
 @endsection

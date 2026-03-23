@@ -38,6 +38,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/collections', [App\Http\Controllers\Api\CollectionApiController::class, 'index'])->name('api.collections.index');
     Route::post('/api/collections/{collection}/quotes/{quote}', [App\Http\Controllers\Api\CollectionApiController::class, 'addQuote'])->name('api.collections.add-quote');
     Route::delete('/api/collections/{collection}/quotes/{quote}', [App\Http\Controllers\Api\CollectionApiController::class, 'removeQuote'])->name('api.collections.remove-quote');
+
+    // Push Subscriptions
+    Route::post('/push_subscriptions', [\App\Http\Controllers\PushSubscriptionController::class, 'store']);
+    Route::delete('/push_subscriptions', [\App\Http\Controllers\PushSubscriptionController::class, 'destroy']);
 });
 
 // Not-Interested (works for guests via session too)
@@ -46,8 +50,8 @@ Route::post('/api/feed/not-interested', [App\Http\Controllers\Api\FeedPreference
 // Public comment listing (guests can read comments)
 Route::get('/api/quotes/{quote}/comments', [App\Http\Controllers\Api\CommentController::class, 'index'])->name('api.comments.index');
 
-Route::get('/', [FeedController::class, 'index'])->name('home');
-Route::get('/feed', [FeedController::class, 'index'])->name('feed');
+Route::get('/', [\App\Http\Controllers\LandingController::class, 'index'])->name('home');
+Route::get('/feed', [App\Http\Controllers\FeedController::class, 'index'])->name('feed');
 
 // Author pages
 Route::get('/authors/{author}', [App\Http\Controllers\AuthorController::class, 'show'])->name('author.show')->where('author', '.+');
