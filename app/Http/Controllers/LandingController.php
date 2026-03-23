@@ -38,7 +38,7 @@ class LandingController extends Controller
                 'stats' => [
                     'quotes' => Quote::approved()->count(),
                     'users' => User::count(),
-                    'saves' => \Illuminate\Support\Facades\DB::table('quote_user_saves')->count(),
+                    'saves' => \App\Models\Save::count(),
                 ]
             ];
         });

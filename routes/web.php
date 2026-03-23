@@ -176,7 +176,7 @@ Route::middleware(['auth', 'noindex'])->group(function () {
     Route::post('/quotes/{quote}/report', [QuoteController::class, 'report'])->name('quotes.report')->middleware('throttle:5,1');
     
     // Profile management
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.show');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
 
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update')->middleware('throttle:10,1');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy')->middleware('throttle:3,1');

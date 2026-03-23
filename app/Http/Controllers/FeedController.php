@@ -41,17 +41,25 @@ class FeedController extends Controller
             default    => $query->latest(),
         };
 
-        $quotes = $query->paginate(15);
-
         // Add user interaction flags if authenticated
         if (auth()->check()) {
+            $query->withExists([
+                'likes as is_liked' => fn($q) => $q->where('user_id', auth()->id()),
+                'saves as is_saved' => fn($q) => $q->where('user_id', auth()->id())
+            ])->with(['collections' => function($q) {
+                $q->where('user_id', auth()->id())->select('collections.id');
+            }]);
+        }
+
+        $quotes = $query->paginate(15);
+
+        if (auth()->check()) {
             $quotes->getCollection()->transform(function ($quote) {
-                $quote->is_liked = $quote->isLikedBy(auth()->user());
-                $quote->is_saved = $quote->isSavedBy(auth()->user());
-                $quote->collection_ids = $quote->collections()
-                    ->where('user_id', auth()->id())
-                    ->pluck('collections.id')
-                    ->toArray();
+                // map collections relation to simple array of IDs
+                $quote->collection_ids = $quote->collections->pluck('id')->toArray();
+                // Ensure the appended or logic handles boolean properly
+                $quote->is_liked = (bool) $quote->is_liked;
+                $quote->is_saved = (bool) $quote->is_saved;
                 return $quote;
             });
         }
