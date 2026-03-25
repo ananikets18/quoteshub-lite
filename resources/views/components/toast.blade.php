@@ -18,11 +18,11 @@
             style="
                 pointer-events: auto;
                 backdrop-filter: blur(20px);
-                border: 1px solid rgba(255,255,255,0.12);
+                border: 1px solid var(--border-subtle, rgba(255,255,255,0.12));
                 background: var(--bg-elevated, #1a1a27);
                 font-size: 14px;
                 font-weight: 500;
-                color: #e2e8f0;
+                color: var(--text-primary, #e2e8f0);
                 white-space: nowrap;
             "
             :style="toast.type === 'success' ? 'border-color: rgba(16,185,129,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(16,185,129,0.15);' :

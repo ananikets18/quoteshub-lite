@@ -6,17 +6,15 @@
 ])
 
 <article
-    @if($showActions && auth()->check())
+    @if($showActions)
         x-data="quoteCard(@js($quote))"
-    @endif
-    class="quote-card-new anim-fade-up"
-    aria-label="Quote by {{ $quote->author }}"
-    @if($showActions && auth()->check())
         x-show="!dismissed"
         x-transition:leave="transition ease-in duration-300"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0 -translate-y-2"
     @endif
+    class="quote-card-new anim-fade-up"
+    aria-label="Quote by {{ $quote->author }}"
 >
     <div class="quote-card-body">
         {{-- Header: who shared --}}
@@ -132,13 +130,6 @@
                     </div>
                 </div>
 
-                {{-- Share --}}
-                <button @click="shareQuote" class="action-btn" title="Share">
-                    <svg class="fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-                    </svg>
-                </button>
-
             @else
                 {{-- Guest --}}
                 <a href="{{ route('login') }}" class="action-btn" title="Sign in to like">
@@ -154,6 +145,13 @@
                     <span class="text-xs font-semibold">{{ $quote->saves_count }}</span>
                 </a>
             @endauth
+            
+            {{-- Share (Available to both guests and auth) --}}
+            <button @click="shareQuote" class="action-btn" title="Share">
+                <svg class="fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                </svg>
+            </button>
 
             <span class="action-spacer"></span>
 
