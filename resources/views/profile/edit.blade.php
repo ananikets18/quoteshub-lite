@@ -54,7 +54,7 @@
                 <div style="font-size:13px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:20px;">Basic Information</div>
 
                 @php
-                    $inputStyle = "width:100%;padding:12px 16px;background:var(--bg-input);border:1px solid var(--border-muted);border-radius:12px;font-size:15px;color:#e2e8f0;outline:none;transition:border-color 0.2s ease;";
+                    $inputStyle = "width:100%;padding:12px 16px;background:var(--bg-input);border:1px solid var(--border-muted);border-radius:12px;font-size:15px;color:var(--text-primary, #e2e8f0);outline:none;transition:border-color 0.2s ease;";
                     $labelStyle = "display:block;font-size:13px;font-weight:600;color:#94a3b8;margin-bottom:8px;";
                 @endphp
 
@@ -115,7 +115,7 @@
                 
                 <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-elevated);border:1px solid var(--border-subtle);padding:16px;border-radius:12px;">
                     <div>
-                        <div style="color:#e2e8f0;font-weight:600;font-size:15px;">Enable Web Push Notifications</div>
+                        <div style="color:var(--text-primary, #e2e8f0);font-weight:600;font-size:15px;">Enable Web Push Notifications</div>
                         <div style="color:#64748b;font-size:13px;margin-top:4px;">Receive alerts natively on this device even when QuotesHub is closed.</div>
                     </div>
                     <button type="button" @click="togglePush" :disabled="loading || 'denied' === permission"

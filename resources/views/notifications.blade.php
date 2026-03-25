@@ -49,7 +49,7 @@
 
                         {{-- Content --}}
                         <div style="flex:1;min-width:0;">
-                            <p style="font-size:14px;color:#e2e8f0;line-height:1.5;" x-html="notif.data?.message || notif.data?.body || 'New notification'"></p>
+                            <p style="font-size:14px;color:var(--text-primary, #e2e8f0);line-height:1.5;" x-html="notif.data?.message || notif.data?.body || 'New notification'"></p>
                             <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
                                 <span style="font-size:12px;color:#475569;" x-text="timeAgo(notif.created_at)"></span>
                                 <span x-show="!notif.read_at" style="width:6px;height:6px;border-radius:50%;background:var(--brand);flex-shrink:0;"></span>
@@ -67,7 +67,7 @@
             {{-- Empty state --}}
             <div x-show="!loading && notifications.length === 0" style="text-align:center;padding:60px 20px;">
                 <div style="font-size:48px;margin-bottom:16px;">🔕</div>
-                <h3 style="font-size:18px;font-weight:700;color:#e2e8f0;margin-bottom:8px;">You're all caught up!</h3>
+                <h3 style="font-size:18px;font-weight:700;color:var(--text-primary, #e2e8f0);margin-bottom:8px;">You're all caught up!</h3>
                 <p style="font-size:14px;color:#64748b;">No notifications right now. Go interact with some quotes!</p>
                 <a href="{{ route('feed') }}" class="btn-brand" style="display:inline-flex;margin-top:20px;font-size:14px;">Browse Feed</a>
             </div>

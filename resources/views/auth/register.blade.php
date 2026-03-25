@@ -3,20 +3,20 @@
 @section('title', 'Register - QuotesHub')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
+<div class="flex items-center justify-center min-h-[80vh] py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 p-10 rounded-3xl" style="background: var(--bg-card); border: 1px solid var(--border-subtle); box-shadow: 0 12px 40px rgba(0,0,0,0.2);">
         <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-                Create your account
+            <h2 class="mt-2 text-center text-3xl font-extrabold" style="color: var(--text-primary, #e2e8f0);">
+                Create an account
             </h2>
-            <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+            <p class="mt-2 text-center text-sm" style="color: #64748b;">
                 Join QuotesHub and start sharing wisdom
             </p>
         </div>
 
         @if ($errors->any())
-            <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
-                <ul class="list-disc list-inside text-sm text-red-800 dark:text-red-200">
+            <div class="rounded-xl p-4" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);">
+                <ul class="list-disc list-inside text-sm font-medium text-red-400">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -26,54 +26,70 @@
 
         <form class="mt-8 space-y-6" action="{{ route('register.store') }}" method="POST">
             @csrf
-            <div class="rounded-md shadow-sm space-y-4">
+            <div class="space-y-4">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
+                    <label for="name" class="block text-sm font-medium" style="color: #94a3b8; margin-bottom: 4px;">Full Name</label>
                     <input id="name" name="name" type="text" required 
-                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                           class="appearance-none block w-full px-4 py-3 rounded-xl focus:outline-none sm:text-sm transition-colors" 
+                           style="background: var(--bg-input); border: 1px solid var(--border-muted); color: var(--text-primary, #e2e8f0);"
+                           onfocus="this.style.borderColor='var(--brand)'; this.style.boxShadow='0 0 0 2px var(--brand-subtle)'"
+                           onblur="this.style.borderColor='var(--border-muted)'; this.style.boxShadow='none'"
                            placeholder="John Doe" value="{{ old('name') }}">
                 </div>
 
                 <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+                    <label for="username" class="block text-sm font-medium" style="color: #94a3b8; margin-bottom: 4px;">Username</label>
                     <input id="username" name="username" type="text" required 
-                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                           class="appearance-none block w-full px-4 py-3 rounded-xl focus:outline-none sm:text-sm transition-colors" 
+                           style="background: var(--bg-input); border: 1px solid var(--border-muted); color: var(--text-primary, #e2e8f0);"
+                           onfocus="this.style.borderColor='var(--brand)'; this.style.boxShadow='0 0 0 2px var(--brand-subtle)'"
+                           onblur="this.style.borderColor='var(--border-muted)'; this.style.boxShadow='none'"
                            placeholder="johndoe" value="{{ old('username') }}">
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
+                    <label for="email" class="block text-sm font-medium" style="color: #94a3b8; margin-bottom: 4px;">Email address</label>
                     <input id="email" name="email" type="email" autocomplete="email" required 
-                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                           class="appearance-none block w-full px-4 py-3 rounded-xl focus:outline-none sm:text-sm transition-colors" 
+                           style="background: var(--bg-input); border: 1px solid var(--border-muted); color: var(--text-primary, #e2e8f0);"
+                           onfocus="this.style.borderColor='var(--brand)'; this.style.boxShadow='0 0 0 2px var(--brand-subtle)'"
+                           onblur="this.style.borderColor='var(--border-muted)'; this.style.boxShadow='none'"
                            placeholder="john@example.com" value="{{ old('email') }}">
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                    <label for="password" class="block text-sm font-medium" style="color: #94a3b8; margin-bottom: 4px;">Password</label>
                     <input id="password" name="password" type="password" autocomplete="new-password" required 
-                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                           class="appearance-none block w-full px-4 py-3 rounded-xl focus:outline-none sm:text-sm transition-colors" 
+                           style="background: var(--bg-input); border: 1px solid var(--border-muted); color: var(--text-primary, #e2e8f0);"
+                           onfocus="this.style.borderColor='var(--brand)'; this.style.boxShadow='0 0 0 2px var(--brand-subtle)'"
+                           onblur="this.style.borderColor='var(--border-muted)'; this.style.boxShadow='none'"
                            placeholder="••••••••">
                 </div>
 
                 <div>
-                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
+                    <label for="password_confirmation" class="block text-sm font-medium" style="color: #94a3b8; margin-bottom: 4px;">Confirm Password</label>
                     <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required 
-                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm" 
+                           class="appearance-none block w-full px-4 py-3 rounded-xl focus:outline-none sm:text-sm transition-colors" 
+                           style="background: var(--bg-input); border: 1px solid var(--border-muted); color: var(--text-primary, #e2e8f0);"
+                           onfocus="this.style.borderColor='var(--brand)'; this.style.boxShadow='0 0 0 2px var(--brand-subtle)'"
+                           onblur="this.style.borderColor='var(--border-muted)'; this.style.boxShadow='none'"
                            placeholder="••••••••">
                 </div>
             </div>
 
             <div>
                 <button type="submit" 
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        class="w-full flex justify-center py-3 px-4 rounded-xl shadow-lg text-sm font-bold text-white transition-transform active:scale-95"
+                        style="background: var(--brand); box-shadow: 0 4px 14px var(--brand-glow);">
                     Create Account
                 </button>
             </div>
 
-            <div class="text-center">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
+            <div class="text-center mt-4">
+                <p class="text-sm font-medium" style="color: #64748b;">
                     Already have an account?
-                    <a href="{{ route('login') }}" class="font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400">
+                    <a href="{{ route('login') }}" class="font-bold hover:underline ml-1" style="color: var(--brand);">
                         Sign in
                     </a>
                 </p>

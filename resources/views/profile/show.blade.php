@@ -40,7 +40,7 @@
             <div style="padding:52px 20px 20px;">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                     <div>
-                        <h1 style="font-size:22px;font-weight:800;color:#f1f5f9;letter-spacing:-0.3px;margin-bottom:2px;">{{ $profile->name }}</h1>
+                        <h1 style="font-size:22px;font-weight:800;color:var(--text-primary, #f1f5f9);letter-spacing:-0.3px;margin-bottom:2px;">{{ $profile->name }}</h1>
                         <div style="font-size:14px;color:#64748b;margin-bottom:8px;">{{ '@' . $profile->username }}</div>
                         @if($profile->bio)
                             <p style="font-size:14px;color:#94a3b8;line-height:1.6;max-width:520px;">{{ $profile->bio }}</p>
@@ -85,12 +85,12 @@
                     ] as $stat)
                         @if(isset($stat[2]))
                             <a href="{{ route($stat[2], $stat[3]) }}" style="text-decoration:none;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
-                                <div style="font-size:18px;font-weight:800;color:#f1f5f9;">{{ number_format($stat[1]) }}</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--text-primary, #f1f5f9);">{{ number_format($stat[1]) }}</div>
                                 <div style="font-size:12px;color:#64748b;">{{ $stat[0] }}</div>
                             </a>
                         @else
                             <div>
-                                <div style="font-size:18px;font-weight:800;color:#f1f5f9;">{{ number_format($stat[1]) }}</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--text-primary, #f1f5f9);">{{ number_format($stat[1]) }}</div>
                                 <div style="font-size:12px;color:#64748b;">{{ $stat[0] }}</div>
                             </div>
                         @endif

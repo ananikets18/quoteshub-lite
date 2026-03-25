@@ -50,7 +50,7 @@
                         minlength="10"
                         maxlength="500"
                         placeholder="Enter the quote text here..."
-                        style="width:100%;padding:14px 16px 14px 44px;background:var(--bg-input);border:1px solid var(--border-muted);border-radius:14px;font-family:'Playfair Display',serif;font-size:17px;color:#f1f5f9;line-height:1.65;resize:vertical;outline:none;transition:border-color 0.2s ease;"
+                        style="width:100%;padding:14px 16px 14px 44px;background:var(--bg-input);border:1px solid var(--border-muted);border-radius:14px;font-family:'Playfair Display',serif;font-size:17px;color:var(--text-primary, #f1f5f9);line-height:1.65;resize:vertical;outline:none;transition:border-color 0.2s ease;"
                         onfocus="this.style.borderColor='var(--brand)'"
                         onblur="this.style.borderColor='var(--border-muted)'"
                     >{{ old('content') }}</textarea>
@@ -65,7 +65,7 @@
             <div class="panel-card anim-fade-up" style="margin-bottom:16px;padding:24px;">
                 <div style="font-size:13px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;">Attribution</div>
 
-                @php $inputStyle = "width:100%;padding:12px 16px;background:var(--bg-input);border:1px solid var(--border-muted);border-radius:12px;font-size:15px;color:#e2e8f0;outline:none;transition:border-color 0.2s ease;"; @endphp
+                @php $inputStyle = "width:100%;padding:12px 16px;background:var(--bg-input);border:1px solid var(--border-muted);border-radius:12px;font-size:15px;color:var(--text-primary, #e2e8f0);outline:none;transition:border-color 0.2s ease;"; @endphp
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                     <div>
