@@ -81,10 +81,28 @@ export const searchBar = () => ({
         this.query = '';
         this.results = [];
     },
+
+    escapeHTML(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag));
+    },
     
     highlightMatch(text, query) {
-        if (!query) return text;
-        const regex = new RegExp(`(${query})`, 'gi');
-        return text.replace(regex, '<mark class="bg-yellow-200">$1</mark>');
+        if (!text) return '';
+        const escapedText = this.escapeHTML(text);
+        if (!query) return escapedText;
+        
+        // Escape query to safely put in Regex and match against escapedText
+        // Also escape regex special chars in the query just in case
+        const escapedQuery = this.escapeHTML(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escapedQuery})`, 'gi');
+        
+        return escapedText.replace(regex, '<mark style="background:var(--brand-muted);color:inherit;border-radius:2px;padding:0 2px;">$1</mark>');
     }
 });
