@@ -50,7 +50,7 @@ Route::post('/api/feed/not-interested', [App\Http\Controllers\Api\FeedPreference
 // Public comment listing (guests can read comments)
 Route::get('/api/quotes/{quote}/comments', [App\Http\Controllers\Api\CommentController::class, 'index'])->name('api.comments.index');
 
-Route::get('/', [\App\Http\Controllers\LandingController::class, 'index'])->name('home');
+Route::get('/', [App\Http\Controllers\FeedController::class, 'index'])->name('home');
 Route::get('/feed', [App\Http\Controllers\FeedController::class, 'index'])->name('feed');
 
 // Author pages

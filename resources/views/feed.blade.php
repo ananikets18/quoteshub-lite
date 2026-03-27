@@ -211,4 +211,23 @@
         <div style="font-size:11px;color:#334155;padding:0 4px;">© {{ date('Y') }} QuotesHub</div>
     </aside>
 </div>
+
+@guest
+    <div class="fixed bottom-0 left-0 right-0 z-50 px-4 py-4 md:px-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xl"
+         style="background: var(--bg-elevated); border-color: var(--border-subtle); backdrop-filter: blur(12px);">
+        <div class="text-center md:text-left">
+            <h3 class="text-base font-bold mb-1" style="color: var(--text-main);">Stay Inspired Daily ✨</h3>
+            <p class="text-sm m-0" style="color: var(--text-subtle);">Join QuotesHub to save your favorite quotes, create collections, and follow amazing authors.</p>
+        </div>
+        <div class="flex items-center gap-3 w-full md:w-auto flex-shrink-0">
+            <a href="{{ route('login') }}" class="btn-ghost flex-1 md:flex-none text-center" style="padding: 10px 24px;">Log In</a>
+            <a href="{{ route('register') }}" class="btn-brand flex-1 md:flex-none text-center" style="padding: 10px 24px;">Sign Up</a>
+        </div>
+    </div>
+    <style>
+        /* Add bottom padding to body so the banner doesn't cover content */
+        body { padding-bottom: 80px; }
+        @media (max-width: 768px) { body { padding-bottom: 140px; } }
+    </style>
+@endguest
 @endsection

@@ -92,7 +92,11 @@ class FeedController extends Controller
                 ->limit(5)
                 ->get()
                 ->map(fn($u) => tap($u, fn($u) => $u->is_following = false))
-            : collect();
+            : \App\Models\User::withCount('quotes')
+                ->orderByDesc('quotes_count')
+                ->limit(5)
+                ->get()
+                ->map(fn($u) => tap($u, fn($u) => $u->is_following = false));
 
         return view('feed', compact('quotes', 'categories', 'suggestedUsers'));
     }
