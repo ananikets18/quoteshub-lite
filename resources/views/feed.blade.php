@@ -117,7 +117,7 @@
                 </template>
 
                 {{-- All-done message --}}
-                <template x-if="!hasMore && !loading && (items.length > 0 || {{ $quotes->count() }} > 0)">
+                <template x-if="!hasMore && !loading && {{ $quotes->count() }} > 0">
                     <div style="text-align:center;padding:32px 16px;color:#475569;font-size:13px;">
                         ✨ You've seen all the quotes for now. Check back soon!
                     </div>
