@@ -30,7 +30,7 @@
             </div>
         @endif
 
-        <form class="mt-8 space-y-6" action="{{ route('login.store') }}" method="POST">
+        <form id="login-form" class="mt-8 space-y-6" action="{{ route('login.store') }}" method="POST">
             @csrf
             <div class="space-y-4">
                 <div>
@@ -72,10 +72,10 @@
             </div>
 
             <div>
-                <button type="submit" 
-                        class="w-full flex justify-center py-3 px-4 rounded-xl shadow-lg text-sm font-bold text-white transition-transform active:scale-95"
-                        style="background: var(--brand); box-shadow: 0 4px 14px var(--brand-glow);">
-                    Sign in
+                <button id="login-submit-btn" type="submit"
+                        class="btn-brand w-full flex justify-center py-3 px-4 rounded-xl text-sm font-bold transition-transform active:scale-95"
+                        style="box-shadow: 0 4px 14px var(--brand-glow);">
+                    <span id="login-submit-text">Sign in</span>
                 </button>
             </div>
 
@@ -91,3 +91,35 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        const form = document.getElementById('login-form');
+        const submitBtn = document.getElementById('login-submit-btn');
+        const submitText = document.getElementById('login-submit-text');
+
+        if (!form || !submitBtn || !submitText) {
+            return;
+        }
+
+        form.addEventListener('submit', function () {
+            const controls = form.querySelectorAll('input, button, a');
+            controls.forEach(function (el) {
+                if (el.tagName === 'A') {
+                    el.style.pointerEvents = 'none';
+                    el.style.opacity = '0.6';
+                    return;
+                }
+
+                el.disabled = true;
+            });
+
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.7';
+            submitBtn.style.cursor = 'not-allowed';
+            submitText.textContent = 'Logging in...';
+        });
+    })();
+</script>
+@endpush
