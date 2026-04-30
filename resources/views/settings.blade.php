@@ -20,13 +20,39 @@
 
         {{-- Tab navigation --}}
         <div style="display:flex;gap:6px;margin-bottom:24px;background:var(--bg-elevated);padding:6px;border-radius:16px;border:1px solid var(--border-subtle);">
-            @foreach(['profile' => '👤 Profile', 'privacy' => '🔒 Privacy', 'notifications' => '🔔 Notifications', 'account' => '🗑️ Account'] as $tab => $label)
+            @foreach(['profile' => '👤 Profile', 'appearance' => '🎨 Appearance', 'privacy' => '🔒 Privacy', 'notifications' => '🔔 Notifications', 'account' => '🗑️ Account'] as $tab => $label)
                 <button @click="activeTab = '{{ $tab }}'"
                         :style="activeTab === '{{ $tab }}' ? 'background:var(--brand);color:#fff;box-shadow:0 4px 16px var(--brand-glow);' : 'color:#64748b;'"
                         style="flex:1;padding:9px 8px;border-radius:11px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all 0.2s ease;white-space:nowrap;">
                     {{ $label }}
                 </button>
             @endforeach
+        </div>
+
+        {{-- APPEARANCE TAB --}}
+        <div x-show="activeTab === 'appearance'" x-transition>
+            <div class="panel-card anim-fade-up" style="padding:24px;margin-bottom:16px;">
+                <div style="font-size:13px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:20px;">Theme</div>
+                
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;">
+                    <div>
+                        <div style="font-size:14px;font-weight:600;color:#e2e8f0;">Dark/Light Mode</div>
+                        <div style="font-size:12px;color:#64748b;margin-top:2px;">Choose your preferred theme</div>
+                    </div>
+                    <button onclick="window.toggleTheme()" class="btn-ghost" style="font-size:13px;padding:8px 14px;">
+                        <span class="dark:block hidden">☀️ Light Mode</span>
+                        <span class="dark:hidden block">🌙 Dark Mode</span>
+                    </button>
+                </div>
+
+                <div style="border-top:1px solid var(--border-subtle);padding-top:16px;margin-top:16px;">
+                    <div style="font-size:13px;color:#64748b;line-height:1.6;">
+                        <strong style="color:#e2e8f0;">Current Theme:</strong> 
+                        <span class="dark:block hidden">Dark Mode 🌙</span>
+                        <span class="dark:hidden block">Light Mode ☀️</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         {{-- PROFILE TAB --}}
