@@ -9,8 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Services\UserStreakService;
 
 class User extends Authenticatable
 {
@@ -55,8 +54,8 @@ class User extends Authenticatable
         'following_count',
         
         // Activity tracking
-        'daily_streak',      // TODO: Consider moving to user_stats table
-        'last_active_at',    // Changed from last_active_date for precision
+        'daily_streak',
+        'last_active_at',
         
         // Status flags
         'is_active',
@@ -87,7 +86,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'last_active_at' => 'datetime',  // Changed from date to datetime
+            'last_active_at' => 'datetime',
             'is_active' => 'boolean',
             
             // Onboarding
@@ -272,50 +271,9 @@ class User extends Authenticatable
         return in_array($this->role, ['moderator', 'admin']);
     }
 
-    /**
-     * Update daily streak
-     * 
-     * TODO: Consider moving streak logic to a separate service
-     * or computing from activity logs instead of storing in users table
-     */
     public function updateDailyStreak(): void
     {
-        $today = now()->toDateString();
-        $lastActive = $this->last_active_at?->toDateString();
-
-        // Already updated today, skip
-        if ($lastActive === $today) {
-            return;
-        }
-
-        $yesterday = now()->subDay()->toDateString();
-
-        DB::transaction(function () use ($today, $lastActive, $yesterday) {
-            // Lock the row to prevent race conditions
-            $user = User::where('id', $this->id)->lockForUpdate()->first();
-
-            // Double-check after acquiring lock
-            if ($user->last_active_at?->toDateString() === $today) {
-                return;
-            }
-
-            if ($lastActive === $yesterday) {
-                // Continue streak
-                $user->increment('daily_streak');
-            } else {
-                // Reset streak
-                $user->daily_streak = 1;
-            }
-
-            $user->last_active_at = now();
-            $user->save();
-
-            // Refresh current instance
-            $this->refresh();
-
-            // Check streak achievements asynchronously
-            \App\Jobs\CheckUserAchievements::dispatch($this->id, 'streak_updated', $this->daily_streak)->afterCommit();
-        });
+        app(UserStreakService::class)->update($this);
     }
 
     /**
