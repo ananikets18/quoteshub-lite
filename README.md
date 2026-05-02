@@ -12,3 +12,8 @@ A platform to discover and share inspiring quotes. Join a community of thinkers 
 
 
 More to come....
+
+## Deployment
+
+For DigitalOcean production deployment, use `.env.production.example` as the starting point for your server `.env` file and follow `docs/DEPLOYMENT_CHECKLIST.md`.
+For repeat deployments, use `deploy-production.sh` on the server.

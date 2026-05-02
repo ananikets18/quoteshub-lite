@@ -13,6 +13,8 @@
 - [ ] Set `SESSION_SECURE_COOKIE=true` (requires HTTPS)
 - [ ] Configure mail settings (SMTP)
 
+Production template is available in the repo as `.env.production.example`.
+
 ### 2. Security Hardening
 - [ ] Ensure HTTPS is enabled (SSL certificate installed)
 - [ ] Set proper file permissions:
