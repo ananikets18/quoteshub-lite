@@ -60,6 +60,8 @@ Production template is available in the repo as `.env.production.example`.
 
 ### 7. Web Server Configuration
 
+If you use Laravel Reverb, expose it through Nginx on your public domain and keep the app-facing websocket host separate from the internal listener host.
+
 #### Nginx Configuration Example:
 ```nginx
 server {
