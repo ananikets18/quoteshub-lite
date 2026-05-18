@@ -66,7 +66,7 @@
              @click.self="closeCreateModal()">
             <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="closeCreateModal()"></div>
 
-            <div class="panel-card anim-fade-up" style="position:relative;z-index:1;width:100%;max-width:440px;padding:28px;" @click.stop>
+            <div class="panel-card anim-fade-up" style="position:relative;z-index:1;width:100%;max-width:440px;padding:28px;" @click.stop @click.outside="closeCreateModal()">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
                     <h3 style="font-size:18px;font-weight:700;color:#f1f5f9;">New Collection</h3>
                     <button type="button" @click="closeCreateModal()" style="color:#64748b;background:none;border:none;cursor:pointer;padding:4px;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='#64748b'">

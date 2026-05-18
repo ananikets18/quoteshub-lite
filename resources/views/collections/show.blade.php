@@ -93,7 +93,7 @@
                   @keydown.escape.window="closeEdit()"
                   @click.self="closeEdit()">
                  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="closeEdit()"></div>
-                 <div class="panel-card" style="position:relative;z-index:1;width:100%;max-width:440px;padding:28px;" @click.stop>
+                 <div class="panel-card" style="position:relative;z-index:1;width:100%;max-width:440px;padding:28px;" @click.stop @click.outside="closeEdit()">
                     <h3 style="font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:20px;">Edit Collection</h3>
                     <form method="POST" action="{{ route('collections.update', $collection->slug) }}">
                         @csrf @method('PATCH')
