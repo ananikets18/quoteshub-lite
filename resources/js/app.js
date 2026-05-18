@@ -10,6 +10,7 @@ import { infiniteScroll } from './components/infiniteScroll.js';
 import { feedInfiniteScroll } from './components/feedInfiniteScroll.js';
 import { collectionPicker } from './components/collectionPicker.js';
 import { searchBar } from './components/searchBar.js';
+import { initQuoteViewTracker } from './components/viewTracker.js';
 
 // Register Alpine components
 Alpine.data('quoteCard', quoteCard);
@@ -56,6 +57,12 @@ Alpine.data('modal', (initialOpen = false) => ({
 // Initialize Alpine.js
 window.Alpine = Alpine;
 Alpine.start();
+
+// Initial scan for server-rendered quote cards.
+initQuoteViewTracker();
+
+// Allow dynamic renderers (infinite scroll) to register new cards.
+window.initQuoteViewTracker = initQuoteViewTracker;
 
 // Theme toggle functionality
 window.toggleTheme = function () {

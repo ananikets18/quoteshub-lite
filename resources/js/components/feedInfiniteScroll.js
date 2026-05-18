@@ -72,6 +72,7 @@ export const feedInfiniteScroll = (baseUrl, params = {}) => ({
                     }
                 });
                 container.appendChild(wrapper);
+                window.initQuoteViewTracker?.(wrapper);
             }
 
             this.hasMore = data.hasMore;

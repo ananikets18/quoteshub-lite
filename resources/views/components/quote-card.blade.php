@@ -14,6 +14,8 @@
         x-transition:leave-end="opacity-0 -translate-y-2"
     @endif
     class="quote-card-new anim-fade-up"
+    data-quote-id="{{ $quote->id }}"
+    data-view-source="{{ $size === 'large' ? 'quote_show' : 'feed' }}"
     aria-label="Quote by {{ $quote->author }}"
 >
     <div class="quote-card-body">
@@ -92,7 +94,7 @@
 
                 {{-- Add to Collection --}}
                 <div class="relative" x-data="collectionPicker({{ $quote->id }})">
-                    <button @click="toggle()" class="action-btn" title="Add to collection"
+                    <button @click.stop="toggle()" class="action-btn" title="Add to collection"
                             :class="inAny ? 'saved' : ''">
                         <svg style="width:17px;height:17px;" :class="inAny ? 'fill-current' : 'fill-none stroke-current'" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
@@ -100,7 +102,7 @@
                     </button>
 
                     {{-- Dropdown --}}
-                    <div x-show="open" @click.away="open=false" x-transition
+                    <div x-show="open" @click.outside="open=false" @keydown.escape.window="open=false" x-transition
                          style="position:absolute;bottom:calc(100% + 8px);left:0;z-index:50;min-width:200px;
                                 background:var(--bg-elevated);border:1px solid var(--border-muted);
                                 border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.45);overflow:hidden;">
@@ -112,7 +114,7 @@
                             Loading…
                         </div>
                         <template x-for="col in collections" :key="col.id">
-                            <button @click="toggleCollection(col)"
+                            <button @click.stop="toggleCollection(col)"
                                     class="collection-picker-item"
                                     :class="isInCollection(col.id) ? 'in-collection' : ''">
                                 <svg x-show="isInCollection(col.id)" style="width:13px;height:13px;flex-shrink:0;" fill="currentColor" viewBox="0 0 20 20">
@@ -161,7 +163,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                 </svg>
-                <span class="text-xs" style="color:#475569;">{{ $quote->views_count }}</span>
+                <span class="text-xs" style="color:#475569;" data-view-count-for="{{ $quote->id }}">{{ $quote->views_count }}</span>
             </span>
 
             {{-- Not Interested (auth, non-show pages only) --}}
