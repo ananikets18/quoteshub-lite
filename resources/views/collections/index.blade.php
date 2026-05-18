@@ -60,7 +60,7 @@
         @endif
 
         {{-- Create Collection Modal --}}
-        <div x-show="showModal" x-cloak x-transition.opacity
+        <div x-show="showModal" x-cloak x-transition.opacity.duration.100ms
              style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;"
              @keydown.escape.window="closeCreateModal()"
              @click.self="closeCreateModal()">
