@@ -38,7 +38,7 @@
                 {{-- Owner actions --}}
                 @if($isOwner)
                     <div style="display:flex;gap:8px;">
-                        <button @click="showEdit = true" class="btn-ghost" style="font-size:13px;padding:8px 14px;">
+                        <button @click="openEdit()" class="btn-ghost" style="font-size:13px;padding:8px 14px;">
                             <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             Edit
                         </button>
@@ -88,11 +88,12 @@
 
         {{-- Edit Modal --}}
         @if($isOwner)
-            <div x-show="showEdit" x-transition
+              <div x-show="showEdit" x-cloak x-transition.opacity
                  style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;"
-                 @click.self="showEdit=false">
-                <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="showEdit=false"></div>
-                <div class="panel-card" style="position:relative;z-index:1;width:100%;max-width:440px;padding:28px;">
+                  @keydown.escape.window="closeEdit()"
+                  @click.self="closeEdit()">
+                 <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="closeEdit()"></div>
+                 <div class="panel-card" style="position:relative;z-index:1;width:100%;max-width:440px;padding:28px;" @click.stop>
                     <h3 style="font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:20px;">Edit Collection</h3>
                     <form method="POST" action="{{ route('collections.update', $collection->slug) }}">
                         @csrf @method('PATCH')
@@ -110,7 +111,7 @@
                             <label for="edit_is_public" style="font-size:14px;color:#94a3b8;cursor:pointer;">Public collection</label>
                         </div>
                         <div style="display:flex;gap:10px;justify-content:flex-end;">
-                            <button type="button" @click="showEdit=false" class="btn-ghost">Cancel</button>
+                            <button type="button" @click="closeEdit()" class="btn-ghost">Cancel</button>
                             <button type="submit" class="btn-brand">Save Changes</button>
                         </div>
                     </form>
@@ -124,7 +125,15 @@
 @push('scripts')
 <script>
 function collectionShow() {
-    return { showEdit: false };
+    return {
+        showEdit: false,
+        openEdit() {
+            this.showEdit = true;
+        },
+        closeEdit() {
+            this.showEdit = false;
+        }
+    };
 }
 </script>
 @endpush

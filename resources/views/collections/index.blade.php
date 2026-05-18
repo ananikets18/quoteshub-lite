@@ -13,7 +13,7 @@
                 <h1 class="page-title">📚 My Collections</h1>
                 <p class="page-subtitle">{{ $collections->count() }} collection{{ $collections->count() !== 1 ? 's' : '' }}</p>
             </div>
-            <button @click="showModal = true" class="btn-brand">
+            <button @click="openCreateModal()" class="btn-brand">
                 <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                 New Collection
             </button>
@@ -60,15 +60,16 @@
         @endif
 
         {{-- Create Collection Modal --}}
-        <div x-show="showModal" x-transition
+        <div x-show="showModal" x-cloak x-transition.opacity
              style="position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;"
-             @click.self="showModal = false">
-            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="showModal = false"></div>
+             @keydown.escape.window="closeCreateModal()"
+             @click.self="closeCreateModal()">
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" @click="closeCreateModal()"></div>
 
-            <div class="panel-card anim-fade-up" style="position:relative;z-index:1;width:100%;max-width:440px;padding:28px;">
+            <div class="panel-card anim-fade-up" style="position:relative;z-index:1;width:100%;max-width:440px;padding:28px;" @click.stop>
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
                     <h3 style="font-size:18px;font-weight:700;color:#f1f5f9;">New Collection</h3>
-                    <button @click="showModal = false" style="color:#64748b;background:none;border:none;cursor:pointer;padding:4px;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='#64748b'">
+                    <button type="button" @click="closeCreateModal()" style="color:#64748b;background:none;border:none;cursor:pointer;padding:4px;" onmouseover="this.style.color='#e2e8f0'" onmouseout="this.style.color='#64748b'">
                         <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
@@ -105,7 +106,15 @@
 @push('scripts')
 <script>
 function collectionsPage() {
-    return { showModal: {{ $errors->any() ? 'true' : 'false' }} };
+    return {
+        showModal: {{ $errors->any() ? 'true' : 'false' }},
+        openCreateModal() {
+            this.showModal = true;
+        },
+        closeCreateModal() {
+            this.showModal = false;
+        }
+    };
 }
 </script>
 @endpush

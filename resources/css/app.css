@@ -8,6 +8,10 @@
    DESIGN TOKENS
    ========================================================= */
 @layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
     :root {
         /* App shell */
         --bg-base: #0a0a0f;
