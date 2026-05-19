@@ -124,6 +124,9 @@ class Quote extends Model
         $cacheKey = 'quote_views_' . $this->id;
         $buffered = \Illuminate\Support\Facades\Cache::increment($cacheKey);
 
+        // Keep the rendered count in sync with the buffered total for this request.
+        $this->views_count = (int) $this->views_count + 1;
+
         // Flush to DB every 10 views to reduce write pressure
         if ($buffered % 10 === 0) {
             $this->increment('views_count', 10);
