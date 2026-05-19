@@ -127,10 +127,12 @@ class QuoteController extends Controller
     /**
      * Display the specified quote.
      */
-    public function show(Quote $quote)
+    public function show(Quote $quote, Request $request)
     {
         $quote->load(['user', 'categories', 'tags']);
-        $quote->incrementViews();
+
+        $sessionId = auth()->check() ? null : ($request->session()->getId() ?: md5($request->ip() . $request->userAgent()));
+        $quote->recordUniqueView(auth()->user(), $sessionId, 'quote_show');
 
         // Add user interaction flags if authenticated
         if (auth()->check()) {

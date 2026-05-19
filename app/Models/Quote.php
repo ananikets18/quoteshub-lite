@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\QuoteView;
 
 class Quote extends Model
 {
@@ -132,6 +133,41 @@ class Quote extends Model
             $this->increment('views_count', 10);
             \Illuminate\Support\Facades\Cache::put($cacheKey, 0, now()->addHour());
         }
+    }
+
+    /**
+     * Record a view only if this user/session has not viewed the quote recently.
+     */
+    public function recordUniqueView(?User $user, ?string $sessionId, string $source = 'feed', int $durationSeconds = 0, int $windowMinutes = 60): bool
+    {
+        $identityColumn = $user ? 'user_id' : 'session_id';
+        $identityValue = $user ? $user->id : $sessionId;
+
+        if (!$identityValue) {
+            return false;
+        }
+
+        $recentViewExists = QuoteView::where('quote_id', $this->id)
+            ->where($identityColumn, $identityValue)
+            ->where('created_at', '>=', now()->subMinutes($windowMinutes))
+            ->exists();
+
+        if ($recentViewExists) {
+            return false;
+        }
+
+        QuoteView::create([
+            'user_id' => $user?->id,
+            'quote_id' => $this->id,
+            'session_id' => $user ? null : $sessionId,
+            'duration_seconds' => $durationSeconds,
+            'source' => $source,
+        ]);
+
+        $this->increment('views_count');
+        $this->views_count = (int) $this->views_count + 1;
+
+        return true;
     }
 
     /**

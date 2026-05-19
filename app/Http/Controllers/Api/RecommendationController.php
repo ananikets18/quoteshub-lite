@@ -135,26 +135,18 @@ class RecommendationController extends Controller
             'source' => 'nullable|string|max:50',
         ]);
 
-        $viewData = [
-            'quote_id' => $quote->id,
-            'duration_seconds' => $validated['duration'] ?? 0,
-            'source' => $validated['source'] ?? 'feed',
-        ];
+        $sessionId = Auth::check() ? null : md5($request->ip() . $request->userAgent());
+        $counted = $quote->recordUniqueView(
+            Auth::user(),
+            $sessionId,
+            $validated['source'] ?? 'feed',
+            $validated['duration'] ?? 0
+        );
 
-        if (Auth::check()) {
-            $viewData['user_id'] = Auth::id();
-            
-            // Track interaction for recommendations
+        if ($counted && Auth::check()) {
+            // Track interaction for recommendations only when this is a new view.
             $this->recommendationService->trackInteraction(Auth::user(), $quote, 'view');
-        } else {
-            // For API routes, generate a session ID from IP and user agent
-            $viewData['session_id'] = md5($request->ip() . $request->userAgent());
         }
-
-        QuoteView::create($viewData);
-
-        // Increment quote views count
-        $quote->increment('views_count');
 
         return response()->json([
             'message' => 'View tracked successfully',
