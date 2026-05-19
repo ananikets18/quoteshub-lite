@@ -63,6 +63,25 @@
             })();
         </script>
 
+        <!-- Fallback toggleTheme so inline onclick handlers work before app.js loads -->
+        <script>
+            if (typeof window.toggleTheme !== 'function') {
+                window.toggleTheme = function () {
+                    var root = document.documentElement;
+                    var current = localStorage.getItem('qh-theme') || 'dark';
+                    if (current === 'dark') {
+                        localStorage.setItem('qh-theme', 'light');
+                        root.classList.remove('dark');
+                        root.classList.add('light');
+                    } else {
+                        localStorage.setItem('qh-theme', 'dark');
+                        root.classList.remove('light');
+                        root.classList.add('dark');
+                    }
+                };
+            }
+        </script>
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         @stack('styles')
