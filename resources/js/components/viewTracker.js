@@ -11,6 +11,10 @@ function incrementViewBadge(quoteId) {
 }
 
 async function trackQuoteView(quoteId, source = 'feed') {
+    if (source !== 'feed') {
+        return;
+    }
+
     try {
         const response = await fetch(`/api/quotes/${quoteId}/view`, {
             method: 'POST',
@@ -40,7 +44,7 @@ function ensureObserver() {
 
                 const quoteId = entry.target.getAttribute('data-quote-id');
                 const source = entry.target.getAttribute('data-view-source') || 'feed';
-                if (!quoteId || trackedQuoteIds.has(quoteId)) return;
+                if (!quoteId || source !== 'feed' || trackedQuoteIds.has(quoteId)) return;
 
                 trackedQuoteIds.add(quoteId);
                 viewObserver.unobserve(entry.target);
