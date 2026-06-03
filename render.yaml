@@ -46,8 +46,8 @@ services:
     domains:
       - thequoteshub.info
       - www.thequoteshub.info
-    envVarGroups:
-      - quoteshub-env
+    envVars:
+      - fromGroup: quoteshub-env
 
   - type: cron
     name: quoteshub-queue-cron
@@ -56,5 +56,5 @@ services:
     schedule: "* * * * *"
     buildCommand: "composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader"
     startCommand: "php artisan queue:work --stop-when-empty --timeout=90 --tries=3"
-    envVarGroups:
-      - quoteshub-env
+    envVars:
+      - fromGroup: quoteshub-env
