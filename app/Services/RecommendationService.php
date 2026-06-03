@@ -194,10 +194,10 @@ class RecommendationService
             ->whereDoesntHave('followers', function ($q) use ($user) {
                 $q->where('follower_id', $user->id);
             })
-            ->withCount(['quotes' => function ($q) {
+            ->withCount(['quotes as approved_quotes_count' => function ($q) {
                 $q->approved();
             }])
-            ->orderByDesc('quotes_count')
+            ->orderByDesc('approved_quotes_count')
             ->take($limit)
             ->get();
 

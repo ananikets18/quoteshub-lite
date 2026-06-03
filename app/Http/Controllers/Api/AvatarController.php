@@ -37,23 +37,23 @@ class AvatarController extends Controller
 
         $user = Auth::user();
 
-        // Delete old avatar if exists
-        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+        // Delete old avatar if exists locally
+        if ($user->avatar && !str_starts_with($user->avatar, 'http') && Storage::disk('public')->exists($user->avatar)) {
             Storage::disk('public')->delete($user->avatar);
         }
 
-        // Store new avatar with secure filename
-        $path = $request->file('avatar')->store('avatars', 'public');
+        // Store new avatar on Cloudinary
+        $url = $request->file('avatar')->storeOnCloudinary('avatars')->getSecurePath();
 
         // Update user avatar path
         $user->update([
-            'avatar' => $path,
+            'avatar' => $url,
         ]);
 
         return response()->json([
             'message' => 'Avatar uploaded successfully',
-            'avatar_url' => Storage::url($path),
-            'avatar_path' => $path,
+            'avatar_url' => $url,
+            'avatar_path' => $url,
         ]);
     }
 
@@ -77,23 +77,23 @@ class AvatarController extends Controller
 
         $user = Auth::user();
 
-        // Delete old cover image if exists
-        if ($user->cover_image && Storage::disk('public')->exists($user->cover_image)) {
+        // Delete old cover image if exists locally
+        if ($user->cover_image && !str_starts_with($user->cover_image, 'http') && Storage::disk('public')->exists($user->cover_image)) {
             Storage::disk('public')->delete($user->cover_image);
         }
 
-        // Store new cover image
-        $path = $request->file('cover_image')->store('covers', 'public');
+        // Store new cover image on Cloudinary
+        $url = $request->file('cover_image')->storeOnCloudinary('covers')->getSecurePath();
 
         // Update user cover image path
         $user->update([
-            'cover_image' => $path,
+            'cover_image' => $url,
         ]);
 
         return response()->json([
             'message' => 'Cover image uploaded successfully',
-            'cover_url' => Storage::url($path),
-            'cover_path' => $path,
+            'cover_url' => $url,
+            'cover_path' => $url,
         ]);
     }
 
@@ -104,7 +104,7 @@ class AvatarController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+        if ($user->avatar && !str_starts_with($user->avatar, 'http') && Storage::disk('public')->exists($user->avatar)) {
             Storage::disk('public')->delete($user->avatar);
         }
 
@@ -124,7 +124,7 @@ class AvatarController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->cover_image && Storage::disk('public')->exists($user->cover_image)) {
+        if ($user->cover_image && !str_starts_with($user->cover_image, 'http') && Storage::disk('public')->exists($user->cover_image)) {
             Storage::disk('public')->delete($user->cover_image);
         }
 

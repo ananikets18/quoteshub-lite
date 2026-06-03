@@ -131,20 +131,20 @@ class ProfileController extends Controller
         
         // Handle avatar upload
         if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists
-            if ($user->avatar) {
+            // Delete old avatar if exists locally
+            if ($user->avatar && !str_starts_with($user->avatar, 'http') && Storage::disk('public')->exists($user->avatar)) {
                 Storage::disk('public')->delete($user->avatar);
             }
-            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = $request->file('avatar')->storeOnCloudinary('avatars')->getSecurePath();
         }
         
         // Handle cover image upload
         if ($request->hasFile('cover_image')) {
-            // Delete old cover if exists
-            if ($user->cover_image) {
+            // Delete old cover if exists locally
+            if ($user->cover_image && !str_starts_with($user->cover_image, 'http') && Storage::disk('public')->exists($user->cover_image)) {
                 Storage::disk('public')->delete($user->cover_image);
             }
-            $validated['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+            $validated['cover_image'] = $request->file('cover_image')->storeOnCloudinary('covers')->getSecurePath();
         }
         
         $user->fill($validated);

@@ -298,10 +298,10 @@ class UserController extends Controller
         $suggestedUsers = User::has('quotes')
             ->where('is_active', true)
             ->whereNotIn('id', $followingIds)
-            ->withCount(['quotes' => function ($q) {
+            ->withCount(['quotes as approved_quotes_count' => function ($q) {
                 $q->approved();
             }])
-            ->orderByDesc('quotes_count')
+            ->orderByDesc('approved_quotes_count')
             ->orderByDesc('followers_count')
             ->limit($request->get('limit', 10))
             ->get();
@@ -346,10 +346,10 @@ class UserController extends Controller
                   });
             })
             ->whereNotIn('id', $excludeIds)
-            ->withCount(['quotes' => function ($q) {
+            ->withCount(['quotes as approved_quotes_count' => function ($q) {
                 $q->approved();
             }])
-            ->orderByDesc('quotes_count')
+            ->orderByDesc('approved_quotes_count')
             ->limit($request->get('limit', 10))
             ->get();
 
