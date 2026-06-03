@@ -1,4 +1,4 @@
-envGroups:
+envVarGroups:
   - name: quoteshub-env
     envVars:
       - key: APP_ENV
@@ -43,10 +43,10 @@ services:
     plan: free
     buildCommand: "composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader && npm install && npm run build"
     preDeployCommand: "php artisan migrate --force"
-    customDomains:
+    domains:
       - thequoteshub.info
       - www.thequoteshub.info
-    envGroups:
+    envVarGroups:
       - quoteshub-env
 
   - type: cron
@@ -56,5 +56,5 @@ services:
     schedule: "* * * * *"
     buildCommand: "composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader"
     startCommand: "php artisan queue:work --stop-when-empty --timeout=90 --tries=3"
-    envGroups:
+    envVarGroups:
       - quoteshub-env
