@@ -12,7 +12,7 @@ envVarGroups:
       - key: SESSION_DRIVER
         value: database
       - key: APP_URL
-        sync: false
+        value: https://thequoteshub.info
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
