@@ -43,6 +43,9 @@ services:
     plan: free
     buildCommand: "composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader && npm install && npm run build"
     preDeployCommand: "php artisan migrate --force"
+    customDomains:
+      - thequoteshub.info
+      - www.thequoteshub.info
     envGroups:
       - quoteshub-env
 
