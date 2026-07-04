@@ -1,0 +1,67 @@
+name: Quoteshub CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: quoteshub
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+    
+    - name: Use Node.js
+      uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
+        
+    - name: Install dependencies (Backend)
+      run: npm ci
+      working-directory: ./Quoteshub-Lite
+      
+    - name: Install dependencies (Frontend)
+      run: npm ci
+      working-directory: ./Quoteshub-Frontend
+
+    - name: Run Type Check (Backend)
+      run: node ace typecheck
+      working-directory: ./Quoteshub-Lite
+      
+    - name: Run Tests (Backend)
+      run: node ace test
+      working-directory: ./Quoteshub-Lite
+      env:
+        DB_HOST: localhost
+        DB_USER: postgres
+        DB_PASSWORD: password
+        DB_DATABASE: quoteshub
+        UPSTASH_REDIS_REST_URL: 'http://localhost:6379'
+        UPSTASH_REDIS_REST_TOKEN: 'fake-token'
+
+    - name: Build (Frontend)
+      run: npm run build
+      working-directory: ./Quoteshub-Frontend

@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: quoteshub-backend-adonis
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && node ace build
+    startCommand: cd build && npm ci --omit=dev && node bin/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3333
+      - key: HOST
+        value: 0.0.0.0
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        value: postgres
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: CORS_ORIGIN
+        sync: false

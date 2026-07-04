@@ -1,0 +1,30 @@
+name: Bot Simulator Cron Job
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every day
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    # Allows manual triggering from the GitHub Actions UI
+
+jobs:
+  simulate-activity:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger Bot Simulator API
+        run: |
+          # Send a POST request to the Render API endpoint
+          # Use secrets.API_URL for the base URL (e.g. https://your-render-app.onrender.com)
+          # Use secrets.SIMULATOR_SECRET for the security token
+          
+          RESPONSE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.API_URL }}/api/internal/simulate" \
+            -H "x-simulator-secret: ${{ secrets.SIMULATOR_SECRET }}" \
+            -H "Content-Type: application/json")
+            
+          if [ "$RESPONSE_STATUS" -eq 200 ] || [ "$RESPONSE_STATUS" -eq 201 ]; then
+            echo "Bot simulation completed successfully! (Status: $RESPONSE_STATUS)"
+          else
+            echo "Failed to trigger bot simulation! (Status: $RESPONSE_STATUS)"
+            exit 1
+          fi
