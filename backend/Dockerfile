@@ -17,6 +17,7 @@ FROM base as build
 WORKDIR /app
 COPY --from=deps /app/node_modules /app/node_modules
 ADD . .
+ENV NODE_ENV=development
 RUN npm run build
 
 # Production stage
