@@ -4,6 +4,15 @@ import { controllers } from '#generated/controllers'
 
 router.get('/health', [() => import('#controllers/health_controller'), 'handle'])
 
+import db from '@adonisjs/lucid/services/db'
+
+router.get('/seed-magic', async () => {
+  const { default: MainSeeder } = await import('#database/seeders/main_seeder')
+  const seeder = new MainSeeder(db.connection())
+  await seeder.run()
+  return 'Seeded 50 quotes successfully!'
+})
+
 // Bot simulation moved inside /api/v1
 
 router
