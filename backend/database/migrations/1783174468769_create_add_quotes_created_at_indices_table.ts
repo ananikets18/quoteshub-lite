@@ -5,7 +5,7 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.index('created_at')
+      // table.index('created_at') // Removed because it is already created in the previous migration
     })
   }
 
