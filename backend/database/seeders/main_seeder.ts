@@ -11,13 +11,13 @@ export default class MainSeeder extends BaseSeeder {
     // 1. Create some random categories
     const categories = ['Inspirational', 'Life', 'Success', 'Wisdom', 'Love', 'Technology']
     const createdCategories = await Promise.all(
-      categories.map((name) => Category.create({ name, slug: name.toLowerCase(), color: faker.color.rgb() }))
+      categories.map((name) => Category.firstOrCreate({ slug: name.toLowerCase() }, { name, slug: name.toLowerCase(), color: faker.color.rgb() }))
     )
 
     // 2. Create some random tags
     const tags = ['mindset', 'growth', 'future', 'happiness', 'motivation', 'peace']
     const createdTags = await Promise.all(
-      tags.map((name) => Tag.create({ name, slug: name.toLowerCase() }))
+      tags.map((name) => Tag.firstOrCreate({ slug: name.toLowerCase() }, { name, slug: name.toLowerCase() }))
     )
 
     // 3. Create 12 Dummy Users
